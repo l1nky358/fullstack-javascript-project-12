@@ -2,7 +2,7 @@ install:
 	npm ci
 
 start:
-	npx nodemon test-server.js
+	node test-server.js
 
 start-frontend:
 	cd frontend && npm run dev
@@ -13,7 +13,7 @@ build:
 test:
 	npx playwright test
 
-test-local:
-	npx playwright test --headed
+test-debug:
+	npx playwright test --debug
 
-.PHONY: install start start-frontend build test test-local
+.PHONY: install start start-frontend build test test-debug
