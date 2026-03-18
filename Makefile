@@ -1,5 +1,5 @@
 install:
-	npm install
+	npm ci
 
 start:
 	npx nodemon test-server.js
@@ -8,7 +8,9 @@ start-frontend:
 	cd frontend && npm run dev
 
 build:
-	cd frontend && npm install && npm run build
+	cd frontend && npm ci && npm run build
 
 test:
 	npx playwright test
+
+.PHONY: install start start-frontend build test
