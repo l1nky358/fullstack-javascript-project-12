@@ -1,2 +1,30 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/l1nky358/fullstack-javascript-project-12/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/l1nky358/fullstack-javascript-project-12/actions)
+# Hexlet Chat
+
+Real-time chat application built with React, Redux, and Socket.io.
+
+## Features
+
+- User registration and authentication
+- Real-time messaging
+- Channel management (create, rename, delete)
+- Profanity filter
+- Responsive design
+
+## Tech Stack
+
+- React
+- Redux Toolkit
+- React Router
+- Socket.io
+- Bootstrap
+- Formik + Yup
+- i18next
+
+## Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   cd frontend
+   npm install
