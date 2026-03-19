@@ -8,7 +8,7 @@ start-frontend:
 	cd frontend && npm run dev
 
 build:
-	cd frontend && npm install && npm run build
+	cd frontend && npm install && ./node_modules/.bin/vite build
 
 test:
 	npx playwright test
