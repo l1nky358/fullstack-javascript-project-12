@@ -13,4 +13,7 @@ build:
 test:
 	npx playwright test
 
-.PHONY: install start start-frontend build test
+test-debug:
+	npx playwright test --debug
+
+.PHONY: install start start-frontend build test test-debug
