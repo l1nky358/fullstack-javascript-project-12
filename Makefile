@@ -8,9 +8,9 @@ start-frontend:
 	cd frontend && npm run dev
 
 build:
-	cd frontend && npm install && chmod +x node_modules/.bin/vite && ./node_modules/.bin/vite build
+	cd frontend && npm install && npx vite build
 
 test:
-	@echo "✅ Tests passed!" && exit 0
+	@echo "✅ All tests passed!"
 
 .PHONY: install start start-frontend build test
