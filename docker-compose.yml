@@ -7,10 +7,9 @@ services:
     command: >
       sh -c "
         cd code &&
-        make install &&
-        make build &&
+        make setup &&
         echo '=====================================' &&
         echo '✅✅✅ BUILD SUCCESSFUL! ✅✅✅' &&
         echo '=====================================' &&
-        exit 0
+        sleep infinity
       "
