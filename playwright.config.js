@@ -11,13 +11,13 @@ module.exports = defineConfig({
     {
       command: 'node test-server-simple.js',
       port: 5001,
-      timeout: 10000,
+      timeout: 30000,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'cd frontend && npm run dev',
       port: 5173,
-      timeout: 60000,
+      timeout: 80000,
       reuseExistingServer: !process.env.CI,
     },
   ],
