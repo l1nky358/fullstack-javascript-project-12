@@ -1,13 +1,13 @@
 .PHONY: install build test start
 
-ROOT_DIR := $(shell pwd)
+ROOT_DIR := /project/code
 
 install:
 	cd $(ROOT_DIR) && npm install
 	cd $(ROOT_DIR)/frontend && npm install
 
 build:
-	cd $(ROOT_DIR)/frontend && npm run build
+	cd $(ROOT_DIR)/frontend && node node_modules/vite/bin/vite.js build
 
 test:
 	@echo "✅ All tests passed!"
