@@ -2,12 +2,9 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "Hexlet Chat",
-  "engines": {
-    "node": ">=20.0.0"
-  },
   "scripts": {
     "start": "node test-server.js",
-    "test": "make test"
+    "test": "npx playwright test"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -15,7 +12,6 @@
     "socket.io": "^4.7.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "nodemon": "^3.0.1"
+    "@playwright/test": "^1.40.0"
   }
 }
