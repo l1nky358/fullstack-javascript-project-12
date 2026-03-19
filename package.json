@@ -2,8 +2,11 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "Hexlet Chat",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "start": "node test-server.js",
+    "start": "node test-server-simple.js",
     "test": "npx playwright test"
   },
   "dependencies": {

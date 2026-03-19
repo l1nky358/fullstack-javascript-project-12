@@ -2,7 +2,7 @@ install:
 	npm install
 
 start:
-	node test-server.js
+	node test-server-simple.js
 
 start-frontend:
 	cd frontend && npm run dev
@@ -13,7 +13,4 @@ build:
 test:
 	npx playwright test
 
-test-debug:
-	npx playwright test --debug
-
-.PHONY: install start start-frontend build test test-debug
+.PHONY: install start start-frontend build test
