@@ -11,5 +11,5 @@ services:
         echo '=====================================' &&
         echo '✅✅✅ BUILD SUCCESSFUL! ✅✅✅' &&
         echo '=====================================' &&
-        sleep infinity
+        tail -f /dev/null
       "

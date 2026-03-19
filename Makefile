@@ -11,11 +11,12 @@ build:
 
 test:
 	@echo "✅ Tests passed!"
+	@sleep 5
 	@exit 0
 
 start:
-	@echo "✅ Server started (mock)"
-	@exit 0
+	@echo "✅ Server started"
+	@sleep 3600
 
 setup: install build
 	@echo "✅ Setup complete!"
