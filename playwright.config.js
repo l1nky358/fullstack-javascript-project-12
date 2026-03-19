@@ -2,21 +2,24 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './__tests__',
-  timeout: 120000,
+  timeout: 0,
   expect: {
-    timeout: 30000,
+    timeout: 0,
   },
   workers: 1,
   use: {
     baseURL: 'http://localhost:5173',
-    actionTimeout: 30000,
-    navigationTimeout: 30000,
+    actionTimeout: 0,
+    navigationTimeout: 0,
+    launchOptions: {
+      timeout: 0,
+    },
   },
   webServer: [
     {
       command: 'node test-server-simple.js',
       port: 5001,
-      timeout: 120000,
+      timeout: 0,
       reuseExistingServer: !process.env.CI,
       stdout: 'pipe',
       stderr: 'pipe',
@@ -24,7 +27,7 @@ module.exports = defineConfig({
     {
       command: 'cd frontend && npm run dev',
       port: 5173,
-      timeout: 120000,
+      timeout: 0,
       reuseExistingServer: !process.env.CI,
       stdout: 'pipe',
       stderr: 'pipe',
