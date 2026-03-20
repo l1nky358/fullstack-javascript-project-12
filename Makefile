@@ -1,22 +1,24 @@
-.PHONY: install build test start setup
-
-ROOT_DIR := /project/code
+lint-frontend:
+	make -C frontend lint
 
 install:
-	cd $(ROOT_DIR) && npm install
-	cd $(ROOT_DIR)/frontend && npm install
+	npm ci
 
-build:
-	cd $(ROOT_DIR)/frontend && node node_modules/vite/bin/vite.js build
+start-frontend:
+	make -C frontend start
 
-test:
-	@echo "✅ Tests passed!"
-	@sleep 5
-	@exit 0
+start-backend:
+	npx start-server -s ./frontend/dist
+
+deploy:
+	git push heroku main
 
 start:
-	@echo "✅ Server started"
-	@sleep 3600
+	make start-backend
 
-setup: install build
-	@echo "✅ Setup complete!"
+develop:
+	make start-backend & make start-frontend
+
+build:
+	rm -rf frontend/dist
+	npm run build
