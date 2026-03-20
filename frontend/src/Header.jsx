@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 const Header = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { token, logout, username } = useAuth();
+  const { token, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -17,15 +17,9 @@ const Header = () => {
       <div className="container-fluid">
         <span className="navbar-brand mb-0 h1">{t('header.brand')}</span>
         {token && (
-          <div className="d-flex gap-2">
-            {/* Добавляем кнопку "general", которую ищет тест */}
-            <button className="btn btn-outline-secondary">
-              general
-            </button>
-            <button className="btn btn-outline-primary" onClick={handleLogout}>
-              {t('header.logout')}
-            </button>
-          </div>
+          <button className="btn btn-outline-primary" onClick={handleLogout}>
+            {t('header.logout')}
+          </button>
         )}
       </div>
     </nav>
