@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChannelMenu from './ChannelMenu';
 import AddChannelModal from './modals/AddChannelModal';
@@ -11,43 +11,47 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
   const [renameChannel, setRenameChannel] = useState(null);
   const [removeChannel, setRemoveChannel] = useState(null);
 
+  console.log('📋 ChannelsList rendered with channels:', channels);
+
+  useEffect(() => {
+    console.log('channels changed:', channels);
+  }, [channels]);
+
   return (
-    <div className="channels-list">
-      <div className="channels-header">
-        <span className="channels-title">{t('chat.channels')}</span>
+    <div className="channels-list d-flex flex-column h-100">
+      <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 className="mb-0">{t('chat.channels')}</h6>
         <button 
-          className="add-channel-btn"
+          className="btn btn-sm btn-outline-primary"
           onClick={() => setShowAddModal(true)}
-          title={t('channels.modals.add.title')}
           aria-label={t('channels.modals.add.title')}
         >
-          +
+          {t('chat.addChannel')}
         </button>
       </div>
       
-      <div className="channels-container">
+      <ul className="list-unstyled p-2 mb-0 flex-grow-1 overflow-auto">
         {channels.map((channel) => (
-          <div 
-            key={channel.id} 
-            className={`channel-item ${channel.id === currentChannelId ? 'active' : ''}`}
-          >
-            <button
-              className="channel-button"
-              onClick={() => onChannelSelect(channel.id)}
-              aria-label={channel.name}
-              title={channel.name}
-            >
-              <span className="channel-prefix">#</span>
-              <span className="channel-name">{channel.name}</span>
-            </button>
-            <ChannelMenu
-              channel={channel}
-              onRename={() => setRenameChannel(channel)}
-              onRemove={() => setRemoveChannel(channel)}
-            />
-          </div>
+          <li key={channel.id} className="mb-1">
+            <div className={`d-flex justify-content-between align-items-center p-1 rounded ${channel.id === currentChannelId ? 'bg-primary text-white' : ''}`}>
+              <button
+                className="btn btn-link text-decoration-none flex-grow-1 text-start"
+                onClick={() => onChannelSelect(channel.id)}
+                style={{ color: channel.id === currentChannelId ? 'white' : 'inherit' }}
+                aria-label={channel.name}
+              >
+                # {channel.name}
+              </button>
+              
+              <ChannelMenu
+                channel={channel}
+                onRename={() => setRenameChannel(channel)}
+                onRemove={() => setRemoveChannel(channel)}
+              />
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {showAddModal && <AddChannelModal onClose={() => setShowAddModal(false)} />}
       {renameChannel && <RenameChannelModal channel={renameChannel} onClose={() => setRenameChannel(null)} />}
