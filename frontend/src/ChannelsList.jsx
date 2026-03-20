@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTranslation } 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import ChannelMenu from './ChannelMenu';
 import AddChannelModal from './modals/AddChannelModal';
 import RenameChannelModal from './modals/RenameChannelModal';
