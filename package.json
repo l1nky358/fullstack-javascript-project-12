@@ -1,18 +1,17 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "Hexlet Chat",
-  "engines": {
-    "node": ">=20.0.0"
-  },
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node test-server-simple.js",
-    "test": "echo \"✅ Tests passed\" && exit 0"
+    "build": "npm run build --prefix frontend",
+    "start": "start-server -s ./frontend/dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd frontend && npm ci"
   },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "socket.io": "^4.7.4"
-  },
-  "devDependencies": {}
+    "@hexlet/chat-server": "^1.1.6"
+  }
 }
