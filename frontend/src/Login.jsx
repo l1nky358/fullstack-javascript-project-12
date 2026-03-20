@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import api from './api';
-import { showError, showSuccess } from './Toast';
 import { useAuth } from './AuthContext';
+import { showError, showSuccess } from './Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -26,10 +26,7 @@ const Login = () => {
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const response = await api.post('/login', {
-          username: values.username,
-          password: values.password,
-        });
+        const response = await api.post('/login', values);
         login(response.data.token, values.username);
         showSuccess(t('toast.loginSuccess'));
         navigate('/');
@@ -48,69 +45,82 @@ const Login = () => {
   });
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <h2 className="text-center mb-4">{t('login.title')}</h2>
-              
-              {authError && (
-                <div className="alert alert-danger">{authError}</div>
-              )}
-              
-              <form onSubmit={formik.handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">
-                    {t('login.username')}
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${formik.touched.username && formik.errors.username ? 'is-invalid' : ''}`}
-                    id="username"
-                    name="username"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.username}
-                  />
-                  {formik.touched.username && formik.errors.username && (
-                    <div className="invalid-feedback">{formik.errors.username}</div>
-                  )}
-                </div>
-                
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">
-                    {t('login.password')}
-                  </label>
-                  <input
-                    type="password"
-                    className={`form-control ${formik.touched.password && formik.errors.password ? 'is-invalid' : ''}`}
-                    id="password"
-                    name="password"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.password}
-                  />
-                  {formik.touched.password && formik.errors.password && (
-                    <div className="invalid-feedback">{formik.errors.password}</div>
-                  )}
-                </div>
-                
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100"
-                  disabled={formik.isSubmitting}
-                >
-                  {formik.isSubmitting ? '...' : t('login.submit')}
-                </button>
-              </form>
-              
-              <div className="text-center mt-3">
-                {t('login.noAccount')}{' '}
-                <Link to="/signup">{t('login.signup')}</Link>
-              </div>
-            </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>{t('login.title')}</h2>
+          <p>Добро пожаловать обратно!</p>
+        </div>
+        
+        {authError && (
+          <div className="auth-error">
+            {authError}
           </div>
+        )}
+        
+        <form onSubmit={formik.handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="username">
+              {t('login.username')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Введите ваш ник"
+                className={`form-input ${formik.touched.username && formik.errors.username ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.username}
+              />
+            </div>
+            {formik.touched.username && formik.errors.username && (
+              <div className="error-message">{formik.errors.username}</div>
+            )}
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">
+              {t('login.password')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Введите пароль"
+                className={`form-input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+              />
+            </div>
+            {formik.touched.password && formik.errors.password && (
+              <div className="error-message">{formik.errors.password}</div>
+            )}
+          </div>
+          
+          <button
+            type="submit"
+            className="auth-button"
+            disabled={formik.isSubmitting}
+          >
+            {formik.isSubmitting ? (
+              <span className="button-loader"></span>
+            ) : (
+              t('login.submit')
+            )}
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          {t('login.noAccount')}{' '}
+          <Link to="/signup" className="auth-link">
+            {t('login.signup')}
+          </Link>
         </div>
       </div>
     </div>
