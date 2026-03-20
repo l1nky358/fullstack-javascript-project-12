@@ -17,7 +17,8 @@ const Chat = () => {
   const channels = useSelector((state) => state.channels.items);
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
   const messages = useSelector((state) => state.messages.items);
-  const loading = useSelector((state) => state.channels.loading || state.messages.loading);
+  const channelsLoading = useSelector((state) => state.channels.loading);
+  const messagesLoading = useSelector((state) => state.messages.loading);
 
   const currentChannel = channels.find(c => c.id === currentChannelId);
   const channelMessages = messages
@@ -25,10 +26,10 @@ const Chat = () => {
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   useEffect(() => {
-    if (!loading && channels.length > 0 && !currentChannelId) {
+    if (!channelsLoading && channels.length > 0 && !currentChannelId) {
       dispatch(setCurrentChannel(channels[0].id));
     }
-  }, [channels, loading, currentChannelId, dispatch]);
+  }, [channels, channelsLoading, currentChannelId, dispatch]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -45,55 +46,50 @@ const Chat = () => {
     });
   }, [dispatch, navigate, t]);
 
-  if (loading) {
+  if (channelsLoading || messagesLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner"></div>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">{t('chat.loading')}</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container-fluid">
-      <div className="chat-card">
-        <div className="row">
-          <div className="channels-sidebar">
-            <ChannelsList 
-              channels={channels}
-              currentChannelId={currentChannelId}
-              onChannelSelect={(id) => dispatch(setCurrentChannel(id))}
-            />
-          </div>
-          
-          <div className="messages-area">
-            {currentChannel ? (
-              <>
-                <div className="messages-header">
-                  <h5 className="current-channel-title">
-                    {currentChannel.name}
-                  </h5>
-                  <span className="messages-count">
-                    {channelMessages.length} {t('chat.messages')}
-                  </span>
-                </div>
-                
-                <div className="messages-container">
-                  <MessagesList messages={channelMessages} />
-                </div>
-                
-                <div className="message-form">
-                  <MessageForm currentChannelId={currentChannelId} />
-                </div>
-              </>
-            ) : (
-              <div className="d-flex align-items-center justify-content-center h-100">
-                <div className="text-center text-muted">
-                  <h4>👋 {t('chat.selectChannel')}</h4>
-                  <p>{t('chat.createFirstChannel')}</p>
-                </div>
+    <div className="container-fluid h-100 overflow-hidden p-0">
+      <div className="row h-100 g-0">
+        <div className="col-3 col-md-2 bg-light border-end">
+          <ChannelsList 
+            channels={channels}
+            currentChannelId={currentChannelId}
+            onChannelSelect={(id) => dispatch(setCurrentChannel(id))}
+          />
+        </div>
+        
+        <div className="col-9 col-md-10 d-flex flex-column h-100">
+          {currentChannel ? (
+            <>
+              <div className="bg-light p-3 border-bottom">
+                <h5 className="mb-0"># {currentChannel.name}</h5>
               </div>
-            )}
-          </div>
+              
+              <div className="flex-grow-1 overflow-auto p-3">
+                <MessagesList messages={channelMessages} />
+              </div>
+              
+              <div className="p-3 border-top">
+                <MessageForm currentChannelId={currentChannelId} />
+              </div>
+            </>
+          ) : (
+            <div className="d-flex align-items-center justify-content-center h-100">
+              <div className="text-center text-muted">
+                <h4>👋 {t('chat.selectChannel')}</h4>
+                <p>{t('chat.createFirstChannel')}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
