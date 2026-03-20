@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } 'react-i18next';
 import ChannelMenu from './ChannelMenu';
 import AddChannelModal from './modals/AddChannelModal';
 import RenameChannelModal from './modals/RenameChannelModal';
@@ -19,6 +19,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
           className="add-channel-btn"
           onClick={() => setShowAddModal(true)}
           title={t('channels.modals.add.title')}
+          aria-label={t('channels.modals.add.title')}
         >
           +
         </button>
@@ -29,19 +30,21 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
           <div 
             key={channel.id} 
             className={`channel-item ${channel.id === currentChannelId ? 'active' : ''}`}
-            onClick={() => onChannelSelect(channel.id)}
           >
-            <div className="channel-content">
+            <button
+              className="channel-button"
+              onClick={() => onChannelSelect(channel.id)}
+              aria-label={channel.name}
+              title={channel.name}
+            >
               <span className="channel-prefix">#</span>
-              <span className="channel-name" title={channel.name}>
-                {channel.name}
-              </span>
-              <ChannelMenu
-                channel={channel}
-                onRename={() => setRenameChannel(channel)}
-                onRemove={() => setRemoveChannel(channel)}
-              />
-            </div>
+              <span className="channel-name">{channel.name}</span>
+            </button>
+            <ChannelMenu
+              channel={channel}
+              onRename={() => setRenameChannel(channel)}
+              onRemove={() => setRemoveChannel(channel)}
+            />
           </div>
         ))}
       </div>
