@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from './AuthContext';
 import { fetchChannels, setCurrentChannel } from './slices/channelsSlice';
 import { fetchMessages } from './slices/messagesSlice';
 import MessageForm from './MessageForm';
@@ -13,6 +14,7 @@ const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { token } = useAuth();
   
   const channels = useSelector((state) => state.channels.items);
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
@@ -32,7 +34,6 @@ const Chat = () => {
   }, [channels, channelsLoading, currentChannelId, dispatch]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
@@ -44,7 +45,7 @@ const Chat = () => {
     ]).catch(() => {
       showError(t('toast.error.failedToLoad'));
     });
-  }, [dispatch, navigate, t]);
+  }, [dispatch, navigate, t, token]);
 
   if (channelsLoading || messagesLoading) {
     return (
@@ -57,9 +58,9 @@ const Chat = () => {
   }
 
   return (
-    <div className="container-fluid h-100 overflow-hidden p-0">
-      <div className="row h-100 g-0">
-        <div className="col-3 col-md-2 bg-light border-end">
+    <div className="container-fluid h-100 overflow-hidden">
+      <div className="row h-100">
+        <div className="col-3 col-md-2 px-0 bg-light border-end">
           <ChannelsList 
             channels={channels}
             currentChannelId={currentChannelId}
@@ -67,7 +68,7 @@ const Chat = () => {
           />
         </div>
         
-        <div className="col-9 col-md-10 d-flex flex-column h-100">
+        <div className="col-9 col-md-10 px-0 d-flex flex-column h-100">
           {currentChannel ? (
             <>
               <div className="bg-light p-3 border-bottom">
@@ -86,7 +87,6 @@ const Chat = () => {
             <div className="d-flex align-items-center justify-content-center h-100">
               <div className="text-center text-muted">
                 <h4>👋 {t('chat.selectChannel')}</h4>
-                <p>{t('chat.createFirstChannel')}</p>
               </div>
             </div>
           )}
