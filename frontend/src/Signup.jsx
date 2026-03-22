@@ -4,13 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import api from './api';
-import { useAuth } from './AuthContext';
 import { showError, showSuccess } from './Toast';
 
 const Signup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [authError, setAuthError] = useState('');
 
   const validationSchema = yup.object({
@@ -42,8 +40,14 @@ const Signup = () => {
           username: values.username,
           password: values.password,
         });
-        login(response.data.token, values.username);
+        
+        // Сохраняем токен
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', values.username);
+        
         showSuccess(t('toast.signupSuccess'));
+        
+        // Перенаправляем на главную страницу (чат)
         navigate('/');
       } catch (error) {
         if (error.response?.status === 409) {
