@@ -41,26 +41,20 @@ const Signup = () => {
           password: values.password,
         });
         
-        const token = response.data.token;
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', values.username);
         
         showSuccess(t('toast.signupSuccess'));
-        
-        window.location.href = '/';
-        
-      }
-      catch (error) {
+        navigate('/'); // Перенаправляем в чат
+      } catch (error) {
         if (error.response?.status === 409) {
           setAuthError(t('signup.errors.userExists'));
           showError(t('signup.errors.userExists'));
-        }
-        else {
+        } else {
           setAuthError(t('signup.errors.serverError'));
           showError(t('signup.errors.serverError'));
         }
-      }
-      finally {
+      } finally {
         setSubmitting(false);
       }
     },
