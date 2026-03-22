@@ -1,14 +1,9 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
-console.log('🔥🔥🔥 TEST SERVER STARTING 🔥🔥🔥');
-
+app.use(cors());
 app.use(express.json());
-
-app.use((req, res, next) => {
-  console.log(`📨 ${req.method} ${req.url}`);
-  next();
-});
 
 let channels = [
   { id: 1, name: 'general', removable: false },
@@ -16,94 +11,79 @@ let channels = [
   { id: 3, name: 'tech', removable: true }
 ];
 
-let messages = [];
+let messages = [
+  { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
+];
 
+// Получить каналы
 app.get('/api/channels', (req, res) => {
-  console.log('📡 GET /api/channels - returning:', channels);
+  console.log('GET /api/channels');
   res.json(channels);
 });
 
+// Создать канал
 app.post('/api/channels', (req, res) => {
+  console.log('POST /api/channels', req.body);
   const { name } = req.body;
+  
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+  
   const newChannel = {
     id: channels.length + 1,
-    name,
+    name: name,
     removable: true
   };
+  
   channels.push(newChannel);
   console.log('✅ Channel created:', newChannel);
   res.json(newChannel);
 });
 
-app.patch('/api/channels/:id', (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const channel = channels.find(c => c.id === parseInt(id));
-  if (channel) {
-    channel.name = name;
-    console.log('✅ Channel renamed:', channel);
-    res.json(channel);
-  } else {
-    res.status(404).json({ error: 'Channel not found' });
-  }
-});
-
-app.delete('/api/channels/:id', (req, res) => {
-  const { id } = req.params;
-  channels = channels.filter(c => c.id !== parseInt(id));
-  messages = messages.filter(m => m.channelId !== parseInt(id));
-  console.log('✅ Channel deleted:', id);
-  res.json({ success: true });
-});
-
+// Получить сообщения
 app.get('/api/messages', (req, res) => {
-  console.log('📡 GET /api/messages - returning:', messages.length, 'messages');
+  console.log('GET /api/messages');
   res.json(messages);
 });
 
+// Отправить сообщение
 app.post('/api/messages', (req, res) => {
+  console.log('POST /api/messages', req.body);
   const { text, channelId } = req.body;
+  
   const newMessage = {
     id: messages.length + 1,
     text,
     channelId,
-    username: req.user?.username || 'test-user',
-    createdAt: new Date()
+    username: 'User',
+    createdAt: new Date().toISOString()
   };
+  
   messages.push(newMessage);
-  console.log('✅ Message created:', newMessage);
   res.json(newMessage);
 });
 
+// Логин
 app.post('/api/login', (req, res) => {
-  console.log('📡 POST /api/login', req.body);
-  if (req.body.username === 'admin' && req.body.password === 'admin') {
-    res.json({ token: 'test-token', username: req.body.username });
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
-  }
+  console.log('POST /api/login', req.body);
+  res.json({ token: 'test-token', username: req.body.username });
 });
 
+// Регистрация
 app.post('/api/signup', (req, res) => {
-  console.log('📡 POST /api/signup', req.body);
-  if (req.body.username === 'user2') {
-    res.status(409).json({ error: 'User exists' });
-  } else {
-    res.json({ token: 'test-token', username: req.body.username });
-  }
+  console.log('POST /api/signup', req.body);
+  res.json({ token: 'test-token', username: req.body.username });
 });
 
-app.use((req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (token === 'test-token' || !token) {
-    req.user = { username: req.headers['x-username'] || 'test-user' };
-    next();
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
-  }
-});
-
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅✅✅ TEST SERVER RUNNING ON http://0.0.0.0:${PORT} ✅✅✅`);
+const PORT = 5001;
+app.listen(PORT, () => {
+  console.log(`\n✅ Server running on http://localhost:${PORT}`);
+  console.log(`📡 API endpoints:`);
+  console.log(`   GET  /api/channels`);
+  console.log(`   POST /api/channels`);
+  console.log(`   GET  /api/messages`);
+  console.log(`   POST /api/messages`);
+  console.log(`   POST /api/login`);
+  console.log(`   POST /api/signup\n`);
 });

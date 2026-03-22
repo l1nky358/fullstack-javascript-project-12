@@ -34,6 +34,7 @@ const MessageForm = ({ currentChannelId }) => {
       })).unwrap();
       showSuccess(t('toast.messageSent'));
     } catch (error) {
+      console.error('Failed to send message:', error);
       showError(t('toast.error.failedToSend'));
       setText(messageText);
     }

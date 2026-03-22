@@ -41,7 +41,8 @@ const AddChannelModal = ({ onClose }) => {
           onClose();
         }
       } catch (error) {
-        if (error.message?.includes('exists')) {
+        console.error('Failed to create channel:', error);
+        if (error.message?.includes('exists') || error.response?.status === 409) {
           setStatus(t('channels.modals.add.errors.exists'));
           showError(t('channels.modals.add.errors.exists'));
         } else {
@@ -60,7 +61,7 @@ const AddChannelModal = ({ onClose }) => {
 
   return (
     <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-      <div className="modal-dialog">
+      <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{t('channels.modals.add.title')}</h5>
@@ -86,6 +87,7 @@ const AddChannelModal = ({ onClose }) => {
                   onBlur={formik.handleBlur}
                   value={formik.values.name}
                   disabled={formik.isSubmitting}
+                  autoComplete="off"
                 />
                 {formik.touched.name && formik.errors.name && (
                   <div className="invalid-feedback">{formik.errors.name}</div>

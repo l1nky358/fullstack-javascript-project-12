@@ -50,7 +50,6 @@ const channelsSlice = createSlice({
     builder
       .addCase(fetchChannels.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(fetchChannels.fulfilled, (state, action) => {
         state.loading = false;
@@ -68,16 +67,14 @@ const channelsSlice = createSlice({
         state.currentChannelId = action.payload.id;
       })
       .addCase(renameChannel.fulfilled, (state, action) => {
-        const updatedChannel = action.payload;
-        const index = state.items.findIndex(c => c.id === updatedChannel.id);
+        const index = state.items.findIndex(c => c.id === action.payload.id);
         if (index !== -1) {
-          state.items[index] = updatedChannel;
+          state.items[index] = action.payload;
         }
       })
       .addCase(removeChannel.fulfilled, (state, action) => {
-        const id = action.payload;
-        state.items = state.items.filter(c => c.id !== id);
-        if (state.currentChannelId === id) {
+        state.items = state.items.filter(c => c.id !== action.payload);
+        if (state.currentChannelId === action.payload) {
           state.currentChannelId = state.items[0]?.id || null;
         }
       });
