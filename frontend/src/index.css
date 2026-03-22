@@ -827,3 +827,23 @@ html, body, #root {
   font-size: 18px;
   font-weight: 500;
 }
+.channels-list .btn-link {
+  text-align: left;
+  padding: 8px 12px;
+  display: block;
+  width: 100%;
+}
+
+.channels-list .btn-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.channels-list .bg-primary .btn-link {
+  color: white !important;
+}
+
+.channels-list .bg-primary .btn-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
