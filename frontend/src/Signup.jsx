@@ -3,12 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { setAuthData } from './slices/authSlice';
 import api from './api';
 import { showError, showSuccess } from './Toast';
 
 const Signup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [authError, setAuthError] = useState('');
 
   const validationSchema = yup.object({
@@ -41,23 +44,29 @@ const Signup = () => {
           password: values.password,
         });
         
-        // Сохраняем токен
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', values.username);
         
+        dispatch(setAuthData({
+          token: response.data.token,
+          username: values.username,
+        }));
+        
         showSuccess(t('toast.signupSuccess'));
         
-        // Перенаправляем на главную страницу (чат)
         navigate('/');
-      } catch (error) {
+      }
+      catch (error) {
         if (error.response?.status === 409) {
           setAuthError(t('signup.errors.userExists'));
           showError(t('signup.errors.userExists'));
-        } else {
+        }
+        else {
           setAuthError(t('signup.errors.serverError'));
           showError(t('signup.errors.serverError'));
         }
-      } finally {
+      }
+      finally {
         setSubmitting(false);
       }
     },
