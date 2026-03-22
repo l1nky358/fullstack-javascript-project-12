@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/l1nky358/fullstack-javascript-project-12/workflows/hexlet-check/badge.svg)](https://github.com/l1nky358/fullstack-javascript-project-12/actions)
 # Hexlet Chat
 
 Real-time chat application built with React, Redux, and Socket.io.
