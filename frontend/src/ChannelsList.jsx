@@ -33,7 +33,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
                 onClick={() => onChannelSelect(channel.id)}
                 style={{ color: channel.id === currentChannelId ? 'white' : 'inherit' }}
                 aria-label={channel.name}
-                name={channel.name}
+                role="button"
               >
                 # {channel.name}
               </button>
