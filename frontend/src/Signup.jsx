@@ -43,11 +43,21 @@ const Signup = () => {
           password: values.password,
         });
         
+        console.log('✅ Signup response:', response.data);
+        
+        // Сохраняем в localStorage напрямую
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', values.username);
+        
+        // Обновляем контекст
         login(response.data.token, values.username);
         
         showSuccess(t('toast.signupSuccess'));
-        navigate('/');
+        
+        // Принудительный редирект
+        window.location.href = '/';
       } catch (error) {
+        console.error('❌ Signup error:', error);
         if (error.response?.status === 409) {
           setAuthError(t('signup.errors.userExists'));
           showError(t('signup.errors.userExists'));
