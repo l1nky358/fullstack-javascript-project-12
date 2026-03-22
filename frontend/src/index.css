@@ -1,18 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
+/* Базовые стили для всего приложения */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
 }
 
-/* Стили для страниц авторизации */
+/* Контейнер для страниц авторизации */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -227,15 +233,6 @@ body {
 }
 
 /* Стили для чата */
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
 .container-fluid {
   height: 100vh;
   width: 100vw;
@@ -549,159 +546,6 @@ html, body, #root {
   cursor: not-allowed;
 }
 
-/* Выпадающее меню */
-.dropdown-menu {
-  background: white;
-  border: 1px solid #eef2f6;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  padding: 6px;
-  min-width: 160px;
-  z-index: 1050;
-}
-
-.dropdown-item {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #334155;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.dropdown-item:hover {
-  background: #f1f5f9;
-  color: #3b82f6;
-}
-
-.dropdown-item.text-danger {
-  color: #ef4444;
-}
-
-.dropdown-item.text-danger:hover {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.dropdown-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1040;
-}
-
-/* Модальные окна */
-.modal.show {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-}
-
-.modal-dialog {
-  max-width: 450px;
-  margin: 100px auto;
-  padding: 0 15px;
-}
-
-.modal-content {
-  border: none;
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-  padding: 25px 30px;
-}
-
-.modal-title {
-  font-weight: 700;
-  color: #2d3748;
-  font-size: 20px;
-}
-
-.modal-body {
-  padding: 30px;
-}
-
-.modal-footer {
-  padding: 20px 30px;
-  border-top: 1px solid rgba(102, 126, 234, 0.2);
-  gap: 12px;
-}
-
-/* Кнопки */
-.btn {
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-.btn-secondary {
-  background: #edf2f7;
-  color: #4a5568;
-}
-
-.btn-secondary:hover {
-  background: #e2e8f0;
-  transform: translateY(-2px);
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
-}
-
-.btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
-}
-
-/* Тосты */
-.Toastify__toast {
-  border-radius: 16px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  padding: 16px 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.Toastify__toast--success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.Toastify__toast--error {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-}
-
-.Toastify__toast--warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
 /* Скроллбар */
 ::-webkit-scrollbar {
   width: 8px;
@@ -770,37 +614,6 @@ html, body, #root {
   .send-button {
     width: 100%;
   }
-  
-  .modal-dialog {
-    margin: 50px auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 30px 20px;
-  }
-  
-  .auth-header h2 {
-    font-size: 28px;
-  }
-  
-  .channels-header {
-    padding: 15px;
-  }
-  
-  .messages-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .current-channel-title {
-    width: 100%;
-  }
-  
-  .messages-count {
-    align-self: flex-start;
-  }
 }
 
 /* Спиннер загрузки */
@@ -811,39 +624,4 @@ html, body, #root {
   border-top-color: white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 20px;
-}
-
-.loading-text {
-  color: white;
-  font-size: 18px;
-  font-weight: 500;
-}
-.channels-list .btn-link {
-  text-align: left;
-  padding: 8px 12px;
-  display: block;
-  width: 100%;
-}
-
-.channels-list .btn-link:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-.channels-list .bg-primary .btn-link {
-  color: white !important;
-}
-
-.channels-list .bg-primary .btn-link:hover {
-  background-color: rgba(255,255,255,0.1);
-  border-radius: 4px;
 }
