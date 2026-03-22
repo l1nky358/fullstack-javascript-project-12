@@ -41,7 +41,15 @@ const Chat = () => {
     Promise.all([
       dispatch(fetchChannels()),
       dispatch(fetchMessages())
-    ]).catch(() => {
+    ]).then(() => {
+      // Ждем дополнительную секунду чтобы Redux обновился
+      setTimeout(() => {
+        if (channels.length > 0 && !currentChannelId) {
+          dispatch(setCurrentChannel(channels[0].id));
+        }
+      }, 100);
+    }).catch((error) => {
+      console.error('Error loading data:', error);
       showError(t('toast.error.failedToLoad'));
     });
   }, [dispatch, navigate, t]);
