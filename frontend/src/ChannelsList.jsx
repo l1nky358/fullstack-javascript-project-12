@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ChannelMenu from './ChannelMenu';
 import AddChannelModal from './modals/AddChannelModal';
@@ -10,12 +10,6 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [renameChannel, setRenameChannel] = useState(null);
   const [removeChannel, setRemoveChannel] = useState(null);
-
-  console.log('📋 ChannelsList rendered with channels:', channels);
-
-  useEffect(() => {
-    console.log('channels changed:', channels);
-  }, [channels]);
 
   return (
     <div className="channels-list d-flex flex-column h-100">
@@ -39,6 +33,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelSelect }) => {
                 onClick={() => onChannelSelect(channel.id)}
                 style={{ color: channel.id === currentChannelId ? 'white' : 'inherit' }}
                 aria-label={channel.name}
+                name={channel.name}
               >
                 # {channel.name}
               </button>
