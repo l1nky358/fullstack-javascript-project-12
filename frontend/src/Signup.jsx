@@ -3,15 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { setAuthData } from './slices/authSlice';
 import api from './api';
 import { showError, showSuccess } from './Toast';
 
 const Signup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [authError, setAuthError] = useState('');
 
   const validationSchema = yup.object({
@@ -44,17 +41,14 @@ const Signup = () => {
           password: values.password,
         });
         
-        localStorage.setItem('token', response.data.token);
+        const token = response.data.token;
+        localStorage.setItem('token', token);
         localStorage.setItem('username', values.username);
-        
-        dispatch(setAuthData({
-          token: response.data.token,
-          username: values.username,
-        }));
         
         showSuccess(t('toast.signupSuccess'));
         
-        navigate('/');
+        window.location.href = '/';
+        
       }
       catch (error) {
         if (error.response?.status === 409) {
