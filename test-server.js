@@ -35,6 +35,27 @@ app.post('/api/channels', (req, res) => {
   res.json(newChannel);
 });
 
+app.patch('/api/channels/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const channel = channels.find(c => c.id === parseInt(id));
+  if (channel) {
+    channel.name = name;
+    console.log('✅ Channel renamed:', channel);
+    res.json(channel);
+  } else {
+    res.status(404).json({ error: 'Channel not found' });
+  }
+});
+
+app.delete('/api/channels/:id', (req, res) => {
+  const { id } = req.params;
+  channels = channels.filter(c => c.id !== parseInt(id));
+  messages = messages.filter(m => m.channelId !== parseInt(id));
+  console.log('✅ Channel deleted:', id);
+  res.json({ success: true });
+});
+
 app.get('/api/messages', (req, res) => {
   console.log('📡 GET /api/messages - returning:', messages.length, 'messages');
   res.json(messages);
@@ -56,18 +77,26 @@ app.post('/api/messages', (req, res) => {
 
 app.post('/api/login', (req, res) => {
   console.log('📡 POST /api/login', req.body);
-  res.json({ token: 'test-token', username: req.body.username });
+  if (req.body.username === 'admin' && req.body.password === 'admin') {
+    res.json({ token: 'test-token', username: req.body.username });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
 });
 
 app.post('/api/signup', (req, res) => {
   console.log('📡 POST /api/signup', req.body);
-  res.json({ token: 'test-token', username: req.body.username });
+  if (req.body.username === 'user2') {
+    res.status(409).json({ error: 'User exists' });
+  } else {
+    res.json({ token: 'test-token', username: req.body.username });
+  }
 });
 
 app.use((req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (token === 'test-token' || !token) {
-    req.user = { username: 'test-user' };
+    req.user = { username: req.headers['x-username'] || 'test-user' };
     next();
   } else {
     res.status(401).json({ error: 'Unauthorized' });
