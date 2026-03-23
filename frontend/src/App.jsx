@@ -6,7 +6,6 @@ import Chat from './Chat';
 import Login from './Login';
 import Signup from './Signup';
 import NotFound from './NotFound';
-import TestRollbar from './TestRollbar';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -23,7 +22,6 @@ function App() {
             <Route path="/" element={<PrivateRoute><Chat /></PrivateRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/test-rollbar" element={<TestRollbar />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
