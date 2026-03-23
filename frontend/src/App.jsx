@@ -1,37 +1,36 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthProvider, useAuth } from './AuthContext';
 import Header from './Header';
 import Chat from './Chat';
 import Login from './Login';
 import Signup from './Signup';
 import NotFound from './NotFound';
+import TestRollbar from './TestRollbar';
 
 const PrivateRoute = ({ children }) => {
-  const { token } = useAuth();
+  const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" replace />;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <div className="d-flex flex-column vh-100">
-          <Header />
-          <div className="flex-grow-1">
-            <Routes>
-              <Route path="/" element={<PrivateRoute><Chat /></PrivateRoute>} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/404" element={<NotFound />} />
-              <Route path="*" element={<Navigate to="/404" replace />} />
-            </Routes>
-          </div>
+    <BrowserRouter>
+      <div className="d-flex flex-column vh-100">
+        <Header />
+        <div className="flex-grow-1">
+          <Routes>
+            <Route path="/" element={<PrivateRoute><Chat /></PrivateRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/test-rollbar" element={<TestRollbar />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Routes>
         </div>
-        <ToastContainer />
-      </BrowserRouter>
-    </AuthProvider>
+      </div>
+      <ToastContainer />
+    </BrowserRouter>
   );
 }
 
