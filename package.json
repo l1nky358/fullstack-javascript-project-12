@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm install && chmod +x node_modules/.bin/vite && npm run build",
     "start": "node test-server.js"
   },
   "dependencies": {
