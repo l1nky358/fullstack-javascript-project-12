@@ -5,11 +5,15 @@ import { useAuth } from './AuthContext';
 const Header = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { token, logout } = useAuth();
+  const auth = useAuth();
+  const token = auth?.token;
+  const logout = auth?.logout;
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    if (logout) {
+      logout();
+      navigate('/login');
+    }
   };
 
   return (
