@@ -1,6 +1,6 @@
 {
+  "outputDirectory": "frontend/dist",
   "buildCommand": "",
   "installCommand": "",
-  "outputDirectory": "frontend/dist",
   "framework": null
 }
