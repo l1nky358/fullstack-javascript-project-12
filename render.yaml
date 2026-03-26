@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: hexlet-chat-backend
-    env: node
-    buildCommand: npm install
-    startCommand: node test-server.js
-    envVars:
-      - key: NODE_ENV
-        value: production
