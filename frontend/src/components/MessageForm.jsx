@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { sendMessage } from './slices/messagesSlice';
+import { useAddMessageMutation } from '../services/api';
 import { showSuccess, showError } from './Toast';
 import { containsProfanity, cleanProfanity } from './utils/profanity';
 
