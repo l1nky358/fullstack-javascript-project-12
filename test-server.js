@@ -9,6 +9,18 @@ app.get('/api/channels', (req, res) => {
   res.json([{ id: 1, name: 'general', removable: false }]);
 });
 
+app.post('/api/channels', (req, res) => {
+  res.json({ id: 2, name: req.body.name, removable: true });
+});
+
+app.get('/api/messages', (req, res) => {
+  res.json([]);
+});
+
+app.post('/api/messages', (req, res) => {
+  res.json({ id: 1, ...req.body, username: 'User' });
+});
+
 app.post('/api/login', (req, res) => {
   res.json({ token: 'test-token', username: req.body.username });
 });
