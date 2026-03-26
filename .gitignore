@@ -1,53 +1,8 @@
-# Dependencies
 node_modules/
-frontend/node_modules/
-
-# Build outputs
 dist/
-frontend/dist/
-build/
-frontend/build/
-
-# Environment files
 .env
-.env.local
-.env.production
-.env.development
-*.env
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# Logs
 *.log
-npm-debug.log*
-
-# Testing
+.DS_Store
 coverage/
 test-results/
-playwright-report/
-test-data/
-tmp/
-__tests__/test-results/
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Vite
-.vite/
-frontend/.vite/
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.cache
+__tests__/
