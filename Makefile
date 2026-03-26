@@ -1,24 +1,11 @@
-lint-frontend:
-	make -C frontend lint
-
 install:
-	npm ci
-
-start-frontend:
-	make -C frontend start
-
-start-backend:
-	npx start-server -s ./frontend/dist
-
-deploy:
-	git push heroku main
-
-start:
-	make start-backend
-
-develop:
-	make start-backend & make start-frontend
+	cd frontend && npm install --no-audit --no-fund
+	npm install --no-audit --no-fund
 
 build:
-	rm -rf frontend/dist
-	npm run build
+	cd frontend && npm run build
+
+start:
+	node test-server.js
+
+.PHONY: install build start
