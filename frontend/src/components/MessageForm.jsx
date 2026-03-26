@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAddMessageMutation } from '../services/api';
 import { showSuccess, showError } from './Toast';
-import { containsProfanity, cleanProfanity } from './utils/profanity';
+import { containsProfanity, cleanProfanity } from '../utils/profanity';
 
 const MessageForm = ({ currentChannelId }) => {
   const [text, setText] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingMessage, setPendingMessage] = useState('');
   const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const [addMessage, { isLoading }] = useAddMessageMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,10 +27,10 @@ const MessageForm = ({ currentChannelId }) => {
     setText('');
     
     try {
-      await dispatch(sendMessage({
+      await addMessage({
         text: messageText,
         channelId: currentChannelId,
-      })).unwrap();
+      }).unwrap();
       showSuccess(t('toast.messageSent'));
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -47,10 +46,10 @@ const MessageForm = ({ currentChannelId }) => {
       setPendingMessage('');
       
       try {
-        await dispatch(sendMessage({
+        await addMessage({
           text: cleanedText,
           channelId: currentChannelId,
-        })).unwrap();
+        }).unwrap();
         showSuccess(t('toast.messageSent'));
       } catch (error) {
         showError(t('toast.error.failedToSend'));
@@ -98,13 +97,13 @@ const MessageForm = ({ currentChannelId }) => {
             placeholder={currentChannelId ? t('chat.messagePlaceholder') : t('chat.selectChannel')}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            disabled={!currentChannelId}
+            disabled={!currentChannelId || isLoading}
             aria-label={t('chat.newMessage')}
           />
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={!text.trim() || !currentChannelId}
+            disabled={!text.trim() || !currentChannelId || isLoading}
           >
             {t('chat.send')}
           </button>
