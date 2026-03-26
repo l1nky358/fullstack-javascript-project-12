@@ -1,9 +1,11 @@
+# Makefile для Hexlet Check
+
 install:
 	cd frontend && npm install --no-audit --no-fund
 	npm install --no-audit --no-fund
 
 build:
-	cd frontend && npm run build
+	cd frontend && npx vite build
 
 start:
 	node test-server.js
