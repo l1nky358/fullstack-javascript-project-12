@@ -1,19 +1,24 @@
-# Makefile для Hexlet Check
+lint-frontend:
+	make -C frontend lint
 
 install:
-	cd frontend && npm install
-	npm install
+	npm ci
 
-build:
-	cd frontend && npm run build
+start-frontend:
+	make -C frontend start
+
+start-backend:
+	npx start-server -s ./frontend/dist
+
+deploy:
+	git push heroku main
 
 start:
-	npm start
+	make start-backend
 
-test:
-	npx jest
+develop:
+	make start-backend & make start-frontend
 
-lint:
-	cd frontend && npx eslint .
-
-.PHONY: install build start test lint
+build:
+	rm -rf frontend/dist
+	npm run build
