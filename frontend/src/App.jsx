@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Header from './Header';
-import Chat from './Chat';
-import Login from './Login';
-import Signup from './Signup';
-import NotFound from './NotFound';
+import Header from './components/Header';
+import Chat from './components/Chat';
+import Login from './components/pages/Login';
+import Signup from './components/pages/Signup';
+import NotFound from './components/NotFound';
+import { useAuth } from './hooks/useAuth';
 
 const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
+  const { token } = useAuth();
   return token ? children : <Navigate to="/login" replace />;
 };
 
