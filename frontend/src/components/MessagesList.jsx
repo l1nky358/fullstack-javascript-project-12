@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cleanProfanity } from './utils/profanity';
+import { cleanProfanity } from '../utils/profanity';
 
 const MessagesList = ({ messages }) => {
   const messagesEndRef = useRef(null);
