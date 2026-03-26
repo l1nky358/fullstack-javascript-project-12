@@ -45,5 +45,4 @@ render.yaml
 .idea/
 
 # Старые файлы
-test-server.js
 public/
