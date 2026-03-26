@@ -4,7 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { I18nextProvider } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import store from './store';
-import i18n from './i18n';
+import i18n from './locales/i18n';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';

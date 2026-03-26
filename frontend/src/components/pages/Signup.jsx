@@ -3,14 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import api from './api';
-import { useAuth } from './AuthContext';
-import { showError, showSuccess } from './Toast';
+import { useSignupMutation } from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
+import { showError, showSuccess } from '../Toast';
 
 const Signup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [signup, { isLoading }] = useSignupMutation();
   const [authError, setAuthError] = useState('');
 
   const validationSchema = yup.object({
@@ -36,37 +37,25 @@ const Signup = () => {
       confirmPassword: '',
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting }) => {
+    onSubmit: async (values) => {
       try {
-        const response = await api.post('/signup', {
+        const response = await signup({
           username: values.username,
           password: values.password,
-        });
+        }).unwrap();
         
-        console.log('✅ Signup response:', response.data);
-        
-        // Сохраняем в localStorage напрямую
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('username', values.username);
-        
-        // Обновляем контекст
-        login(response.data.token, values.username);
-        
+        login(response.token, values.username);
         showSuccess(t('toast.signupSuccess'));
-        
-        // Принудительный редирект
-        window.location.href = '/';
+        navigate('/');
       } catch (error) {
-        console.error('❌ Signup error:', error);
-        if (error.response?.status === 409) {
+        console.error('Signup error:', error);
+        if (error.status === 409) {
           setAuthError(t('signup.errors.userExists'));
           showError(t('signup.errors.userExists'));
         } else {
           setAuthError(t('signup.errors.serverError'));
           showError(t('signup.errors.serverError'));
         }
-      } finally {
-        setSubmitting(false);
       }
     },
   });
@@ -155,9 +144,9 @@ const Signup = () => {
           <button
             type="submit"
             className="auth-button"
-            disabled={formik.isSubmitting}
+            disabled={isLoading}
           >
-            {formik.isSubmitting ? (
+            {isLoading ? (
               <span className="button-loader"></span>
             ) : (
               t('signup.submit')

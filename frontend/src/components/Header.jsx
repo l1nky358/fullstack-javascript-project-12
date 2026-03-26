@@ -1,32 +1,31 @@
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 
 const Header = () => {
   const { t } = useTranslation();
+  const { token, username, logout } = useAuth();
   const navigate = useNavigate();
-  const auth = useAuth();
-  const token = auth?.token;
-  const logout = auth?.logout;
 
   const handleLogout = () => {
-    if (logout) {
-      logout();
-      navigate('/login');
-    }
+    logout();
+    navigate('/login');
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
-      <div className="container-fluid">
-        <span className="navbar-brand mb-0 h1">{t('header.brand')}</span>
+    <header className="bg-primary text-white p-3">
+      <div className="container d-flex justify-content-between align-items-center">
+        <h1 className="h4 m-0">{t('header.title')}</h1>
         {token && (
-          <button className="btn btn-outline-primary" onClick={handleLogout}>
-            {t('header.logout')}
-          </button>
+          <div>
+            <span className="me-3">{username}</span>
+            <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
+              {t('header.logout')}
+            </button>
+          </div>
         )}
       </div>
-    </nav>
+    </header>
   );
 };
 

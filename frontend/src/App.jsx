@@ -5,7 +5,7 @@ import Header from './components/Header';
 import Chat from './components/Chat';
 import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
-import NotFound from './components/NotFound';
+import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
 
 const PrivateRoute = ({ children }) => {
