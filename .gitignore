@@ -24,10 +24,7 @@ yarn-error.log*
 __tests__/
 test-results/
 coverage/
-playwright.config.local.js
 
-# Docker
-docker-compose.yml
 
 # Makefile
 Makefile
