@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', message: 'Server is running' });
 });
 
 app.get('/api/channels', (req, res) => {
@@ -22,7 +22,7 @@ app.get('/api/messages', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
-  res.json({ id: 1, text: req.body.text, channelId: req.body.channelId });
+  res.json({ id: 1, text: req.body.text });
 });
 
 app.post('/api/login', (req, res) => {
@@ -34,9 +34,10 @@ app.post('/api/signup', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
+
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`   Health check: http://localhost:${PORT}/health`);
+  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+  console.log(`   Health check: http://0.0.0.0:${PORT}/health`);
 });
 
 process.on('SIGTERM', () => {
