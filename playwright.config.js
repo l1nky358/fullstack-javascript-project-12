@@ -5,9 +5,13 @@ module.exports = {
     command: 'npm start',
     port: 5001,
     timeout: 120000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      NODE_ENV: 'test',
+      PORT: '5001',
+    },
   },
   
   expect: {

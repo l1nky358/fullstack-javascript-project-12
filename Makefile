@@ -8,7 +8,7 @@ build:
 	@echo "Build completed"
 	@exit 0
 
-lint:
-	npx eslint --ext js,jsx --no-eslintrc --config .eslintrc.yml . frontend || true
+test:
+	npx playwright test
 
-.PHONY: install start build lint
+.PHONY: install start build test
