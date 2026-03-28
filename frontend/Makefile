@@ -1,10 +1,21 @@
+# Makefile для фронтенда
+
 install:
-	cd frontend && npm install
+	npm ci || npm install
 
 build:
-	cd frontend && npm run build
+	npm run build
 
 start:
-	cd frontend && npm run dev
+	npm run dev
 
-.PHONY: install build start
+dev:
+	npm run dev
+
+lint:
+	npx eslint --ext js,jsx src
+
+test:
+	npm test
+
+.PHONY: install build start dev lint test
