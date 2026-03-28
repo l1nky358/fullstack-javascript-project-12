@@ -9,5 +9,4 @@ COPY . .
 
 EXPOSE 5001
 
-# Запускаем сервер
-CMD ["node", "test-server.js"]
+CMD ["npm", "start"]

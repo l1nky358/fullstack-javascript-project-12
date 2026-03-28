@@ -1,15 +1,11 @@
 module.exports = {
   webServer: {
-    command: 'node test-server.js',
+    command: 'npm start',
     port: 5001,
     timeout: 120000,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     stdout: 'pipe',
     stderr: 'pipe',
-    env: {
-      PORT: '5001',
-      NODE_ENV: 'test',
-    },
   },
   use: {
     baseURL: 'http://localhost:5001',
