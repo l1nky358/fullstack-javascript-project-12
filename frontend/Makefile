@@ -1,11 +1,10 @@
 install:
-	npm ci
-
-start:
-	npm start
+	cd frontend && npm install
 
 build:
-	npm build
+	cd frontend && npm run build
 
-lint:
-	npx eslint --ext js,jsx --no-eslintrc --config .eslintrc.yml .
+start:
+	cd frontend && npm run dev
+
+.PHONY: install build start
