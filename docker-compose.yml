@@ -8,19 +8,3 @@ services:
     environment:
       - NODE_ENV=test
       - PORT=5001
-    command: node test-server.js
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:5001/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-  tests:
-    build: .
-    environment:
-      - NODE_ENV=test
-      - BASE_URL=http://app:5001
-    depends_on:
-      app:
-        condition: service_healthy
-    command: npx playwright test

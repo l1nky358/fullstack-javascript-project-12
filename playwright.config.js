@@ -1,19 +1,24 @@
-import { defineConfig } from '@playwright/test';
+// playwright.config.js
+const { defineConfig, devices } = require('@playwright/test');
 
-const baseURL = process.env.BASE_URL || 'http://localhost:5001';
-
-export default defineConfig({
-  testDir: './tests',
-  retries: 1,
+module.exports = defineConfig({
+  testDir: './',
   timeout: 30000,
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  
   use: {
-    baseURL: baseURL,
+    baseURL: 'http://localhost:5001',
     trace: 'on-first-retry',
   },
-  webServer: {
-    command: 'npm run start',
-    port: 5001,
-    timeout: 300000, 
-    reuseExistingServer: false,
-  },
+  
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });
