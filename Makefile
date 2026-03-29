@@ -2,7 +2,7 @@ install:
 	npm install --no-audit --no-fund
 
 start:
-	npm start
+	node test-server.js
 
 build:
 	@echo "Build completed"

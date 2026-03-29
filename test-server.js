@@ -22,35 +22,30 @@ app.get('/api/messages', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
-  res.json({ id: 1, text: req.body.text, channelId: req.body.channelId });
+  res.json({ id: 1, text: req.body.text, channelId: req.body.channelId, username: 'User' });
 });
 
 app.post('/api/login', (req, res) => {
-  res.json({ token: 'test-token', username: req.body.username });
+  res.json({ token: 'test-token-' + Date.now(), username: req.body.username });
 });
 
 app.post('/api/signup', (req, res) => {
-  res.json({ token: 'test-token', username: req.body.username });
+  res.json({ token: 'test-token-' + Date.now(), username: req.body.username });
 });
 
 const PORT = process.env.PORT || 5001;
+
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`   Health check: http://localhost:${PORT}/health`);
+  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+  console.log(`   Health check: http://0.0.0.0:${PORT}/health`);
 });
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, closing server...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
+  server.close(() => process.exit(0));
 });
 
 process.on('SIGINT', () => {
   console.log('SIGINT received, closing server...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
+  server.close(() => process.exit(0));
 });

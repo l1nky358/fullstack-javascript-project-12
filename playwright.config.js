@@ -1,26 +1,24 @@
 module.exports = {
-  timeout: 180000,
-
+  testDir: './__tests__',
+  testMatch: '**/*.test.js',
+  timeout: 60000,
+  
   webServer: {
-    command: 'npm start',
+    command: 'node test-server.js',
     port: 5001,
-    timeout: 180000,
+    timeout: 120000,
     reuseExistingServer: false,
     stdout: 'pipe',
     stderr: 'pipe',
     env: {
-      NODE_ENV: 'test',
       PORT: '5001',
+      NODE_ENV: 'test',
     },
   },
-
-  expect: {
-    timeout: 20000,
-  },
-
+  
   use: {
     baseURL: 'http://localhost:5001',
     actionTimeout: 15000,
-    navigationTimeout: 60000,
+    navigationTimeout: 30000,
   },
 };
