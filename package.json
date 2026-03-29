@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "echo 'Build skipped'",
-    "start": "node test-server.js",
+    "start": "npm run start",
     "test": "npx playwright test"
   },
   "dependencies": {
