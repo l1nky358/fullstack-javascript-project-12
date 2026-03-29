@@ -3,17 +3,19 @@
   "version": "1.0.0",
   "description": "Hexlet Chat",
   "engines": {
-    "node": "18.x",
-    "npm": "10.x"
+    "node": "24.x"
   },
   "scripts": {
     "build": "echo 'Build skipped'",
     "start": "node test-server.js",
-    "test": "exit 0"
+    "test": "npx playwright test"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^4.22.1",
     "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
   }
 }
