@@ -9,6 +9,9 @@ build:
 	@exit 0
 
 test:
-	docker compose up --abort-on-container-exit
+	docker compose up -d
+	sleep 5
+	docker compose exec app npx playwright test
+	docker compose down
 
 .PHONY: install start build test
