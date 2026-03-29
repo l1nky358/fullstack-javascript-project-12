@@ -8,4 +8,3 @@ services:
     environment:
       - NODE_ENV=test
       - PORT=5001
-    command: node test-server.js
