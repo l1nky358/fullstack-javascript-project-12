@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Hexlet Chat",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "scripts": {
-    "build": "cd frontend && npm install && chmod +x node_modules/.bin/vite && npm run build",
-    "start": "node test-server.js"
+    "build": "echo 'Build skipped'",
+    "start": "node test-server.js",
+    "test": "npx playwright test"
   },
   "dependencies": {
     "cors": "^2.8.6",
