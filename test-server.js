@@ -5,12 +5,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check - обязательно
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok' });
 });
 
-// API endpoints
 app.get('/api/channels', (req, res) => {
   res.json([{ id: 1, name: 'general', removable: false }]);
 });
@@ -36,9 +34,6 @@ app.post('/api/signup', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
-
-// Слушаем на всех интерфейсах (важно для Docker)
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
-  console.log(`   Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
