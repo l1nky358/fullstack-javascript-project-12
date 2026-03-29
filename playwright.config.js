@@ -1,4 +1,3 @@
-// playwright.config.js
 const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
@@ -14,6 +13,8 @@ module.exports = defineConfig({
     baseURL: 'http://localhost:5001',
     trace: 'on-first-retry',
   },
+  
+  // Убираем webServer полностью
   
   projects: [
     {

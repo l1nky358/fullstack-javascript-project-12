@@ -1,4 +1,3 @@
-// run-tests.js
 const { spawn } = require('child_process');
 const http = require('http');
 
@@ -52,7 +51,7 @@ async function runTests() {
     await waitForServer(5001, 30000);
     
     console.log('Running Playwright tests...');
-
+    
     const testProcess = spawn('npx', ['playwright', 'test'], {
       stdio: 'inherit',
       shell: true
