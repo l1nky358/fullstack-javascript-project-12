@@ -1,3 +1,4 @@
+export FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
 lint-frontend:
 	make -C frontend lint
 install:
