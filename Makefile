@@ -1,17 +1,24 @@
+lint-frontend:
+	make -C frontend lint
+
 install:
-	npm install --no-audit --no-fund
+	npm ci
+
+start-frontend:
+	make -C frontend start
+
+start-backend:
+	npx start-server -s ./frontend/dist
+
+deploy:
+	git push heroku main
 
 start:
-	node test-server.js
+	make start-backend
+
+develop:
+	make start-backend & make start-frontend
 
 build:
-	@echo "Build completed"
-	@exit 0
-
-test:
-	docker compose up -d
-	sleep 5
-	docker compose exec app npx playwright test
-	docker compose down
-
-.PHONY: install start build test
+	rm -rf frontend/dist
+	npm run build
