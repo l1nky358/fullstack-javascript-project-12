@@ -1,3 +1,5 @@
+.PHONY: install start-backend start-frontend deploy start develop build test lint-frontend
+
 lint-frontend:
 	make -C frontend lint
 
@@ -17,7 +19,7 @@ deploy:
 	git push heroku main
 
 develop:
-	make start-backend & make start-frontend
+	make -j 2 start-backend start-frontend
 
 build:
 	rm -rf frontend/dist
@@ -25,5 +27,3 @@ build:
 
 test:
 	npm test
-
-.PHONY: install start-backend start-frontend deploy start develop build test
