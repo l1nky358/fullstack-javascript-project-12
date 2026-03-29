@@ -1,5 +1,6 @@
-// playwright.config.js
 const { defineConfig, devices } = require('@playwright/test');
+
+const baseURL = process.env.BASE_URL || 'http://localhost:5001';
 
 module.exports = defineConfig({
   testDir: './',
@@ -11,7 +12,7 @@ module.exports = defineConfig({
   reporter: 'html',
   
   use: {
-    baseURL: 'http://localhost:5001',
+    baseURL: baseURL,
     trace: 'on-first-retry',
   },
 
@@ -22,6 +23,8 @@ module.exports = defineConfig({
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',
     stderr: 'pipe',
+    // В Docker не нужно запускать webServer отдельно
+    // потому что сервер уже запущен в отдельном контейнере
   },
 
   projects: [
