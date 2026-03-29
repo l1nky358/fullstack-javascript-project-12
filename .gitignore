@@ -21,7 +21,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Тесты
-__tests__/
 test-results/
 coverage/
 
