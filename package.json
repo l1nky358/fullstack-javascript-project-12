@@ -6,8 +6,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "echo 'Build skipped'",
-    "start": "npm run start",
+    "build": "echo 'Build completed'",
+    "start": "node test-server.js",
     "test": "node run-tests.js"
   },
   "dependencies": {

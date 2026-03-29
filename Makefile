@@ -1,13 +1,29 @@
+lint-frontend:
+	make -C frontend lint
+
 install:
 	npm install --no-audit --no-fund
 
-lint:
-	echo "Linting skipped"
+start-frontend:
+	make -C frontend start
+
+start-backend:
+	npx start-server -s ./frontend/dist
+
+start:
+	node test-server.js
+
+deploy:
+	git push heroku main
+
+develop:
+	make start-backend & make start-frontend
 
 build:
-	echo "Build completed"
+	rm -rf frontend/dist
+	npm run build
 
 test:
-	node run-tests.js
+	npm test
 
-.PHONY: install lint build test
+.PHONY: install start-backend start-frontend deploy start develop build test
