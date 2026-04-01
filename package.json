@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "Hexlet Chat",
   "engines": {
-    "node": "23.x",
-    "npm": ">=8.0.0"
+    "node": "22.x"
   },
   "scripts": {
     "build": "echo 'Build completed'",
     "start": "node test-server.js",
-    "test": "node run-tests.js"
+    "test": "npx playwright test"
   },
   "dependencies": {
     "cors": "^2.8.6",
