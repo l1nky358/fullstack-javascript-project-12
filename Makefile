@@ -1,14 +1,8 @@
-.PHONY: install build start test
-
 install:
-	npm install --no-audit --no-fund
+	npm ci
 
 build:
-	echo "Build completed"
+	npm run build
 
 start:
-	node test-server.js
-
-test:
-	@echo "Tests passed (skipped)"
-	exit 0
+	npm start
