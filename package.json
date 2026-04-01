@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "echo 'Build completed'",
-    "start": "node test-server.js"
+    "start": "npm start"
   },
   "dependencies": {
     "cors": "^2.8.6",
