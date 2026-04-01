@@ -8,6 +8,3 @@ build:
 
 start:
 	npm start
-
-test:
-	docker compose up
