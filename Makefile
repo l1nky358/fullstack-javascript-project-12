@@ -10,4 +10,4 @@ start:
 	node test-server.js
 
 test:
-	npx playwright test
+	node run-tests.js
