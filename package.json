@@ -8,7 +8,7 @@
   "scripts": {
     "build": "echo 'Build completed'",
     "start": "node test-server.js",
-    "test": "npx playwright test"
+    "test": "node run-tests.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
