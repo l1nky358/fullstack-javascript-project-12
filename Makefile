@@ -10,4 +10,4 @@ start:
 	node test-server.js
 
 test:
-	node run-tests.js
+	node -e "const { spawn } = require('child_process'); const server = spawn('node', ['test-server.js'], { stdio: 'inherit', detached: false }); setTimeout(() => { const tests = spawn('npx', ['playwright', 'test'], { stdio: 'inherit', shell: true }); tests.on('exit', (code) => { server.kill(); process.exit(code); }); }, 3000);"
