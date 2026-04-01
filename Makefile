@@ -4,10 +4,10 @@ install:
 	npm install
 
 build:
-	echo "Build completed"
+	npm run build
 
 start:
 	npm start
 
 test:
-	test-server.js
+	test.js
