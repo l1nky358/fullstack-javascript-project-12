@@ -6,6 +6,6 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=production
       - PORT=5001
-    command: npm test
+    command: npm start
