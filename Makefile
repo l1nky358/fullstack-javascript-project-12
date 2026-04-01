@@ -7,7 +7,7 @@ build:
 	echo "Build completed"
 
 start:
-	node test-server.js
+	npm start
 
 test:
 	@echo "Tests skipped"
