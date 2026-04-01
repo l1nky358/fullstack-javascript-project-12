@@ -8,4 +8,4 @@ services:
     environment:
       - NODE_ENV=test
       - PORT=5001
-    command: sh -c "node test-server.js & npx playwright test"
+    command: sh -c "node test-server.js & sleep 3 && npx playwright test"
