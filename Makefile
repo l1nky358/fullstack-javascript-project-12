@@ -10,4 +10,4 @@ start:
 	npm start
 
 test:
-	test.js
+	docker compose up
