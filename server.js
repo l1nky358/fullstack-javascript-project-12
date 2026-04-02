@@ -35,7 +35,7 @@ app.post('/api/signup', (req, res) => {
   
   const existingUser = users.find(u => u.username === username);
   if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
+    return res.status(409).json({ error: 'User already exists' });
   }
   
   const newUser = {
@@ -71,7 +71,7 @@ app.post('/api/channels', (req, res) => {
     removable: true
   };
   channels.push(newChannel);
-  
+
   io.emit('channelCreated', newChannel);
   
   res.json(newChannel);
@@ -105,7 +105,7 @@ app.delete('/api/channels/:id', (req, res) => {
   
   channels = channels.filter(c => c.id !== channelId);
   messages = messages.filter(m => m.channelId !== channelId);
-
+  
   io.emit('channelRemoved', channelId);
   
   res.json({ success: true });
@@ -125,7 +125,7 @@ app.post('/api/messages', (req, res) => {
     createdAt: new Date().toISOString()
   };
   messages.push(newMessage);
-
+  
   io.emit('newMessage', newMessage);
   
   res.json(newMessage);
