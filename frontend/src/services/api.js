@@ -22,6 +22,19 @@ export const api = createApi({
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
+      transformResponse: (response) => {
+        if (!response || response.length === 0) {
+          return [{ id: 1, name: 'general', removable: false }];
+        }
+        
+        const hasGeneral = response.some(channel => channel.name === 'general');
+        
+        if (!hasGeneral) {
+          return [{ id: 1, name: 'general', removable: false }, ...response];
+        }
+        
+        return response;
+      }
     }),
     addChannel: builder.mutation({
       query: (name) => ({
