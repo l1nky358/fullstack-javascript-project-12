@@ -1,13 +1,15 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
+  "type": "module",
   "description": "Hexlet Chat",
   "engines": {
     "node": "22.x"
   },
   "scripts": {
-    "build": "echo 'Build completed'",
-    "start": "npm start",
+    "build": "npm run build:client",
+    "build:client": "vite build",
+    "start": "node server.js",
     "test": "echo 'Skipping tests for debugging'"
   },
   "dependencies": {
