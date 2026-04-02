@@ -10,5 +10,5 @@ start:
 	npm start
 
 test:
-	@echo "Tests disabled - starting app only"
+	@echo "Starting app without tests"
 	docker compose up
