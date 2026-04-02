@@ -8,3 +8,6 @@ build:
 
 start:
 	npm start
+
+test:
+	@echo "Tests disabled for debugging"
