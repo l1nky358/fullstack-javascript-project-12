@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-import { showError, showSuccess } from '../Toast';
+import { showSuccess } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -13,6 +13,14 @@ const Login = () => {
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [authError, setAuthError] = useState('');
+
+  // Очищаем ошибку при монтировании и размонтировании
+  useEffect(() => {
+    setAuthError('');
+    return () => {
+      setAuthError('');
+    };
+  }, []);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
@@ -26,18 +34,22 @@ const Login = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      // Очищаем предыдущую ошибку перед новым запросом
+      setAuthError('');
+      
       try {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         showSuccess(t('toast.loginSuccess'));
         navigate('/');
       } catch (error) {
+        // Показываем ошибку только в authError, без toaster
         if (error.status === 401) {
           setAuthError(t('login.errors.invalidCredentials'));
-          showError(t('login.errors.invalidCredentials'));
+          // УБИРАЕМ showError, чтобы не дублировать сообщения
         } else {
           setAuthError(t('login.errors.serverError'));
-          showError(t('login.errors.serverError'));
+          // УБИРАЕМ showError
         }
       }
     },
