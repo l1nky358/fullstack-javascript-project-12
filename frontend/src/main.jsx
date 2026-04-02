@@ -17,7 +17,6 @@ const rollbarConfig = {
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <RollbarProvider config={rollbarConfig}>
       <ErrorBoundary
         fallbackUI={() => (
@@ -34,5 +33,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </ReduxProvider>
       </ErrorBoundary>
     </RollbarProvider>
-  </React.StrictMode>
 );
