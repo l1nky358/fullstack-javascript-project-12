@@ -1,17 +1,45 @@
 import { toast } from 'react-toastify';
 
 export const showSuccess = (message) => {
-  console.log('Toast suppressed (success):', message);
+  toast.success(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showError = (message) => {
-  console.log('Toast suppressed (error):', message);
+  toast.error(message, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showWarning = (message) => {
-  console.log('Toast suppressed (warning):', message);
+  toast.warning(message, {
+    position: "top-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showInfo = (message) => {
-  console.log('Toast suppressed (info):', message);
+  toast.info(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
