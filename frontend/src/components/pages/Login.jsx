@@ -13,6 +13,7 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [authError, setAuthError] = useState('');
 
+  // Очищаем ошибку при монтировании
   useEffect(() => {
     setAuthError('');
   }, []);
@@ -28,7 +29,7 @@ const Login = () => {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       setAuthError('');
       
       try {
