@@ -13,7 +13,6 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [authError, setAuthError] = useState('');
 
-  // Очищаем ошибку при монтировании
   useEffect(() => {
     setAuthError('');
   }, []);
@@ -29,7 +28,7 @@ const Login = () => {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
       setAuthError('');
       
       try {
@@ -42,6 +41,8 @@ const Login = () => {
         } else {
           setAuthError(t('login.errors.serverError'));
         }
+      } finally {
+        setSubmitting(false);
       }
     },
   });
@@ -54,7 +55,6 @@ const Login = () => {
           <p>Добро пожаловать обратно!</p>
         </div>
         
-        {/* Только один блок для ошибки */}
         {authError && (
           <div className="auth-error">
             {authError}
