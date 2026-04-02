@@ -1,34 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
+import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
-  const [authError, setAuthError] = useState('');
-
-  useEffect(() => {
-    setAuthError('');
-    
-    const removeDuplicateErrors = () => {
-      const errors = document.querySelectorAll('.auth-error');
-      if (errors.length > 1) {
-        for (let i = 1; i < errors.length; i++) {
-          errors[i].remove();
-        }
-      }
-    };
-    
-    removeDuplicateErrors();
-    const interval = setInterval(removeDuplicateErrors, 100);
-    return () => clearInterval(interval);
-  }, []);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
@@ -42,17 +25,15 @@ const Login = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
-      setAuthError('');
-      
       try {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         navigate('/');
       } catch (error) {
         if (error.status === 401) {
-          setAuthError(t('login.errors.invalidCredentials'));
+          showError(t('login.errors.invalidCredentials'));
         } else {
-          setAuthError(t('login.errors.serverError'));
+          showError(t('login.errors.serverError'));
         }
       }
     },
@@ -66,11 +47,7 @@ const Login = () => {
           <p>Добро пожаловать обратно!</p>
         </div>
         
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
+        {/* Убираем блок ошибки на странице */}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
