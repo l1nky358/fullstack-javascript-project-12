@@ -15,21 +15,6 @@ const Login = () => {
 
   useEffect(() => {
     setAuthError('');
-
-    const observer = new MutationObserver(() => {
-      const errors = document.querySelectorAll('*');
-      errors.forEach(el => {
-        if (el.textContent === 'Неверные имя пользователя или пароль') {
-          console.log('FOUND ERROR ELEMENT:', el);
-          console.log('Element tag:', el.tagName);
-          console.log('Element class:', el.className);
-          console.log('Parent:', el.parentElement?.tagName);
-        }
-      });
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
   }, []);
 
   const validationSchema = yup.object({
@@ -43,23 +28,19 @@ const Login = () => {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       setAuthError('');
-      
-      const allElements = document.querySelectorAll('*');
-      allElements.forEach(el => {
-        if (el.textContent === 'Неверные имя пользователя или пароль') {
-          el.remove();
-        }
-      });
       
       try {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         navigate('/');
       } catch (error) {
-        console.log('Login error, not showing message for successful test');
-        setAuthError('');
+        if (error.status === 401) {
+          setAuthError(t('login.errors.invalidCredentials'));
+        } else {
+          setAuthError(t('login.errors.serverError'));
+        }
       }
     },
   });
@@ -71,6 +52,13 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Добро пожаловать обратно!</p>
         </div>
+        
+        {/* Только один блок для ошибки */}
+        {authError && (
+          <div className="auth-error">
+            {authError}
+          </div>
+        )}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
