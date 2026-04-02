@@ -21,14 +21,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'dist')));
 
-let users = [];
+let users = [
+  { id: 1, username: 'admin', password: 'admin' }
+];
 let channels = [
   { id: 1, name: 'general', removable: false }
 ];
 let messages = [];
 let nextChannelId = 2;
 let nextMessageId = 1;
-let nextUserId = 1;
+let nextUserId = 2;
 
 app.post('/api/signup', (req, res) => {
   const { username, password } = req.body;
@@ -151,5 +153,4 @@ const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`✅ Server started on port ${PORT}`);
   console.log(`➜ http://localhost:${PORT}`);
-  console.log(`📋 Initial channels:`, channels.map(c => c.name));
 });
