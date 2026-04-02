@@ -5,7 +5,6 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useSignupMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-import { showError, showSuccess } from '../Toast';
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -38,6 +37,8 @@ const Signup = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      setAuthError('');
+      
       try {
         const response = await signup({
           username: values.username,
@@ -45,16 +46,12 @@ const Signup = () => {
         }).unwrap();
         
         login(response.token, values.username);
-        showSuccess(t('toast.signupSuccess'));
         navigate('/');
       } catch (error) {
-        console.error('Signup error:', error);
         if (error.status === 409) {
           setAuthError(t('signup.errors.userExists'));
-          showError(t('signup.errors.userExists'));
         } else {
           setAuthError(t('signup.errors.serverError'));
-          showError(t('signup.errors.serverError'));
         }
       }
     },
