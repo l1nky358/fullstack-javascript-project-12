@@ -54,12 +54,6 @@ const Login = () => {
         </div>
         
         {/* Только один блок ошибки */}
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
-        
         <form onSubmit={formik.handleSubmit} className="auth-form">
           {/* ... остальной код формы без изменений ... */}
         </form>
