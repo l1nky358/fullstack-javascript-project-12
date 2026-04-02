@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
@@ -12,6 +12,21 @@ const Login = () => {
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [authError, setAuthError] = useState('');
+
+  useEffect(() => {
+    const removeDuplicateErrors = () => {
+      const errors = document.querySelectorAll('.auth-error');
+      if (errors.length > 1) {
+        for (let i = 1; i < errors.length; i++) {
+          errors[i].remove();
+        }
+      }
+    };
+    
+    removeDuplicateErrors();
+    const interval = setInterval(removeDuplicateErrors, 50);
+    return () => clearInterval(interval);
+  }, [authError]);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
