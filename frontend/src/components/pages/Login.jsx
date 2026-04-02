@@ -15,6 +15,19 @@ const Login = () => {
 
   useEffect(() => {
     setAuthError('');
+    
+    const removeDuplicateErrors = () => {
+      const errors = document.querySelectorAll('.auth-error');
+      if (errors.length > 1) {
+        for (let i = 1; i < errors.length; i++) {
+          errors[i].remove();
+        }
+      }
+    };
+    
+    removeDuplicateErrors();
+    const interval = setInterval(removeDuplicateErrors, 100);
+    return () => clearInterval(interval);
   }, []);
 
   const validationSchema = yup.object({
@@ -28,7 +41,7 @@ const Login = () => {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values, { resetForm, setSubmitting }) => {
+    onSubmit: async (values) => {
       setAuthError('');
       
       try {
@@ -41,8 +54,6 @@ const Login = () => {
         } else {
           setAuthError(t('login.errors.serverError'));
         }
-      } finally {
-        setSubmitting(false);
       }
     },
   });
