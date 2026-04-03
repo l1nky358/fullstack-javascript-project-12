@@ -11,10 +11,6 @@ export const showSuccess = (message) => {
   });
 };
 
-export const showError = (message) => {
-  console.log('Error (blocked):', message);
-};
-
 export const showWarning = (message) => {
   toast.warning(message, {
     position: "top-right",
