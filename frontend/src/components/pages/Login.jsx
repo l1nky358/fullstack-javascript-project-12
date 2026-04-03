@@ -28,7 +28,22 @@ const Login = () => {
       password: '',
     },
     validationSchema,
+    validateOnChange: false,
+    validateOnBlur: false,
     onSubmit: async (values) => {
+      const errors = {};
+      if (!values.username) {
+        errors.username = t('login.errors.usernameRequired');
+      }
+      if (!values.password) {
+        errors.password = t('login.errors.passwordRequired');
+      }
+      
+      if (Object.keys(errors).length > 0) {
+        formik.setErrors(errors);
+        return;
+      }
+      
       setAuthError('');
       
       try {
@@ -53,7 +68,6 @@ const Login = () => {
           <p>Добро пожаловать обратно!</p>
         </div>
         
-        {/* Только один блок ошибки */}
         {authError && (
           <div className="auth-error">
             {authError}
@@ -61,9 +75,72 @@ const Login = () => {
         )}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
-          {/* ... остальной код формы без изменений ... */}
+          <div className="form-group">
+            <label htmlFor="username">
+              {t('login.username')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Введите ваш ник"
+                className={`form-input ${formik.touched.username && formik.errors.username ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.username}
+              />
+            </div>
+            {formik.touched.username && formik.errors.username && (
+              <div className="error-message">{formik.errors.username}</div>
+            )}
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">
+              {t('login.password')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Введите пароль"
+                className={`form-input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+              />
+            </div>
+            {formik.touched.password && formik.errors.password && (
+              <div className="error-message">{formik.errors.password}</div>
+            )}
+          </div>
+          
+          <button
+            type="submit"
+            className="auth-button"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="button-loader"></span>
+            ) : (
+              t('login.submit')
+            )}
+          </button>
         </form>
+        
+        <div className="auth-footer">
+          {t('login.noAccount')}{' '}
+          <Link to="/signup" className="auth-link">
+            {t('login.signup')}
+          </Link>
+        </div>
       </div>
     </div>
   );
 };
+
+export default Login;
