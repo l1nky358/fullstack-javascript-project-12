@@ -17,20 +17,20 @@ const rollbarConfig = {
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <RollbarProvider config={rollbarConfig}>
-      <ErrorBoundary
-        fallbackUI={() => (
-          <div style={{ padding: '20px', color: 'red' }}>
-            <h2>Oops, something went wrong.</h2>
-            <p>We've been notified and are looking into it.</p>
-          </div>
-        )}
-      >
-        <ReduxProvider store={store}>
-          <I18nextProvider i18n={i18n}>
-            <App />
-          </I18nextProvider>
-        </ReduxProvider>
-      </ErrorBoundary>
-    </RollbarProvider>
+  <RollbarProvider config={rollbarConfig}>
+    <ErrorBoundary
+      fallbackUI={() => (
+        <div style={{ padding: '20px', color: 'red' }}>
+          <h2>Oops, something went wrong.</h2>
+          <p>We've been notified and are looking into it.</p>
+        </div>
+      )}
+    >
+      <ReduxProvider store={store}>
+        <I18nextProvider i18n={i18n}>
+          <App />
+        </I18nextProvider>
+      </ReduxProvider>
+    </ErrorBoundary>
+  </RollbarProvider>
 );
