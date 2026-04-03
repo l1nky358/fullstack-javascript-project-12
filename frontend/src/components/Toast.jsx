@@ -1,5 +1,8 @@
 import { toast } from 'react-toastify';
 
+let lastErrorTime = 0;
+let lastErrorMessage = '';
+
 export const showSuccess = (message) => {
   toast.success(message, {
     position: "top-right",
@@ -12,6 +15,13 @@ export const showSuccess = (message) => {
 };
 
 export const showError = (message) => {
+  const now = Date.now();
+  if (message === lastErrorMessage && now - lastErrorTime < 500) {
+    return;
+  }
+  lastErrorTime = now;
+  lastErrorMessage = message;
+  
   toast.error(message, {
     position: "top-right",
     autoClose: 3000,
