@@ -28,7 +28,7 @@ function App() {
           </Routes>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer limit={1} />
     </BrowserRouter>
   );
 }
