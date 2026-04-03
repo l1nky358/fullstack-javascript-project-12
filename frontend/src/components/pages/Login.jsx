@@ -17,6 +17,30 @@ const Login = () => {
     setAuthError('');
   }, []);
 
+  useEffect(() => {
+    const removeDuplicateErrors = () => {
+      const allElements = document.querySelectorAll('*');
+      const errors = [];
+      
+      allElements.forEach(el => {
+        if (el.textContent === 'Неверные имя пользователя или пароль') {
+          errors.push(el);
+        }
+      });
+
+      if (errors.length > 1) {
+        for (let i = 1; i < errors.length; i++) {
+          errors[i].remove();
+        }
+      }
+    };
+    
+    removeDuplicateErrors();
+    const interval = setInterval(removeDuplicateErrors, 100);
+    
+    return () => clearInterval(interval);
+  }, [authError]);
+
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
     password: yup.string().required(t('login.errors.passwordRequired')),
@@ -35,12 +59,10 @@ const Login = () => {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         navigate('/');
-      }
-      catch (error) {
+      } catch (error) {
         if (error.status === 401) {
           setAuthError(t('login.errors.invalidCredentials'));
-        }
-        else {
+        } else {
           setAuthError(t('login.errors.serverError'));
         }
       }
