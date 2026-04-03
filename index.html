@@ -8,27 +8,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      setInterval(() => {
-        const allElements = document.querySelectorAll('*');
-        const errors = [];
-        
-        allElements.forEach(el => {
-          if (el.textContent === 'Неверные имя пользователя или пароль' && 
-              el.children.length === 0) {
-            errors.push(el);
-          }
-        });
-        
-        if (errors.length > 1) {
-          for (let i = 1; i < errors.length; i++) {
-            if (errors[i].parentNode) {
-              errors[i].parentNode.removeChild(errors[i]);
-            }
-          }
-        }
-      }, 50);
-    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
