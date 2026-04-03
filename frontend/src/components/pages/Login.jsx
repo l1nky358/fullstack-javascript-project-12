@@ -1,65 +1,92 @@
-import { toast } from 'react-toastify';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLoginMutation } from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
+import { showError } from '../Toast';
 
-let errorDiv = null;
+const Login = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [loginMutation] = useLoginMutation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-export const showSuccess = (message) => {
-  toast.success(message, {
-    position: "top-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  });
-};
-
-export const showError = (message) => {
-  if (errorDiv) {
-    errorDiv.remove();
-  }
-  
-  errorDiv = document.createElement('div');
-  errorDiv.textContent = message;
-  errorDiv.style.position = 'fixed';
-  errorDiv.style.top = '20px';
-  errorDiv.style.right = '20px';
-  errorDiv.style.backgroundColor = '#ef4444';
-  errorDiv.style.color = 'white';
-  errorDiv.style.padding = '12px 20px';
-  errorDiv.style.borderRadius = '8px';
-  errorDiv.style.zIndex = '9999';
-  errorDiv.style.fontSize = '14px';
-  errorDiv.style.fontWeight = '500';
-  errorDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-  
-  document.body.appendChild(errorDiv);
-  
-  setTimeout(() => {
-    if (errorDiv) {
-      errorDiv.remove();
-      errorDiv = null;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await loginMutation({ username, password }).unwrap();
+      login(response.token, username);
+      navigate('/');
+    } catch (err) {
+      showError(t('login.errors.invalidCredentials'));
     }
-  }, 3000);
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>{t('login.title')}</h2>
+          <p>Добро пожаловать обратно!</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="username">
+              {t('login.username')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Введите ваш ник"
+                className="form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">
+              {t('login.password')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Введите пароль"
+                className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            className="auth-button"
+          >
+            {t('login.submit')}
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          {t('login.noAccount')}{' '}
+          <Link to="/signup" className="auth-link">
+            {t('login.signup')}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export const showWarning = (message) => {
-  toast.warning(message, {
-    position: "top-right",
-    autoClose: 4000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  });
-};
-
-export const showInfo = (message) => {
-  toast.info(message, {
-    position: "top-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  });
-};
+export default Login;
