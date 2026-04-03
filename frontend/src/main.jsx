@@ -16,23 +16,36 @@ const rollbarConfig = {
   captureUnhandledRejections: true,
 };
 
-const removeDuplicateErrors = () => {
-  const errorElements = document.querySelectorAll('.Toastify__toast--error');
-  if (errorElements.length > 1) {
-    for (let i = 1; i < errorElements.length; i++) {
-      errorElements[i].remove();
+// ФИЛЬТР ДУБЛИКАТОВ ОШИБОК
+setInterval(() => {
+  const errorText = 'Неверные имя пользователя или пароль';
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: (node) => {
+        if (node.textContent === errorText) {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+        return NodeFilter.FILTER_SKIP;
+      }
+    }
+  );
+  
+  const textNodes = [];
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode);
+  }
+  
+  if (textNodes.length > 1) {
+    for (let i = 1; i < textNodes.length; i++) {
+      const parent = textNodes[i].parentNode;
+      if (parent) {
+        parent.removeChild(textNodes[i]);
+      }
     }
   }
-};
-
-const observer = new MutationObserver(() => {
-  removeDuplicateErrors();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  observer.observe(document.body, { childList: true, subtree: true });
-  removeDuplicateErrors();
-});
+}, 100);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RollbarProvider config={rollbarConfig}>
