@@ -11,17 +11,21 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
-    }
-    catch (err) {
-      alert('Неверные имя пользователя или пароль');
+    } catch (err) {
+      const errorMessage = t('login.errors.invalidCredentials', { 
+        defaultValue: 'Неверные имя пользователя или пароль' 
+      });
+      setError(errorMessage);
     }
   };
 
@@ -29,14 +33,20 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h2>{t('login.title') || 'Вход'}</h2>
-          <p>Войдите в свой аккаунт</p>
+          <h2>{t('login.title', { defaultValue: 'Вход' })}</h2>
+          <p>{t('login.subtitle', { defaultValue: 'Войдите в свой аккаунт' })}</p>
         </div>
+        
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">
-              {t('login.username') || 'Имя пользователя'}
+              {t('login.username', { defaultValue: 'Имя пользователя' })}
             </label>
             <div className="input-wrapper">
               <span className="input-icon">👤</span>
@@ -45,7 +55,7 @@ const Login = () => {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('login.placeholders.username') || 'Ваш ник'}
+                placeholder={t('login.placeholders.username', { defaultValue: 'Ваш ник' })}
                 className="form-input"
                 required
               />
@@ -54,7 +64,7 @@ const Login = () => {
           
           <div className="form-group">
             <label htmlFor="password">
-              {t('login.password') || 'Пароль'}
+              {t('login.password', { defaultValue: 'Пароль' })}
             </label>
             <div className="input-wrapper">
               <span className="input-icon">🔒</span>
@@ -63,7 +73,7 @@ const Login = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('login.placeholders.password') || 'Пароль'}
+                placeholder={t('login.placeholders.password', { defaultValue: 'Пароль' })}
                 className="form-input"
                 required
               />
@@ -78,15 +88,15 @@ const Login = () => {
             {isLoading ? (
               <span className="button-loader"></span>
             ) : (
-              t('login.submit') || 'Войти'
+              t('login.submit', { defaultValue: 'Войти' })
             )}
           </button>
         </form>
         
         <div className="auth-footer">
-          {t('login.noAccount') || 'Нет аккаунта?'}{' '}
+          {t('login.noAccount', { defaultValue: 'Нет аккаунта?' })}{' '}
           <Link to="/signup" className="auth-link">
-            {t('login.signup') || 'Регистрация'}
+            {t('login.signup', { defaultValue: 'Регистрация' })}
           </Link>
         </div>
       </div>
