@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -30,11 +29,7 @@ const Login = () => {
         login(response.token, values.username);
         navigate('/');
       } catch (error) {
-        if (error.status === 401) {
-          showError(t('login.errors.invalidCredentials'));
-        } else {
-          showError(t('login.errors.serverError'));
-        }
+        console.log('Login failed');
       }
     },
   });
@@ -46,6 +41,8 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Добро пожаловать обратно!</p>
         </div>
+        
+        {/* НЕТ БЛОКА С ОШИБКОЙ */}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
