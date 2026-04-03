@@ -19,7 +19,8 @@ const Login = () => {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
-    } catch (err) {
+    }
+    catch (err) {
       alert('Неверные имя пользователя или пароль');
     }
   };
