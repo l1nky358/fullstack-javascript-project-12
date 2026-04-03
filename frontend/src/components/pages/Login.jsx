@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-let lastErrorTime = 0;
+let lastErrorTime = 1;
 let lastErrorMessage = '';
 
 export const showSuccess = (message) => {
