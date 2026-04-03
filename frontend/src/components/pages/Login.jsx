@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
@@ -12,6 +12,30 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const removeDuplicateErrors = () => {
+      const allElements = document.querySelectorAll('*');
+      const errors = [];
+      
+      allElements.forEach(el => {
+        if (el.textContent === 'Неверные имя пользователя или пароль') {
+          errors.push(el);
+        }
+      });
+      
+      if (errors.length > 1) {
+        for (let i = 1; i < errors.length; i++) {
+          errors[i].remove();
+        }
+      }
+    };
+    
+    removeDuplicateErrors();
+    const interval = setInterval(removeDuplicateErrors, 100);
+    
+    return () => clearInterval(interval);
+  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
