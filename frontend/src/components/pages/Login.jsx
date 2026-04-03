@@ -21,11 +21,9 @@ const Login = () => {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
-    } catch (err) {
-      const errorMessage = t('login.errors.invalidCredentials', { 
-        defaultValue: 'Неверные имя пользователя или пароль' 
-      });
-      setError(errorMessage);
+    }
+    catch (err) {
+      setError(t('login.errors.invalidCredentials'));
     }
   };
 
@@ -33,8 +31,8 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h2>{t('login.title', { defaultValue: 'Вход' })}</h2>
-          <p>{t('login.subtitle', { defaultValue: 'Войдите в свой аккаунт' })}</p>
+          <h2>{t('login.title')}</h2>
+          <p>Войдите в свой аккаунт</p>
         </div>
         
         {error && (
@@ -46,7 +44,7 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">
-              {t('login.username', { defaultValue: 'Имя пользователя' })}
+              {t('login.username')}
             </label>
             <div className="input-wrapper">
               <span className="input-icon">👤</span>
@@ -55,7 +53,7 @@ const Login = () => {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('login.placeholders.username', { defaultValue: 'Ваш ник' })}
+                placeholder={t('login.username')}
                 className="form-input"
                 required
               />
@@ -64,7 +62,7 @@ const Login = () => {
           
           <div className="form-group">
             <label htmlFor="password">
-              {t('login.password', { defaultValue: 'Пароль' })}
+              {t('login.password')}
             </label>
             <div className="input-wrapper">
               <span className="input-icon">🔒</span>
@@ -73,7 +71,7 @@ const Login = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('login.placeholders.password', { defaultValue: 'Пароль' })}
+                placeholder={t('login.password')}
                 className="form-input"
                 required
               />
@@ -88,15 +86,15 @@ const Login = () => {
             {isLoading ? (
               <span className="button-loader"></span>
             ) : (
-              t('login.submit', { defaultValue: 'Войти' })
+              t('login.submit')
             )}
           </button>
         </form>
         
         <div className="auth-footer">
-          {t('login.noAccount', { defaultValue: 'Нет аккаунта?' })}{' '}
+          {t('login.noAccount')}{' '}
           <Link to="/signup" className="auth-link">
-            {t('login.signup', { defaultValue: 'Регистрация' })}
+            {t('login.signup')}
           </Link>
         </div>
       </div>
