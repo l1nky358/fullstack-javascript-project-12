@@ -1,95 +1,60 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useLoginMutation } from '../../services/api';
-import { useAuth } from '../../hooks/useAuth';
-import { showError } from '../Toast';
+import { toast } from 'react-toastify';
 
-const Login = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const [loginMutation] = useLoginMutation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+let lastErrorTime = 0;
+let lastErrorMessage = '';
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const response = await loginMutation({ username, password }).unwrap();
-      login(response.token, username);
-      navigate('/');
-    } catch (err) {
-      // ТОЛЬКО тост, НЕТ блока с ошибкой
-      showError(t('login.errors.invalidCredentials'));
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h2>{t('login.title')}</h2>
-          <p>Добро пожаловать обратно!</p>
-        </div>
-        
-        {/* НЕТ БЛОКА {error && ...} - ТОЛЬКО ТОСТ */}
-        
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="username">
-              {t('login.username')}
-            </label>
-            <div className="input-wrapper">
-              <span className="input-icon">👤</span>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                placeholder="Введите ваш ник"
-                className="form-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">
-              {t('login.password')}
-            </label>
-            <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Введите пароль"
-                className="form-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <button
-            type="submit"
-            className="auth-button"
-          >
-            {t('login.submit')}
-          </button>
-        </form>
-        
-        <div className="auth-footer">
-          {t('login.noAccount')}{' '}
-          <Link to="/signup" className="auth-link">
-            {t('login.signup')}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+export const showSuccess = (message) => {
+  toast.success(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
-export default Login;
+export const showError = (message) => {
+  const now = Date.now();
+  
+  if (message === lastErrorMessage && now - lastErrorTime < 1000) {
+    console.log('Duplicate error blocked');
+    return;
+  }
+  
+  lastErrorTime = now;
+  lastErrorMessage = message;
+  
+  toast.dismiss();
+  
+  toast.error(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
+};
+
+export const showWarning = (message) => {
+  toast.warning(message, {
+    position: "top-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
+};
+
+export const showInfo = (message) => {
+  toast.info(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
+};
