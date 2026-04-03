@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
+import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -11,20 +12,16 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAuthError('');
-    
-    if (isLoading) return;
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setAuthError(t('login.errors.invalidCredentials') || 'Неверные имя пользователя или пароль');
+      showError('Неверные имя пользователя или пароль');
     }
   };
 
@@ -35,12 +32,6 @@ const Login = () => {
           <h2>{t('login.title') || 'Вход'}</h2>
           <p>Войдите в свой аккаунт</p>
         </div>
-        
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
