@@ -16,37 +16,6 @@ const rollbarConfig = {
   captureUnhandledRejections: true,
 };
 
-// ФИЛЬТР ДУБЛИКАТОВ ОШИБОК
-setInterval(() => {
-  const errorText = 'Неверные имя пользователя или пароль';
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-    {
-      acceptNode: (node) => {
-        if (node.textContent === errorText) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-        return NodeFilter.FILTER_SKIP;
-      }
-    }
-  );
-  
-  const textNodes = [];
-  while (walker.nextNode()) {
-    textNodes.push(walker.currentNode);
-  }
-  
-  if (textNodes.length > 1) {
-    for (let i = 1; i < textNodes.length; i++) {
-      const parent = textNodes[i].parentNode;
-      if (parent) {
-        parent.removeChild(textNodes[i]);
-      }
-    }
-  }
-}, 100);
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RollbarProvider config={rollbarConfig}>
     <ErrorBoundary
