@@ -21,47 +21,68 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      showError('Неверные имя пользователя или пароль');
+      showError(t('login.errors.invalidCredentials'));
     }
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
-      <div className="card shadow-sm" style={{ width: '400px' }}>
-        <div className="card-body p-4">
-          <h2 className="text-center mb-4">Вход в чат</h2>
-          
-          {/* Убираем блок ошибки */}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Ваш ник</label>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2>{t('login.title')}</h2>
+          <p>Добро пожаловать обратно!</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="username">
+              {t('login.username')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">👤</span>
               <input
                 type="text"
-                className="form-control"
+                id="username"
+                name="username"
+                placeholder="Введите ваш ник"
+                className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
-            
-            <div className="mb-3">
-              <label className="form-label">Пароль</label>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">
+              {t('login.password')}
+            </label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
               <input
                 type="password"
-                className="form-control"
+                id="password"
+                name="password"
+                placeholder="Введите пароль"
+                className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            
-            <button type="submit" className="btn btn-primary w-100">
-              Войти
-            </button>
-          </form>
-          
-          <div className="text-center mt-3">
-            Нет аккаунта? <Link to="/signup">Регистрация</Link>
           </div>
+          
+          <button
+            type="submit"
+            className="auth-button"
+          >
+            {t('login.submit')}
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          {t('login.noAccount')}{' '}
+          <Link to="/signup" className="auth-link">
+            {t('login.signup')}
+          </Link>
         </div>
       </div>
     </div>
