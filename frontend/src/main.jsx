@@ -16,6 +16,24 @@ const rollbarConfig = {
   captureUnhandledRejections: true,
 };
 
+const removeDuplicateErrors = () => {
+  const errorElements = document.querySelectorAll('.Toastify__toast--error');
+  if (errorElements.length > 1) {
+    for (let i = 1; i < errorElements.length; i++) {
+      errorElements[i].remove();
+    }
+  }
+};
+
+const observer = new MutationObserver(() => {
+  removeDuplicateErrors();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  observer.observe(document.body, { childList: true, subtree: true });
+  removeDuplicateErrors();
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RollbarProvider config={rollbarConfig}>
     <ErrorBoundary
