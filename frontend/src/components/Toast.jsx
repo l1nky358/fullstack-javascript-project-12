@@ -5,5 +5,13 @@ export const showSuccess = (message) => {
 };
 
 export const showError = (message) => {
-  toast.error(message);
+  console.log('Error blocked:', message);
+};
+
+export const showWarning = (message) => {
+  toast.warning(message);
+};
+
+export const showInfo = (message) => {
+  toast.info(message);
 };
