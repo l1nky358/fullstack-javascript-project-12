@@ -1,21 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
+import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
-  const [authError, setAuthError] = useState('');
-
-  useEffect(() => {
-    setAuthError('');
-  }, []);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
@@ -28,33 +24,16 @@ const Login = () => {
       password: '',
     },
     validationSchema,
-    validateOnChange: false,
-    validateOnBlur: false,
     onSubmit: async (values) => {
-      const errors = {};
-      if (!values.username) {
-        errors.username = t('login.errors.usernameRequired');
-      }
-      if (!values.password) {
-        errors.password = t('login.errors.passwordRequired');
-      }
-      
-      if (Object.keys(errors).length > 0) {
-        formik.setErrors(errors);
-        return;
-      }
-      
-      setAuthError('');
-      
       try {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         navigate('/');
       } catch (error) {
         if (error.status === 401) {
-          setAuthError(t('login.errors.invalidCredentials'));
+          showError(t('login.errors.invalidCredentials'));
         } else {
-          setAuthError(t('login.errors.serverError'));
+          showError(t('login.errors.serverError'));
         }
       }
     },
@@ -68,11 +47,7 @@ const Login = () => {
           <p>Добро пожаловать обратно!</p>
         </div>
         
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
+        {/* Убираем блок authError полностью */}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
