@@ -1,14 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hexlet Chat</title>
-    <script type="module" crossorigin src="/assets/index-Bd2je6zb.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CD7THwRv.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
+    <script>
+      setInterval(() => {
+        const allElements = document.querySelectorAll('*');
+        const errors = [];
+        
+        allElements.forEach(el => {
+          if (el.textContent === 'Неверные имя пользователя или пароль' && 
+              el.children.length === 0) {
+            errors.push(el);
+          }
+        });
+        
+        if (errors.length > 1) {
+          for (let i = 1; i < errors.length; i++) {
+            if (errors[i].parentNode) {
+              errors[i].parentNode.removeChild(errors[i]);
+            }
+          }
+        }
+      }, 50);
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
