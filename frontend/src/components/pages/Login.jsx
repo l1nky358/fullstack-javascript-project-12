@@ -21,6 +21,7 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
+      // Только тост в правом верхнем углу
       showError(t('login.errors.invalidCredentials') || 'Неверные имя пользователя или пароль');
     }
   };
