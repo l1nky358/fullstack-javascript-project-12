@@ -810,3 +810,6 @@ body {
   box-shadow: 0 0 0px 1000px white inset;
   border-color: #667eea;
 }
+.auth-error {
+  display: none !important;
+}
