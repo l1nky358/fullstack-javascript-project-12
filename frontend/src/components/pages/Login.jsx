@@ -8,21 +8,21 @@ const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [loginMutation, { isLoading }] = useLoginMutation();
+  const [loginMutation] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-
+    setError('');
+    
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setError(t('login.errors.invalidCredentials'));
+      setError('Неверные имя пользователя или пароль');
     }
   };
 
@@ -33,14 +33,13 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Добро пожаловать обратно!</p>
         </div>
-
-        {/* ИЗМЕНЕНИЕ: Условный рендеринг блока с ошибкой */}
+        
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <div className="alert alert-danger" style={{marginBottom: '20px'}}>
             {error}
           </div>
         )}
-
+        
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">{t('login.username')}</label>
@@ -49,15 +48,13 @@ const Login = () => {
               <input
                 type="text"
                 id="username"
-                name="username"
-                placeholder="Введите ваш ник"
                 className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
           </div>
-
+          
           <div className="form-group">
             <label htmlFor="password">{t('login.password')}</label>
             <div className="input-wrapper">
@@ -65,20 +62,18 @@ const Login = () => {
               <input
                 type="password"
                 id="password"
-                name="password"
-                placeholder="Введите пароль"
                 className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
-
-          <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? <span className="button-loader"></span> : t('login.submit')}
+          
+          <button type="submit" className="auth-button">
+            {t('login.submit')}
           </button>
         </form>
-
+        
         <div className="auth-footer">
           {t('login.noAccount')}{' '}
           <Link to="/signup" className="auth-link">
