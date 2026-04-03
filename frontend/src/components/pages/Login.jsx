@@ -11,18 +11,15 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAuthError(null);
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setAuthError(t('login.errors.invalidCredentials'));
     }
   };
 
@@ -33,13 +30,6 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Войдите в свой аккаунт</p>
         </div>
-        
-        {/* ТОЛЬКО ОДНА ОШИБКА - локальная */}
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
