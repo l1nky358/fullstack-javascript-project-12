@@ -42,11 +42,13 @@ const Chat = () => {
   useEffect(() => {
     if (channelsError) {
       console.error('Error loading channels:', channelsError);
+      // showError(t('toast.error.failedToLoad'));  // ОТКЛЮЧЕНО
     }
     if (messagesError) {
       console.error('Error loading messages:', messagesError);
+      // showError(t('toast.error.failedToLoad'));  // ОТКЛЮЧЕНО
     }
-  }, [channelsError, messagesError]);
+  }, [channelsError, messagesError, t]);
 
   useEffect(() => {
     if (!channelsLoading && channels.length > 0 && !currentChannelId) {
