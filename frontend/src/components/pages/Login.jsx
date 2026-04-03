@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
+  const [authError, setAuthError] = useState('');
+
+  useEffect(() => {
+    setAuthError('');
+  }, []);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
@@ -25,15 +29,19 @@ const Login = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      setAuthError('');
+      
       try {
         const response = await loginMutation(values).unwrap();
         login(response.token, values.username);
         navigate('/');
-      } catch (error) {
+      }
+      catch (error) {
         if (error.status === 401) {
-          showError(t('login.errors.invalidCredentials'));
-        } else {
-          showError(t('login.errors.serverError'));
+          setAuthError(t('login.errors.invalidCredentials'));
+        }
+        else {
+          setAuthError(t('login.errors.serverError'));
         }
       }
     },
@@ -47,7 +55,11 @@ const Login = () => {
           <p>Добро пожаловать обратно!</p>
         </div>
         
-        {/* Убираем блок authError полностью */}
+        {authError && (
+          <div className="auth-error">
+            {authError}
+          </div>
+        )}
         
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
