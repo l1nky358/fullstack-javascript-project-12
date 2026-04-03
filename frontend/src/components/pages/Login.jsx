@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -21,8 +20,7 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      // Только тост в правом верхнем углу
-      showError(t('login.errors.invalidCredentials') || 'Неверные имя пользователя или пароль');
+      alert('Неверные имя пользователя или пароль');
     }
   };
 
