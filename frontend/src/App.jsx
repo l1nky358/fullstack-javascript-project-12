@@ -1,7 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useEffect } from 'react';
 import Header from './components/Header';
 import Chat from './components/Chat';
 import Login from './components/pages/Login';
@@ -15,21 +12,6 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
-  useEffect(() => {
-    const removeDuplicateToasts = () => {
-      const toasts = document.querySelectorAll('.Toastify__toast--error');
-      if (toasts.length > 1) {
-        for (let i = 1; i < toasts.length; i++) {
-          toasts[i].remove();
-        }
-      }
-    };
-    
-    const observer = new MutationObserver(removeDuplicateToasts);
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <BrowserRouter>
@@ -45,7 +27,6 @@ function App() {
           </Routes>
         </div>
       </div>
-      <ToastContainer limit={1} />
     </BrowserRouter>
   );
 }
