@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
+import { showError } from '../Toast';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -11,42 +12,16 @@ const Login = () => {
   const [loginMutation] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const removeDuplicateErrors = () => {
-      const allElements = document.querySelectorAll('*');
-      const errors = [];
-      
-      allElements.forEach(el => {
-        if (el.textContent === 'Неверные имя пользователя или пароль') {
-          errors.push(el);
-        }
-      });
-      
-      if (errors.length > 1) {
-        for (let i = 1; i < errors.length; i++) {
-          errors[i].remove();
-        }
-      }
-    };
-    
-    removeDuplicateErrors();
-    const interval = setInterval(removeDuplicateErrors, 100);
-    
-    return () => clearInterval(interval);
-  }, [error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setError('Неверные имя пользователя или пароль');
+      showError('Неверные имя пользователя или пароль');
     }
   };
 
@@ -56,11 +31,7 @@ const Login = () => {
         <div className="card-body p-4">
           <h2 className="text-center mb-4">Вход в чат</h2>
           
-          {error && (
-            <div className="alert alert-danger text-center">
-              {error}
-            </div>
-          )}
+          {/* Убираем блок ошибки */}
           
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
