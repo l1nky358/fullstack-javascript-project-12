@@ -1,13 +1,29 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useLoginMutation } from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [loginMutation] = useLoginMutation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/');
+    setError('');
+    
+    try {
+      const response = await loginMutation({ username, password }).unwrap();
+      login(response.token, username);
+      navigate('/');
+    } catch (err) {
+      setError(t('login.errors.invalidCredentials'));
+    }
   };
 
   return (
@@ -17,6 +33,12 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Добро пожаловать обратно!</p>
         </div>
+        
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -29,6 +51,8 @@ const Login = () => {
                 name="username"
                 placeholder="Введите ваш ник"
                 className="form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
           </div>
@@ -43,6 +67,8 @@ const Login = () => {
                 name="password"
                 placeholder="Введите пароль"
                 className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
