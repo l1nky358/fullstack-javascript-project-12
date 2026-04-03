@@ -21,6 +21,7 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
+      // ТОЛЬКО тост, НЕТ блока с ошибкой
       showError(t('login.errors.invalidCredentials'));
     }
   };
@@ -32,6 +33,8 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Добро пожаловать обратно!</p>
         </div>
+        
+        {/* НЕТ БЛОКА {error && ...} - ТОЛЬКО ТОСТ */}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
