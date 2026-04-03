@@ -1,31 +1,7 @@
-# Dependencies
 node_modules/
-
-# Build outputs
+npm-debug.log
 dist/
 build/
-
-# Environment files
 .env
-.env.local
-.env.production
-.env.development
-
-# IDE
-.vscode/
-.idea/
-
-# Logs
-*.log
-npm-debug.log*
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Testing
-coverage/
-test-results/
-
-# Vite
-.vite/
+*.log
