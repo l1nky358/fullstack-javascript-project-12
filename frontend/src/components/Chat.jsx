@@ -7,7 +7,6 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import MessageForm from './MessageForm';
 import ChannelsList from './ChannelsList';
 import MessagesList from './MessagesList';
-import { showError } from './Toast';
 
 const Chat = () => {
   const dispatch = useDispatch();
@@ -43,11 +42,9 @@ const Chat = () => {
   useEffect(() => {
     if (channelsError) {
       console.error('Error loading channels:', channelsError);
-      showError(t('toast.error.failedToLoad'));
     }
     if (messagesError) {
       console.error('Error loading messages:', messagesError);
-      showError(t('toast.error.failedToLoad'));
     }
   }, [channelsError, messagesError, t]);
 
