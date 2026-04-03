@@ -1,17 +1,45 @@
 import { toast } from 'react-toastify';
 
 export const showSuccess = (message) => {
-  console.log('🔇 Success blocked:', message);
+  toast.success(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showError = (message) => {
-  console.log('🔇 Error blocked:', message);
+  toast.error(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showWarning = (message) => {
-  console.log('🔇 Warning blocked:', message);
+  toast.warning(message, {
+    position: "top-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
 
 export const showInfo = (message) => {
-  console.log('🔇 Info blocked:', message);
+  toast.info(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
 };
