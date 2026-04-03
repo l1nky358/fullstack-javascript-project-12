@@ -11,21 +11,18 @@ const Login = () => {
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [authError, setAuthError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    console.log('Error cleared');
+    setAuthError(null);
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      console.log('Setting error');
-      setError(t('login.errors.invalidCredentials'));
-      console.log('Error set to:', t('login.errors.invalidCredentials'));
+      setAuthError(t('login.errors.invalidCredentials'));
     }
   };
 
@@ -37,9 +34,10 @@ const Login = () => {
           <p>Войдите в свой аккаунт</p>
         </div>
         
-        {error && (
-          <div className="auth-error" id="login-error-message">
-            {error}
+        {/* ТОЛЬКО ОДНА ОШИБКА - локальная */}
+        {authError && (
+          <div className="auth-error">
+            {authError}
           </div>
         )}
         
