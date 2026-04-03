@@ -16,14 +16,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    console.log('Error cleared');
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
-    }
-    catch (err) {
+    } catch (err) {
+      console.log('Setting error');
       setError(t('login.errors.invalidCredentials'));
+      console.log('Error set to:', t('login.errors.invalidCredentials'));
     }
   };
 
@@ -36,7 +38,7 @@ const Login = () => {
         </div>
         
         {error && (
-          <div className="auth-error">
+          <div className="auth-error" id="login-error-message">
             {error}
           </div>
         )}
