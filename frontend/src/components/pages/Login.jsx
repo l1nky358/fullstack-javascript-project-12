@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
-//import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -20,11 +20,10 @@ const Login = () => {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
-    } 
-    /*catch (err) {
+    } catch (err) {
       toast.error(t('login.errors.invalidCredentials'), {
         toastId: 'login-error'
-      });  */
+      });
     }
   };
 
@@ -35,6 +34,8 @@ const Login = () => {
           <h2>{t('login.title')}</h2>
           <p>Войдите в свой аккаунт</p>
         </div>
+        
+        {/* НЕТ блока с локальной ошибкой */}
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -67,11 +68,7 @@ const Login = () => {
             </div>
           </div>
           
-          <button
-            type="submit"
-            className="auth-button"
-            disabled={isLoading}
-          >
+          <button type="submit" className="auth-button" disabled={isLoading}>
             {isLoading ? <span className="button-loader"></span> : t('login.submit')}
           </button>
         </form>
