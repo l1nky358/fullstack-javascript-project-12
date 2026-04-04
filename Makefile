@@ -11,4 +11,7 @@ start:
 lint:
 	cd frontend && npx eslint --ext js,jsx src
 
-.PHONY: install build start lint
+test:
+	@echo "Tests disabled for now"
+
+.PHONY: install build start lint test
