@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -9,19 +11,35 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const response = await loginMutation({ username, password }).unwrap();
-      login(response.token, username);
-      navigate('/');
-    } catch (err) {
-    }
-  };
+  const validationSchema = yup.object({
+    username: yup.string().required(t('login.errors.usernameRequired')),
+    password: yup.string().required(t('login.errors.passwordRequired')),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      setAuthError('');
+      
+      try {
+        const response = await loginMutation({
+          username: values.username,
+          password: values.password,
+        }).unwrap();
+        
+        login(response.token, values.username);
+        navigate('/');
+      } catch (error) {
+        setAuthError(t('login.errors.invalidCredentials'));
+      }
+    },
+  });
 
   return (
     <div className="auth-container">
@@ -31,7 +49,13 @@ const Login = () => {
           <p>Войдите в свой аккаунт</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="auth-form">
+        {authError && (
+          <div className="auth-error">
+            {authError}
+          </div>
+        )}
+        
+        <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">
               {t('login.username')}
@@ -41,12 +65,17 @@ const Login = () => {
               <input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="form-input"
-                required
+                name="username"
+                placeholder={t('login.placeholders.username')}
+                className={`form-input ${formik.touched.username && formik.errors.username ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.username}
               />
             </div>
+            {formik.touched.username && formik.errors.username && (
+              <div className="error-message">{formik.errors.username}</div>
+            )}
           </div>
           
           <div className="form-group">
@@ -58,12 +87,17 @@ const Login = () => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="form-input"
-                required
+                name="password"
+                placeholder={t('login.placeholders.password')}
+                className={`form-input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
               />
             </div>
+            {formik.touched.password && formik.errors.password && (
+              <div className="error-message">{formik.errors.password}</div>
+            )}
           </div>
           
           <button
