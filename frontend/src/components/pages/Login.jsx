@@ -35,8 +35,6 @@ const Login = () => {
           <p>Войдите в свой аккаунт</p>
         </div>
         
-        {/* НЕТ блока с локальной ошибкой */}
-        
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">{t('login.username')}</label>
@@ -74,9 +72,9 @@ const Login = () => {
         </form>
         
         <div className="auth-footer">
-          {t('login.noAccount')}{' '}
+          Нет аккаунта?{' '}
           <Link to="/signup" className="auth-link">
-            {t('login.signup')}
+            Регистрация
           </Link>
         </div>
       </div>
