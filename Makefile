@@ -6,7 +6,7 @@ build:
 	cd frontend && npm run build
 
 start:
-	cd frontend && npm run dev
+	npm start
 
 lint:
 	cd frontend && npx eslint --ext js,jsx src
