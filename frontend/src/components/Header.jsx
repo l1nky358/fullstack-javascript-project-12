@@ -15,7 +15,8 @@ const Header = () => {
   return (
     <header className="bg-primary text-white p-3">
       <div className="container d-flex justify-content-between align-items-center">
-        <h1 className="h4 m-0">{t('header.title')}</h1>
+        <h1 className="h4 m-0">Hexlet Chat</h1>
+        
         {token && (
           <div>
             <span className="me-3">{username}</span>
