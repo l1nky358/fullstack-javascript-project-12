@@ -4,10 +4,10 @@ export const showSuccess = (message) => {
   toast.success(message);
 };
 
-export const showError = (message) => {
+/*export const showError = (message) => {
   toast.error(message);
 };
-
+*/
 export const showWarning = (message) => {
   toast.warning(message);
 };
