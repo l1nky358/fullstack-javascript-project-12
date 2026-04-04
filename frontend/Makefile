@@ -1,5 +1,6 @@
 install:
 	cd frontend && npm install
+	cd frontend && npm install react-redux @reduxjs/toolkit react-i18next i18next
 	npm install
 
 build:
