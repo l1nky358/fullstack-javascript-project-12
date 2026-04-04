@@ -22,7 +22,7 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setError(t('login.errors.invalidCredentials'));
+      //setError(t('login.errors.invalidCredentials'));
     }
   };
 
