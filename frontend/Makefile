@@ -1,13 +1,14 @@
 install:
+	cd frontend && npm install
 	npm install
 
 build:
-	npm run build
+	cd frontend && npm run build
 
 start:
-	npm run dev
+	cd frontend && npm run dev
 
 lint:
-	npx eslint --ext js,jsx src
+	cd frontend && npx eslint --ext js,jsx src
 
 .PHONY: install build start lint
