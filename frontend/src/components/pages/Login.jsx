@@ -66,7 +66,7 @@ const Login = () => {
                 type="text"
                 id="username"
                 name="username"
-                placeholder={t('login.placeholders.username')}
+                placeholder={t('login.username')}
                 className={`form-input ${formik.touched.username && formik.errors.username ? 'error' : ''}`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -88,7 +88,7 @@ const Login = () => {
                 type="password"
                 id="password"
                 name="password"
-                placeholder={t('login.placeholders.password')}
+                placeholder={t('login.password')}
                 className={`form-input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
