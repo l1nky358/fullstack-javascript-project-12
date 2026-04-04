@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
@@ -12,6 +12,7 @@ const Login = () => {
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [authError, setAuthError] = useState('');
+  const isSubmittingRef = useRef(false);
 
   const validationSchema = yup.object({
     username: yup.string().required(t('login.errors.usernameRequired')),
@@ -25,6 +26,9 @@ const Login = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      if (isSubmittingRef.current) return;
+      isSubmittingRef.current = true;
+      
       setAuthError('');
       
       try {
@@ -37,6 +41,8 @@ const Login = () => {
         navigate('/');
       } catch (error) {
         setAuthError(t('login.errors.invalidCredentials'));
+      } finally {
+        isSubmittingRef.current = false;
       }
     },
   });
@@ -50,7 +56,7 @@ const Login = () => {
         </div>
         
         {authError && (
-          <div className="auth-error">
+          <div className="auth-error" key="login-error-message">
             {authError}
           </div>
         )}
