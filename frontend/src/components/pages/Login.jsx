@@ -15,14 +15,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    //setError('');
     
     try {
       const response = await loginMutation({ username, password }).unwrap();
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      setError(t('login.errors.invalidCredentials'));
+      //setError(t('login.errors.invalidCredentials'));
     }
   };
 
