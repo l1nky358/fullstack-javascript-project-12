@@ -19,8 +19,11 @@ const io = new Server(httpServer, {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'dist')));
 
+// ИСПРАВЛЕНО: указываем правильную папку с собранным фронтендом
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+
+// Остальной код без изменений...
 let users = [
   { id: 1, username: 'admin', password: 'admin' }
 ];
