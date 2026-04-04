@@ -6,7 +6,7 @@
       "login": "Войти"
     },
     
-    "login": {
+ "login": {
       "title": "Вход в чат",
       "username": "Ваш ник",
       "password": "Пароль",
@@ -14,7 +14,6 @@
       "noAccount": "Нет аккаунта?",
       "signup": "Регистрация",
       "errors": {
-        "invalidCredentials": "Неверные имя пользователя или пароль",
         "serverError": "Ошибка соединения",
         "usernameRequired": "Обязательное поле",
         "usernameMinMax": "От 3 до 20 символов",
