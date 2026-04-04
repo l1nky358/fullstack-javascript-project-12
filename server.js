@@ -12,7 +12,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: ['GET', 'POST']
   }
 });
@@ -20,10 +20,12 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
-// ИСПРАВЛЕНО: указываем правильную папку с собранным фронтендом
 app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
 
-// Остальной код без изменений...
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
 let users = [
   { id: 1, username: 'admin', password: 'admin' }
 ];
@@ -76,9 +78,7 @@ app.post('/api/channels', (req, res) => {
     removable: true
   };
   channels.push(newChannel);
-
   io.emit('channelCreated', newChannel);
-  
   res.json(newChannel);
 });
 
@@ -93,9 +93,7 @@ app.patch('/api/channels/:id', (req, res) => {
   }
   
   channel.name = name;
-  
   io.emit('channelRenamed', channel);
-  
   res.json(channel);
 });
 
@@ -110,9 +108,7 @@ app.delete('/api/channels/:id', (req, res) => {
   
   channels = channels.filter(c => c.id !== channelId);
   messages = messages.filter(m => m.channelId !== channelId);
-  
   io.emit('channelRemoved', channelId);
-  
   res.json({ success: true });
 });
 
@@ -130,9 +126,7 @@ app.post('/api/messages', (req, res) => {
     createdAt: new Date().toISOString()
   };
   messages.push(newMessage);
-  
   io.emit('newMessage', newMessage);
-  
   res.json(newMessage);
 });
 
@@ -142,18 +136,16 @@ app.get('/api/status', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('User connected');
-  
   socket.on('message', (data) => {
     io.emit('message', data);
   });
-  
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server started on port ${PORT}`);
   console.log(`➜ http://localhost:${PORT}`);
 });
