@@ -1,14 +1,14 @@
-.PHONY: install build start test
-
 install:
+	cd frontend && npm install
 	npm install
 
 build:
-	npm run build
+	cd frontend && npm run build
 
 start:
-	npm start
+	cd frontend && npm run dev
 
-test:
-	@echo "Starting app without tests"
-	docker compose up
+lint:
+	cd frontend && npx eslint --ext js,jsx src
+
+.PHONY: install build start lint
