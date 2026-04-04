@@ -10,3 +10,5 @@ start:
 
 lint:
 	cd frontend && npx eslint --ext js,jsx src
+
+.PHONY: install build start lint
