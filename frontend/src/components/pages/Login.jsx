@@ -30,6 +30,8 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h2>{t('login.title')}</h2>
+
+        {error && <div className="auth-error">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <input
