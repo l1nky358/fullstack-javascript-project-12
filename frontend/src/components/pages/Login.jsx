@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -11,114 +9,49 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
-  const [authError, setAuthError] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const validationSchema = yup.object({
-    username: yup.string().required(t('login.errors.usernameRequired')),
-    password: yup.string().required(t('login.errors.passwordRequired')),
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      username: '',
-      password: '',
-    },
-    validationSchema,
-    onSubmit: async (values) => {
-      setAuthError('');
-      
-      try {
-        const response = await loginMutation({
-          username: values.username,
-          password: values.password,
-        }).unwrap();
-        
-        login(response.token, values.username);
-        navigate('/');
-      } catch (error) {
-        setAuthError(t('login.errors.invalidCredentials'));
-      }
-    },
-  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    try {
+      const response = await loginMutation({ username, password }).unwrap();
+      login(response.token, username);
+      navigate('/');
+    } catch (err) {
+      setError(t('login.errors.invalidCredentials'));
+    }
+  };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-header">
-          <h2>{t('login.title')}</h2>
-          <p>Войдите в свой аккаунт</p>
-        </div>
+        <h2>{t('login.title')}</h2>
         
-        {authError && (
-          <div className="auth-error">
-            {authError}
-          </div>
-        )}
+        {error && <div className="auth-error">{error}</div>}
         
-        <form onSubmit={formik.handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="username">
-              {t('login.username')}
-            </label>
-            <div className="input-wrapper">
-              <span className="input-icon">👤</span>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                placeholder={t('login.username')}
-                className={`form-input ${formik.touched.username && formik.errors.username ? 'error' : ''}`}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.username}
-              />
-            </div>
-            {formik.touched.username && formik.errors.username && (
-              <div className="error-message">{formik.errors.username}</div>
-            )}
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">
-              {t('login.password')}
-            </label>
-            <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder={t('login.password')}
-                className={`form-input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.password}
-              />
-            </div>
-            {formik.touched.password && formik.errors.password && (
-              <div className="error-message">{formik.errors.password}</div>
-            )}
-          </div>
-          
-          <button
-            type="submit"
-            className="auth-button"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="button-loader"></span>
-            ) : (
-              t('login.submit')
-            )}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder={t('login.username')}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder={t('login.password')}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit" disabled={isLoading}>
+            {t('login.submit')}
           </button>
         </form>
         
-        <div className="auth-footer">
-          {t('login.noAccount')}{' '}
-          <Link to="/signup" className="auth-link">
-            {t('login.signup')}
-          </Link>
-        </div>
+        <Link to="/signup">{t('login.signup')}</Link>
       </div>
     </div>
   );
