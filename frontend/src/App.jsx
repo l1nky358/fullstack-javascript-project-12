@@ -12,7 +12,6 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
-
   return (
     <BrowserRouter>
       <div className="d-flex flex-column vh-100">
