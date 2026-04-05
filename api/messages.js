@@ -2,6 +2,8 @@ let messages = [
   { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
 ];
 
+let nextId = 2;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -18,13 +20,13 @@ export default async function handler(req, res) {
   
   if (req.method === 'POST') {
     console.log('POST /api/messages', req.body);
-    const { text, channelId } = req.body;
+    const { text, channelId, username } = req.body;
     
     const newMessage = {
-      id: messages.length + 1,
+      id: nextId++,
       text,
       channelId,
-      username: 'User',
+      username: username || 'User',
       createdAt: new Date().toISOString()
     };
     
