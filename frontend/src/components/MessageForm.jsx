@@ -1,27 +1,31 @@
 import { useState } from 'react';
-import { useAddMessageMutation } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
-const MessageForm = ({ currentChannelId }) => {
+const MessageForm = ({ currentChannelId, socket }) => {
   const [text, setText] = useState('');
-  const [addMessage] = useAddMessageMutation();
+  const { username } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!text.trim() || !currentChannelId) return;
+    if (!text.trim() || !currentChannelId || !socket) return;
 
     const messageText = text.trim();
-    console.log('Sending message:', { text: messageText, channelId: currentChannelId });
     
-    try {
-      const result = await addMessage({
-        text: messageText,
-        channelId: currentChannelId,
-      }).unwrap();
-      console.log('Message sent:', result);
-      setText('');
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    const newMessage = {
+      text: messageText,
+      channelId: currentChannelId,
+      username: username,
+      createdAt: new Date().toISOString(),
+    };
+
+    socket.emit('newMessage', newMessage, (response) => {
+      if (response && response.status === 'ok') {
+        console.log('Message sent successfully');
+        setText('');
+      } else {
+        console.error('Failed to send message:', response);
+      }
+    });
   };
 
   return (
@@ -33,8 +37,13 @@ const MessageForm = ({ currentChannelId }) => {
           placeholder="Введите сообщение..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          disabled={!socket}
         />
-        <button type="submit" className="btn btn-primary">
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          disabled={!text.trim() || !socket}
+        >
           Отправить
         </button>
       </div>
