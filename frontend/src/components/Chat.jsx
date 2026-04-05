@@ -46,11 +46,18 @@ const Chat = () => {
     if (messagesError) {
       console.error('Error loading messages:', messagesError);
     }
-  }, [channelsError, messagesError, t]);
+  }, [channelsError, messagesError]);
 
   useEffect(() => {
     if (!channelsLoading && channels.length > 0 && !currentChannelId) {
-      dispatch(setCurrentChannel(channels[0].id));
+      const generalChannel = channels.find(ch => ch.name === 'general');
+      
+      if (generalChannel) {
+        dispatch(setCurrentChannel(generalChannel.id));
+      } else if (channels[0]) {
+        // Если канала 'general' нет, берем первый доступный
+        dispatch(setCurrentChannel(channels[0].id));
+      }
     }
   }, [channelsLoading, channels, currentChannelId, dispatch]);
 
@@ -71,7 +78,6 @@ const Chat = () => {
           <ChannelsList 
             channels={channels}
             currentChannelId={currentChannelId}
-            onChannelSelect={(id) => dispatch(setCurrentChannel(id))}
           />
         </div>
         
