@@ -1,50 +1,42 @@
+import { io } from 'socket.io-client';
 import { useEffect, useState } from 'react';
-import { createSocket } from '../socket';
-
-let socketInstance = null;
 
 export const useSocket = () => {
-  const [isConnected, setIsConnected] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    if (!socketInstance) {
-      socketInstance = createSocket(token);
-    }
+    const newSocket = io('/', {
+      auth: { token },
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      transports: ['websocket', 'polling']
+    });
 
-    const handleConnect = () => {
+    newSocket.on('connect', () => {
       console.log('Socket connected');
       setIsConnected(true);
-      socketInstance.connect();
-    };
+    });
 
-    const handleDisconnect = () => {
+    newSocket.on('disconnect', () => {
       console.log('Socket disconnected');
       setIsConnected(false);
-    };
+    });
 
-    const handleConnectError = (error) => {
+    newSocket.on('connect_error', (error) => {
       console.error('Socket connection error:', error);
       setIsConnected(false);
-    };
+    });
 
-    socketInstance.on('connect', handleConnect);
-    socketInstance.on('disconnect', handleDisconnect);
-    socketInstance.on('connect_error', handleConnectError);
-
-    if (!socketInstance.connected) {
-      socketInstance.connect();
-    }
-
-    setSocket(socketInstance);
+    setSocket(newSocket);
 
     return () => {
-      socketInstance.off('connect', handleConnect);
-      socketInstance.off('disconnect', handleDisconnect);
-      socketInstance.off('connect_error', handleConnectError);
+      newSocket.disconnect();
     };
   }, []);
 
