@@ -51,11 +51,9 @@ const Chat = () => {
   useEffect(() => {
     if (!channelsLoading && channels.length > 0 && !currentChannelId) {
       const generalChannel = channels.find(ch => ch.name === 'general');
-      
       if (generalChannel) {
         dispatch(setCurrentChannel(generalChannel.id));
       } else if (channels[0]) {
-        // Если канала 'general' нет, берем первый доступный
         dispatch(setCurrentChannel(channels[0].id));
       }
     }
