@@ -44,6 +44,16 @@ const Chat = () => {
     }
   }, [channelsLoading, displayChannels, currentChannelId, dispatch]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentChannelId) {
+        refetchMessages();
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [currentChannelId, refetchMessages]);
+
   if (channelsLoading || messagesLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center vh-100">
