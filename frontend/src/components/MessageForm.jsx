@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAddMessageMutation } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 
-const MessageForm = ({ currentChannelId, onMessageSent }) => {
+const MessageForm = ({ currentChannelId }) => {
   const [text, setText] = useState('');
   const [addMessage, { isLoading }] = useAddMessageMutation();
   const { username } = useAuth();
@@ -15,17 +15,13 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
     setText('');
     
     try {
-      const result = await addMessage({
+      await addMessage({
         text: messageText,
         channelId: currentChannelId,
         username: username,
       }).unwrap();
-      console.log('Message sent:', result);
-      if (onMessageSent) {
-        onMessageSent();
-      }
     } catch (error) {
-      console.error('Failed:', error);
+      console.error('Failed to send message:', error);
       setText(messageText);
     }
   };
@@ -40,13 +36,11 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isLoading}
-          data-testid="message-input"
         />
         <button 
           type="submit" 
           className="btn btn-primary"
           disabled={!text.trim() || isLoading}
-          data-testid="send-button"
         >
           Отправить
         </button>
