@@ -1,54 +1,44 @@
 import { useState } from 'react';
 import { useAddMessageMutation } from '../services/api';
-import { useAuth } from '../hooks/useAuth';
 
 const MessageForm = ({ currentChannelId }) => {
   const [text, setText] = useState('');
-  const [addMessage, { isLoading }] = useAddMessageMutation();
-  const { username } = useAuth();
+  const [addMessage] = useAddMessageMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!text.trim() || !currentChannelId) return;
 
     const messageText = text.trim();
-    setText('');
+    console.log('Sending message:', { text: messageText, channelId: currentChannelId });
     
     try {
-      await addMessage({
+      const result = await addMessage({
         text: messageText,
         channelId: currentChannelId,
-        username: username,
       }).unwrap();
+      console.log('Message sent:', result);
+      setText('');
     } catch (error) {
-      console.error('Failed to send message:', error);
-      setText(messageText);
+      console.error('Error:', error);
     }
   };
 
   return (
-    <div className="border-top p-3">
-      <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Введите сообщение..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={!currentChannelId || isLoading}
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!text.trim() || !currentChannelId || isLoading}
-          >
-            Отправить
-          </button>
-        </div>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="p-3 border-top">
+      <div className="input-group">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Введите сообщение..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button type="submit" className="btn btn-primary">
+          Отправить
+        </button>
+      </div>
+    </form>
   );
 };
 
