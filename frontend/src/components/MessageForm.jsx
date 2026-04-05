@@ -20,11 +20,9 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
         channelId: currentChannelId,
         username: username,
       }).unwrap();
-      setTimeout(() => {
-        if (onMessageSent) onMessageSent();
-      }, 500);
+      if (onMessageSent) onMessageSent();
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed:', error);
       setText(messageText);
     }
   };
@@ -36,6 +34,7 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
           type="text"
           className="form-control"
           placeholder="Введите сообщение..."
+          aria-label="Новое сообщение"
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isLoading}
