@@ -13,6 +13,7 @@ const Chat = () => {
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
+    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
@@ -45,13 +46,9 @@ const Chat = () => {
   }, [channelsLoading, displayChannels, currentChannelId, dispatch]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentChannelId) {
-        refetchMessages();
-      }
-    }, 2000);
-    
-    return () => clearInterval(interval);
+    if (currentChannelId) {
+      refetchMessages();
+    }
   }, [currentChannelId, refetchMessages]);
 
   if (channelsLoading || messagesLoading) {
