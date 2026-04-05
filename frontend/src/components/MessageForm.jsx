@@ -40,11 +40,13 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isLoading}
+          data-testid="message-input"
         />
         <button 
           type="submit" 
           className="btn btn-primary"
           disabled={!text.trim() || isLoading}
+          data-testid="send-button"
         >
           Отправить
         </button>
