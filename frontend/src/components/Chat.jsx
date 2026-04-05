@@ -1,30 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
+import { useSocket } from '../hooks/useSocket';
 import MessageForm from './MessageForm';
-import ChannelsList from './ChannelsList';
-import MessagesList from './MessagesList';
 
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { socket, isConnected } = useSocket();
+  const [messages, setMessages] = useState([]);
 
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
-    error: channelsError,
-    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
-    data: messages = [], 
+    data: initialMessages = [], 
     isLoading: messagesLoading,
-    refetch: refetchMessages
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
+
+  useEffect(() => {
+    if (initialMessages) {
+      setMessages(initialMessages);
+    }
+  }, [initialMessages]);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleNewMessage = (message) => {
+      console.log('New message:', message);
+      setMessages(prev => [...prev, message]);
+    };
+
+    socket.on('newMessage', handleNewMessage);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+    };
+  }, [socket, isConnected]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -40,91 +59,43 @@ const Chat = () => {
     }
   }, [channelsLoading, channels, currentChannelId, dispatch]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentChannelId) {
-        refetchMessages();
-      }
-    }, 2000);
-    
-    return () => clearInterval(interval);
-  }, [currentChannelId, refetchMessages]);
-
-  useEffect(() => {
-    if (channelsError) {
-      console.error('Error loading channels:', channelsError);
-    }
-  }, [channelsError]);
-
   if (channelsLoading || messagesLoading) {
-    return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Загрузка...</span>
-        </div>
-      </div>
-    );
+    return <div className="text-center p-5">Загрузка...</div>;
   }
 
   const currentChannel = channels.find(c => c.id === currentChannelId);
   const channelMessages = messages.filter(m => m.channelId === currentChannelId);
 
   return (
-    <div className="container-fluid h-100 overflow-hidden p-0">
-      <div className="row h-100 g-0">
+    <div className="container-fluid h-100">
+      <div className="row h-100">
         <div className="col-3 border-end p-3">
-          <h2>Каналы</h2>
-          <ul className="list-unstyled">
-            {channels.map(channel => (
-              <li key={channel.id} className="mb-2">
-                <button
-                  className={`btn w-100 text-start ${
-                    currentChannelId === channel.id ? 'btn-primary' : 'btn-link'
-                  }`}
-                  onClick={() => dispatch(setCurrentChannel(channel.id))}
-                >
-                  # {channel.name}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <h5>Каналы</h5>
+          {channels.map(ch => (
+            <button
+              key={ch.id}
+              className={`btn w-100 text-start mb-1 ${currentChannelId === ch.id ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => dispatch(setCurrentChannel(ch.id))}
+            >
+              # {ch.name}
+            </button>
+          ))}
         </div>
         
-        <div className="col-9 col-md-10 d-flex flex-column h-100">
-          {currentChannel ? (
-            <>
-              <div className="bg-light p-3 border-bottom">
-                <h5 className="mb-0"># {currentChannel.name}</h5>
+        <div className="col-9 d-flex flex-column h-100">
+          <div className="border-bottom p-3">
+            <h5># {currentChannel?.name}</h5>
+          </div>
+          
+          <div className="flex-grow-1 overflow-auto p-3">
+            {channelMessages.map(msg => (
+              <div key={msg.id} className="mb-2">
+                <strong>{msg.username}:</strong> {msg.text}
               </div>
-              
-              <div className="flex-grow-1 overflow-auto p-3">
-                {channelMessages.length === 0 ? (
-                  <div className="text-center text-muted">
-                    Нет сообщений. Напишите первое!
-                  </div>
-                ) : (
-                  channelMessages.map((message) => (
-                    <div key={message.id} className="mb-2">
-                      <strong className="text-primary me-2">{message.username}:</strong>
-                      <span>{message.text}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-              
-              <MessageForm 
-                currentChannelId={currentChannelId}
-                onMessageSent={refetchMessages}
-              />
-            </>
-          ) : (
-            <div className="d-flex align-items-center justify-content-center h-100">
-              <div className="text-center text-muted">
-                <h4>Добро пожаловать!</h4>
-                <p>Выберите канал из списка слева</p>
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
+          
+          <MessageForm currentChannelId={currentChannelId} socket={socket} />
         </div>
       </div>
     </div>
