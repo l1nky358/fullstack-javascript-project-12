@@ -28,7 +28,7 @@ const MessageForm = ({ currentChannelId }) => {
     
     try {
       await addMessage({
-        text: messageText,
+        body: messageText,
         channelId: currentChannelId,
       }).unwrap();
       showSuccess(t('toast.messageSent'));
@@ -47,7 +47,7 @@ const MessageForm = ({ currentChannelId }) => {
       
       try {
         await addMessage({
-          text: cleanedText,
+          body: cleanedText,
           channelId: currentChannelId,
         }).unwrap();
         showSuccess(t('toast.messageSent'));
