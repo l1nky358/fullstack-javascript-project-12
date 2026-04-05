@@ -31,6 +31,16 @@ export const api = createApi({
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
+      transformResponse: (response) => {
+        if (!response || !Array.isArray(response) || response.length === 0) {
+          return [
+            { id: 1, name: 'general', removable: false },
+            { id: 2, name: 'random', removable: true },
+            { id: 3, name: 'tech', removable: true }
+          ];
+        }
+        return response;
+      },
     }),
     addChannel: builder.mutation({
       query: (name) => ({
@@ -58,6 +68,14 @@ export const api = createApi({
     getMessages: builder.query({
       query: () => '/messages',
       providesTags: ['Messages'],
+      transformResponse: (response) => {
+        if (!response || !Array.isArray(response)) {
+          return [
+            { id: 1, text: 'Добро пожаловать в чат!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
+          ];
+        }
+        return response;
+      },
     }),
     addMessage: builder.mutation({
       query: (message) => ({
