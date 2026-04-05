@@ -25,7 +25,7 @@ export const useSocket = () => {
     });
 
     newSocket.on('connect_error', (err) => {
-      console.error('Socket error:', err.message);
+      console.error('Socket error:', err);
     });
 
     setSocket(newSocket);
