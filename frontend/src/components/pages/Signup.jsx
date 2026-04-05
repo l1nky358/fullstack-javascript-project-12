@@ -44,7 +44,10 @@ const Signup = () => {
         }).unwrap();
         
         login(response.token, values.username);
-        navigate('/');
+        
+        setTimeout(() => {
+          navigate('/');
+        }, 100);
       } catch (error) {
         if (error.status === 409) {
           setAuthError('Такой пользователь уже существует');
