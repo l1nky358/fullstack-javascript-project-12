@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { api } from '../services/api';
 import channelsReducer from './channelsSlice';
+import authReducer from '../slices/authSlice';
 
 export const store = configureStore({
   reducer: {
-    channels: channelsReducer,
     [api.reducerPath]: api.reducer,
+    channels: channelsReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),
 });
-
-export default store;
