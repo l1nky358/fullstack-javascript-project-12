@@ -2,7 +2,16 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api/v1' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: '/api/v1',
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
     login: builder.mutation({
@@ -22,16 +31,6 @@ export const api = createApi({
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
-      transformResponse: (response) => {
-        if (!response || response.length === 0) {
-          return [{ id: 1, name: 'general', removable: false }];
-        }
-        const hasGeneral = response.some(channel => channel.name === 'general');
-        if (!hasGeneral) {
-          return [{ id: 1, name: 'general', removable: false }, ...response];
-        }
-        return response;
-      }
     }),
     addChannel: builder.mutation({
       query: (name) => ({
@@ -61,11 +60,14 @@ export const api = createApi({
       providesTags: ['Messages'],
     }),
     addMessage: builder.mutation({
-      query: (message) => ({
-        url: '/messages',
-        method: 'POST',
-        body: message,
-      }),
+      query: (message) => {
+        console.log('Add message request:', message);
+        return {
+          url: '/messages',
+          method: 'POST',
+          body: message,
+        };
+      },
       invalidatesTags: ['Messages'],
     }),
   }),
