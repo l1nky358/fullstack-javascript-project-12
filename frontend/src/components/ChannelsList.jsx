@@ -56,10 +56,12 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               </div>
               <form onSubmit={handleAddChannel}>
                 <div className="modal-body">
+                  <label htmlFor="channelName" className="form-label">Имя канала</label>
                   <input
                     type="text"
+                    id="channelName"
                     className="form-control"
-                    placeholder="Имя канала"
+                    placeholder="Введите имя канала"
                     value={newChannelName}
                     onChange={(e) => setNewChannelName(e.target.value)}
                     autoFocus
