@@ -14,7 +14,8 @@ const Chat = () => {
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
-    error: channelsError 
+    error: channelsError,
+    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
@@ -40,6 +41,16 @@ const Chat = () => {
   }, [channelsLoading, channels, currentChannelId, dispatch]);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentChannelId) {
+        refetchMessages();
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [currentChannelId, refetchMessages]);
+
+  useEffect(() => {
     if (channelsError) {
       console.error('Error loading channels:', channelsError);
     }
@@ -61,10 +72,23 @@ const Chat = () => {
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
       <div className="row h-100 g-0">
-        <ChannelsList 
-          channels={channels}
-          currentChannelId={currentChannelId}
-        />
+        <div className="col-3 border-end p-3">
+          <h2>Каналы</h2>
+          <ul className="list-unstyled">
+            {channels.map(channel => (
+              <li key={channel.id} className="mb-2">
+                <button
+                  className={`btn w-100 text-start ${
+                    currentChannelId === channel.id ? 'btn-primary' : 'btn-link'
+                  }`}
+                  onClick={() => dispatch(setCurrentChannel(channel.id))}
+                >
+                  # {channel.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
         
         <div className="col-9 col-md-10 d-flex flex-column h-100">
           {currentChannel ? (
@@ -74,7 +98,18 @@ const Chat = () => {
               </div>
               
               <div className="flex-grow-1 overflow-auto p-3">
-                <MessagesList messages={channelMessages} />
+                {channelMessages.length === 0 ? (
+                  <div className="text-center text-muted">
+                    Нет сообщений. Напишите первое!
+                  </div>
+                ) : (
+                  channelMessages.map((message) => (
+                    <div key={message.id} className="mb-2">
+                      <strong className="text-primary me-2">{message.username}:</strong>
+                      <span>{message.text}</span>
+                    </div>
+                  ))
+                )}
               </div>
               
               <MessageForm 
