@@ -10,12 +10,13 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   return (
-    <div className="col-3 border-end p-3">
+    <div className="col-3 border-end p-3" data-testid="channels-list">
       <h2>Каналы</h2>
       <ul className="list-unstyled">
         {channels.map(channel => (
           <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
             <button
+              data-testid={`channel-${channel.id}`}
               className={`btn ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
               onClick={() => handleChannelClick(channel.id)}
             >
