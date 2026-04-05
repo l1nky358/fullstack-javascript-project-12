@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
+import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -14,10 +15,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!newChannelName.trim()) return;
     try {
       await addChannel(newChannelName.trim()).unwrap();
+      toast.success('Канал создан');
       setNewChannelName('');
       setShowModal(false);
     } catch (error) {
-      console.error('Failed to add channel:', error);
+      toast.error('Ошибка при создании канала');
     }
   };
 
@@ -46,6 +48,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         ))}
       </ul>
 
+      {/* Модальное окно для добавления канала */}
       {showModal && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
