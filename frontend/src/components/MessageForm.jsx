@@ -15,14 +15,17 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
     setText('');
     
     try {
-      await addMessage({
+      const result = await addMessage({
         text: messageText,
         channelId: currentChannelId,
         username: username,
       }).unwrap();
-      if (onMessageSent) onMessageSent();
+      console.log('Message sent:', result);
+      if (onMessageSent) {
+        onMessageSent();
+      }
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed:', error);
       setText(messageText);
     }
   };
