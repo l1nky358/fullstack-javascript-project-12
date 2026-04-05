@@ -20,13 +20,13 @@ const Header = () => {
         {token && (
           <div>
             <button 
-              className="btn btn-outline-light"
+              className="btn btn-outline-light me-2"
               aria-label="general"
             >
               {username}
             </button>
             <button 
-              className="btn btn-outline-light btn-sm ms-2" 
+              className="btn btn-outline-light btn-sm" 
               onClick={handleLogout}
             >
               {t('header.logout')}
