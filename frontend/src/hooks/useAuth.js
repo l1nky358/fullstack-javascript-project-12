@@ -1,33 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setCredentials, clearCredentials } from '../slices/authSlice';
 
 export const useAuth = () => {
-  const [token, setToken] = useState(() => {
-    return localStorage.getItem('token');
-  });
-  const [username, setUsername] = useState(() => {
-    return localStorage.getItem('username');
-  });
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const username = useSelector((state) => state.auth.username);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-    if (storedToken !== token) setToken(storedToken);
-    if (storedUsername !== username) setUsername(storedUsername);
-  }, []);
+  const login = (newToken, newUsername) => {
+    dispatch(setCredentials({ token: newToken, username: newUsername }));
+  };
 
-  const login = useCallback((newToken, newUsername) => {
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('username', newUsername);
-    setToken(newToken);
-    setUsername(newUsername);
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    setToken(null);
-    setUsername(null);
-  }, []);
+  const logout = () => {
+    dispatch(clearCredentials());
+  };
 
   return { token, username, login, logout };
 };
