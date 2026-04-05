@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useSocket } from '../hooks/useSocket';
+import { useSocket } from '../services/useSocket';
 import MessageForm from './MessageForm';
 import ChannelsList from './ChannelsList';
 import MessagesList from './MessagesList';
