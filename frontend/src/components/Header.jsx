@@ -18,24 +18,19 @@ const Header = () => {
         <h1 className="h4 m-0">Hexlet Chat</h1>
         
         {token && (
-          <div className="dropdown">
+          <div>
             <button 
-              className="btn btn-outline-light dropdown-toggle" 
-              type="button"
-              name="general"
-              id="dropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
+              className="btn btn-outline-light"
+              aria-label="general"
             >
               {username}
             </button>
-            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li>
-                <button className="dropdown-item" onClick={handleLogout}>
-                  {t('header.logout')}
-                </button>
-              </li>
-            </ul>
+            <button 
+              className="btn btn-outline-light btn-sm ms-2" 
+              onClick={handleLogout}
+            >
+              {t('header.logout')}
+            </button>
           </div>
         )}
       </div>
