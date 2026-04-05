@@ -12,6 +12,7 @@ const Chat = () => {
   const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState([]);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
 
   const { 
     data: channels = [], 
@@ -24,6 +25,14 @@ const Chat = () => {
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
+
+  useEffect(() => {
+    if (isConnected) {
+      setConnectionStatus('connected');
+    } else {
+      setConnectionStatus('connecting');
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     if (initialMessages) {
@@ -45,6 +54,17 @@ const Chat = () => {
       socket.off('newMessage', handleNewMessage);
     };
   }, [socket, isConnected]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (socket && !socket.connected) {
+        setConnectionStatus('reconnecting');
+        socket.connect();
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [socket]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -85,12 +105,20 @@ const Chat = () => {
           {currentChannel ? (
             <>
               <div className="bg-light p-3 border-bottom">
-                <h5 className="mb-0">
-                  {currentChannel.name === 'general' ? 'general' : `# ${currentChannel.name}`}
-                </h5>
-                {!isConnected && (
-                  <small className="text-danger ms-2">Подключение...</small>
-                )}
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5 className="mb-0">
+                    {currentChannel.name === 'general' ? 'general' : `# ${currentChannel.name}`}
+                  </h5>
+                  {connectionStatus === 'connected' && (
+                    <small className="text-success">● Подключено</small>
+                  )}
+                  {connectionStatus === 'connecting' && (
+                    <small className="text-warning">● Подключение...</small>
+                  )}
+                  {connectionStatus === 'reconnecting' && (
+                    <small className="text-danger">● Переподключение...</small>
+                  )}
+                </div>
               </div>
               
               <div className="flex-grow-1 overflow-auto p-3">
@@ -108,9 +136,7 @@ const Chat = () => {
                 )}
               </div>
               
-              <MessageForm 
-                currentChannelId={currentChannelId}
-              />
+              <MessageForm currentChannelId={currentChannelId} />
             </>
           ) : (
             <div className="d-flex align-items-center justify-content-center h-100">
