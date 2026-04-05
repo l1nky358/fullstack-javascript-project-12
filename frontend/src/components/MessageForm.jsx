@@ -1,35 +1,34 @@
 import { useState } from 'react';
+import { useAddMessageMutation } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 
-const MessageForm = ({ currentChannelId, socket }) => {
+const MessageForm = ({ currentChannelId, onMessageSent }) => {
   const [text, setText] = useState('');
+  const [addMessage, { isLoading }] = useAddMessageMutation();
   const { username } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!text.trim() || !currentChannelId || !socket) return;
+    if (!text.trim() || !currentChannelId) return;
 
     const messageText = text.trim();
+    setText('');
     
-    const newMessage = {
-      text: messageText,
-      channelId: currentChannelId,
-      username: username,
-      createdAt: new Date().toISOString(),
-    };
-
-    socket.emit('newMessage', newMessage, (response) => {
-      if (response && response.status === 'ok') {
-        console.log('Message sent successfully');
-        setText('');
-      } else {
-        console.error('Failed to send message:', response);
-      }
-    });
+    try {
+      await addMessage({
+        text: messageText,
+        channelId: currentChannelId,
+        username: username,
+      }).unwrap();
+      if (onMessageSent) onMessageSent();
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setText(messageText);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-3 border-top">
+    <form onSubmit={handleSubmit} className="border-top p-3">
       <div className="input-group">
         <input
           type="text"
@@ -37,12 +36,12 @@ const MessageForm = ({ currentChannelId, socket }) => {
           placeholder="Введите сообщение..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={!socket}
+          disabled={isLoading}
         />
         <button 
           type="submit" 
           className="btn btn-primary"
-          disabled={!text.trim() || !socket}
+          disabled={!text.trim() || isLoading}
         >
           Отправить
         </button>
