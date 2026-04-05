@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: '/api/v1' }),
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
     login: builder.mutation({
@@ -26,13 +26,10 @@ export const api = createApi({
         if (!response || response.length === 0) {
           return [{ id: 1, name: 'general', removable: false }];
         }
-        
         const hasGeneral = response.some(channel => channel.name === 'general');
-        
         if (!hasGeneral) {
           return [{ id: 1, name: 'general', removable: false }, ...response];
         }
-        
         return response;
       }
     }),
