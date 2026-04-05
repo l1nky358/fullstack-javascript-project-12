@@ -19,7 +19,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               className={`btn ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
               onClick={() => handleChannelClick(channel.id)}
             >
-              # {channel.name}
+              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
             </button>
             {channel.removable && <ChannelMenu channel={channel} />}
           </li>
