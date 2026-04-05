@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useSocket } from '../services/useSocket';
 import MessageForm from './MessageForm';
 import ChannelsList from './ChannelsList';
 
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { socket, isConnected } = useSocket();
-  const [messages, setMessages] = useState([]);
-  const [connectionStatus, setConnectionStatus] = useState('connecting');
 
   const { 
     data: channels = [], 
@@ -20,51 +16,19 @@ const Chat = () => {
   } = useGetChannelsQuery();
   
   const { 
-    data: initialMessages = [], 
+    data: messages = [], 
     isLoading: messagesLoading,
+    refetch: refetchMessages
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
 
-  useEffect(() => {
-    if (isConnected) {
-      setConnectionStatus('connected');
-    } else {
-      setConnectionStatus('connecting');
-    }
-  }, [isConnected]);
-
-  useEffect(() => {
-    if (initialMessages) {
-      setMessages(initialMessages);
-    }
-  }, [initialMessages]);
-
-  useEffect(() => {
-    if (!socket || !isConnected) return;
-
-    const handleNewMessage = (newMessage) => {
-      console.log('New message via WebSocket:', newMessage);
-      setMessages(prev => [...prev, newMessage]);
-    };
-
-    socket.on('newMessage', handleNewMessage);
-
-    return () => {
-      socket.off('newMessage', handleNewMessage);
-    };
-  }, [socket, isConnected]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (socket && !socket.connected) {
-        setConnectionStatus('reconnecting');
-        socket.connect();
-      }
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [socket]);
+  const defaultChannels = [
+    { id: 1, name: 'general', removable: false },
+    { id: 2, name: 'random', removable: true },
+  ];
+  
+  const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -74,11 +38,11 @@ const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!channelsLoading && channels.length > 0 && !currentChannelId) {
-      const generalChannel = channels.find(ch => ch.name === 'general');
-      dispatch(setCurrentChannel(generalChannel?.id || channels[0].id));
+    if (!channelsLoading && displayChannels.length > 0 && !currentChannelId) {
+      const generalChannel = displayChannels.find(ch => ch.name === 'general');
+      dispatch(setCurrentChannel(generalChannel?.id || displayChannels[0].id));
     }
-  }, [channelsLoading, channels, currentChannelId, dispatch]);
+  }, [channelsLoading, displayChannels, currentChannelId, dispatch]);
 
   if (channelsLoading || messagesLoading) {
     return (
@@ -90,14 +54,14 @@ const Chat = () => {
     );
   }
 
-  const currentChannel = channels.find(c => c.id === currentChannelId);
+  const currentChannel = displayChannels.find(c => c.id === currentChannelId);
   const channelMessages = messages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
       <div className="row h-100 g-0">
         <ChannelsList 
-          channels={channels}
+          channels={displayChannels}
           currentChannelId={currentChannelId}
         />
         
@@ -105,20 +69,9 @@ const Chat = () => {
           {currentChannel ? (
             <>
               <div className="bg-light p-3 border-bottom">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">
-                    {currentChannel.name === 'general' ? 'general' : `# ${currentChannel.name}`}
-                  </h5>
-                  {connectionStatus === 'connected' && (
-                    <small className="text-success">● Подключено</small>
-                  )}
-                  {connectionStatus === 'connecting' && (
-                    <small className="text-warning">● Подключение...</small>
-                  )}
-                  {connectionStatus === 'reconnecting' && (
-                    <small className="text-danger">● Переподключение...</small>
-                  )}
-                </div>
+                <h5 className="mb-0">
+                  {currentChannel.name === 'general' ? 'general' : `# ${currentChannel.name}`}
+                </h5>
               </div>
               
               <div className="flex-grow-1 overflow-auto p-3">
@@ -136,7 +89,10 @@ const Chat = () => {
                 )}
               </div>
               
-              <MessageForm currentChannelId={currentChannelId} />
+              <MessageForm 
+                currentChannelId={currentChannelId} 
+                onMessageSent={refetchMessages}
+              />
             </>
           ) : (
             <div className="d-flex align-items-center justify-content-center h-100">
