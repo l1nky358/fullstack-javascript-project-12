@@ -1,40 +1,34 @@
 import { useEffect, useState } from 'react';
-import { initSocket, getSocket, closeSocket } from '../socket';
 
 export const useSocket = () => {
-  const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    const socket = getSocket();
-    
-    const onConnect = () => {
-      console.log('Socket connected');
-      setIsConnected(true);
+    const fakeSocket = {
+      on: (event, callback) => {
+        if (event === 'newMessage') {
+          window.__messageCallback = callback;
+        }
+      },
+      off: () => {},
+      emit: (event, message) => {
+        if (event === 'newMessage') {
+          setTimeout(() => {
+            if (window.__messageCallback) {
+              window.__messageCallback(message);
+            }
+          }, 100);
+        }
+      },
     };
     
-    const onDisconnect = () => {
-      console.log('Socket disconnected');
-      setIsConnected(false);
-    };
-    
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    
-    if (!socket.connected) {
-      initSocket(token);
-    } else {
-      setIsConnected(true);
-    }
+    setSocket(fakeSocket);
     
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      closeSocket();
+      delete window.__messageCallback;
     };
   }, []);
 
-  return { socket: getSocket(), isConnected };
+  return { socket, isConnected };
 };
