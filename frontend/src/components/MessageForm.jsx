@@ -20,7 +20,10 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
         channelId: currentChannelId,
         username: username,
       }).unwrap();
-      if (onMessageSent) onMessageSent();
+      
+      if (onMessageSent) {
+        onMessageSent();
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
       setText(messageText);
