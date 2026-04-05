@@ -1,15 +1,11 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAddMessageMutation } from '../services/api';
-import { showSuccess, showError } from './Toast';
-import { containsProfanity, cleanProfanity } from '../utils/profanity';
+import { useAuth } from '../hooks/useAuth';
 
 const MessageForm = ({ currentChannelId }) => {
   const [text, setText] = useState('');
-  const [showProfanityWarning, setShowProfanityWarning] = useState(false);
-  const [pendingMessage, setPendingMessage] = useState('');
-  const { t } = useTranslation();
   const [addMessage, { isLoading }] = useAddMessageMutation();
+  const { username } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,75 +13,19 @@ const MessageForm = ({ currentChannelId }) => {
     if (!text.trim() || !currentChannelId) return;
 
     const messageText = text.trim();
-
-    if (containsProfanity(messageText)) {
-      setPendingMessage(messageText);
-      setShowProfanityWarning(true);
-      return;
-    }
-
     setText('');
     
     try {
       await addMessage({
-        body: messageText,
+        text: messageText,
         channelId: currentChannelId,
+        username: username,
       }).unwrap();
-      showSuccess(t('toast.messageSent'));
     } catch (error) {
       console.error('Failed to send message:', error);
-      showError(t('toast.error.failedToSend'));
       setText(messageText);
     }
   };
-
-  const handleProfanityConfirm = async () => {
-    if (pendingMessage) {
-      const cleanedText = cleanProfanity(pendingMessage);
-      setShowProfanityWarning(false);
-      setPendingMessage('');
-      
-      try {
-        await addMessage({
-          body: cleanedText,
-          channelId: currentChannelId,
-        }).unwrap();
-        showSuccess(t('toast.messageSent'));
-      } catch (error) {
-        showError(t('toast.error.failedToSend'));
-      }
-    }
-  };
-
-  const handleProfanityCancel = () => {
-    setShowProfanityWarning(false);
-    setPendingMessage('');
-    setText('');
-  };
-
-  if (showProfanityWarning) {
-    return (
-      <div className="border-top p-3">
-        <div className="alert alert-warning">
-          <p className="mb-2">{t('messages.profanityWarning')}</p>
-          <div className="d-flex gap-2">
-            <button 
-              className="btn btn-secondary"
-              onClick={handleProfanityCancel}
-            >
-              {t('channels.modals.add.cancel')}
-            </button>
-            <button 
-              className="btn btn-warning"
-              onClick={handleProfanityConfirm}
-            >
-              *****
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="border-top p-3">
@@ -94,18 +34,17 @@ const MessageForm = ({ currentChannelId }) => {
           <input
             type="text"
             className="form-control"
-            placeholder={currentChannelId ? t('chat.messagePlaceholder') : t('chat.selectChannel')}
+            placeholder="Введите сообщение..."
             value={text}
             onChange={(e) => setText(e.target.value)}
             disabled={!currentChannelId || isLoading}
-            aria-label={t('chat.newMessage')}
           />
           <button
             type="submit"
             className="btn btn-primary"
             disabled={!text.trim() || !currentChannelId || isLoading}
           >
-            {t('chat.send')}
+            Отправить
           </button>
         </div>
       </form>
