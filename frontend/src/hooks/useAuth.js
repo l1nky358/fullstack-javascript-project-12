@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 export const useAuth = () => {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
+  const [, forceUpdate] = useState({});
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -16,6 +17,7 @@ export const useAuth = () => {
     localStorage.setItem('username', newUsername);
     setToken(newToken);
     setUsername(newUsername);
+    forceUpdate({}); // Принудительный перерендер
   }, []);
 
   const logout = useCallback(() => {
@@ -23,6 +25,7 @@ export const useAuth = () => {
     localStorage.removeItem('username');
     setToken(null);
     setUsername(null);
+    forceUpdate({}); // Принудительный перерендер
   }, []);
 
   return { token, username, login, logout };
