@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 
 const Login = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loginMutation, { isLoading }] = useLoginMutation();
@@ -21,9 +19,7 @@ const Login = () => {
       login(response.token, username);
       navigate('/');
     } catch (err) {
-      toast.error(t('login.errors.invalidCredentials'), {
-        toastId: 'login-error'
-      });
+      toast.error('Неверные имя пользователя или пароль');
     }
   };
 
@@ -31,13 +27,13 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h2>{t('login.title')}</h2>
+          <h2>Вход в чат</h2>
           <p>Войдите в свой аккаунт</p>
         </div>
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="username">{t('login.username')}</label>
+            <label htmlFor="username">Ваш ник</label>
             <div className="input-wrapper">
               <span className="input-icon">👤</span>
               <input
@@ -52,7 +48,7 @@ const Login = () => {
           </div>
           
           <div className="form-group">
-            <label htmlFor="password">{t('login.password')}</label>
+            <label htmlFor="password">Пароль</label>
             <div className="input-wrapper">
               <span className="input-icon">🔒</span>
               <input
@@ -67,7 +63,7 @@ const Login = () => {
           </div>
           
           <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? <span className="button-loader"></span> : t('login.submit')}
+            {isLoading ? <span className="button-loader"></span> : 'Войти'}
           </button>
         </form>
         
