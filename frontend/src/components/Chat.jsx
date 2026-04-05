@@ -1,49 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useSocket } from '../services/useSocket';
 import MessageForm from './MessageForm';
 
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { socket, isConnected } = useSocket();
-  const [messages, setMessages] = useState([]);
 
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
+    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
-    data: initialMessages = [], 
+    data: messages = [], 
     isLoading: messagesLoading,
+    refetch: refetchMessages
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
-
-  useEffect(() => {
-    if (initialMessages) {
-      setMessages(initialMessages);
-    }
-  }, [initialMessages]);
-
-  useEffect(() => {
-    if (!socket || !isConnected) return;
-
-    const handleNewMessage = (message) => {
-      console.log('New message:', message);
-      setMessages(prev => [...prev, message]);
-    };
-
-    socket.on('newMessage', handleNewMessage);
-
-    return () => {
-      socket.off('newMessage', handleNewMessage);
-    };
-  }, [socket, isConnected]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -88,14 +66,21 @@ const Chat = () => {
           </div>
           
           <div className="flex-grow-1 overflow-auto p-3">
-            {channelMessages.map(msg => (
-              <div key={msg.id} className="mb-2">
-                <strong>{msg.username}:</strong> {msg.text}
-              </div>
-            ))}
+            {channelMessages.length === 0 ? (
+              <div className="text-center text-muted">Нет сообщений</div>
+            ) : (
+              channelMessages.map(msg => (
+                <div key={msg.id} className="mb-2">
+                  <strong>{msg.username}:</strong> {msg.text}
+                </div>
+              ))
+            )}
           </div>
           
-          <MessageForm currentChannelId={currentChannelId} socket={socket} />
+          <MessageForm 
+            currentChannelId={currentChannelId} 
+            onMessageSent={refetchMessages}
+          />
         </div>
       </div>
     </div>
