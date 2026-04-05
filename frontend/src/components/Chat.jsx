@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useSocket } from '../services/useSocket';
 import MessageForm from './MessageForm';
 import ChannelsList from './ChannelsList';
 import MessagesList from './MessagesList';
@@ -11,8 +10,6 @@ import MessagesList from './MessagesList';
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { socket, isConnected } = useSocket();
-  const [liveMessages, setLiveMessages] = useState([]);
 
   const { 
     data: channels = [], 
@@ -21,32 +18,12 @@ const Chat = () => {
   } = useGetChannelsQuery();
   
   const { 
-    data: initialMessages = [], 
-    isLoading: messagesLoading 
+    data: messages = [], 
+    isLoading: messagesLoading,
+    refetch: refetchMessages
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
-
-  useEffect(() => {
-    if (initialMessages) {
-      setLiveMessages(initialMessages);
-    }
-  }, [initialMessages]);
-
-  useEffect(() => {
-    if (!socket || !isConnected) return;
-
-    const handleNewMessage = (message) => {
-      console.log('New message via socket:', message);
-      setLiveMessages((prev) => [...prev, message]);
-    };
-
-    socket.on('newMessage', handleNewMessage);
-
-    return () => {
-      socket.off('newMessage', handleNewMessage);
-    };
-  }, [socket, isConnected]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -79,7 +56,7 @@ const Chat = () => {
   }
 
   const currentChannel = channels.find(c => c.id === currentChannelId);
-  const channelMessages = liveMessages.filter(m => m.channelId === currentChannelId);
+  const channelMessages = messages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
@@ -94,16 +71,16 @@ const Chat = () => {
             <>
               <div className="bg-light p-3 border-bottom">
                 <h5 className="mb-0"># {currentChannel.name}</h5>
-                {!isConnected && (
-                  <small className="text-danger ms-2">Отключено от сервера</small>
-                )}
               </div>
               
-              <div className="flex-grow-1 overflow-auto">
+              <div className="flex-grow-1 overflow-auto p-3">
                 <MessagesList messages={channelMessages} />
               </div>
               
-              <MessageForm currentChannelId={currentChannelId} socket={socket} />
+              <MessageForm 
+                currentChannelId={currentChannelId}
+                onMessageSent={refetchMessages}
+              />
             </>
           ) : (
             <div className="d-flex align-items-center justify-content-center h-100">
