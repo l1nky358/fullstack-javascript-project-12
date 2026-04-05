@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
 import { setCurrentChannel } from '../store/channelsSlice';
+import { useSocket } from '../hooks/useSocket';
 import MessageForm from './MessageForm';
 import ChannelsList from './ChannelsList';
 import MessagesList from './MessagesList';
@@ -10,6 +11,8 @@ import MessagesList from './MessagesList';
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { socket, isConnected } = useSocket();
+  const [liveMessages, setLiveMessages] = useState([]);
 
   const { 
     data: channels = [], 
@@ -18,13 +21,32 @@ const Chat = () => {
   } = useGetChannelsQuery();
   
   const { 
-    data: messages = [], 
+    data: initialMessages = [], 
     isLoading: messagesLoading 
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
 
-  console.log('Chat render:', { channels, messages, currentChannelId });
+  useEffect(() => {
+    if (initialMessages) {
+      setLiveMessages(initialMessages);
+    }
+  }, [initialMessages]);
+
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const handleNewMessage = (message) => {
+      console.log('New message via socket:', message);
+      setLiveMessages((prev) => [...prev, message]);
+    };
+
+    socket.on('newMessage', handleNewMessage);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+    };
+  }, [socket, isConnected]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,8 +57,8 @@ const Chat = () => {
 
   useEffect(() => {
     if (!channelsLoading && channels.length > 0 && !currentChannelId) {
-      console.log('Setting first channel:', channels[0]);
-      dispatch(setCurrentChannel(channels[0].id));
+      const generalChannel = channels.find(ch => ch.name === 'general');
+      dispatch(setCurrentChannel(generalChannel?.id || channels[0].id));
     }
   }, [channelsLoading, channels, currentChannelId, dispatch]);
 
@@ -57,9 +79,7 @@ const Chat = () => {
   }
 
   const currentChannel = channels.find(c => c.id === currentChannelId);
-  const channelMessages = messages.filter(m => m.channelId === currentChannelId);
-
-  console.log('Filtered messages for channel:', channelMessages);
+  const channelMessages = liveMessages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
@@ -74,13 +94,16 @@ const Chat = () => {
             <>
               <div className="bg-light p-3 border-bottom">
                 <h5 className="mb-0"># {currentChannel.name}</h5>
+                {!isConnected && (
+                  <small className="text-danger ms-2">Отключено от сервера</small>
+                )}
               </div>
               
               <div className="flex-grow-1 overflow-auto">
                 <MessagesList messages={channelMessages} />
               </div>
               
-              <MessageForm currentChannelId={currentChannelId} />
+              <MessageForm currentChannelId={currentChannelId} socket={socket} />
             </>
           ) : (
             <div className="d-flex align-items-center justify-content-center h-100">
