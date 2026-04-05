@@ -32,11 +32,14 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
-        return [
-          { id: 1, name: 'general', removable: false },
-          { id: 2, name: 'random', removable: true },
-          { id: 3, name: 'tech', removable: true }
-        ];
+        console.log('Channels API response:', response);
+        if (!response || response.length === 0) {
+          return [
+            { id: 1, name: 'general', removable: false },
+            { id: 2, name: 'random', removable: true },
+          ];
+        }
+        return response;
       }
     }),
     addChannel: builder.mutation({
@@ -66,9 +69,12 @@ export const api = createApi({
       query: () => '/messages',
       providesTags: ['Messages'],
       transformResponse: (response) => {
-        return [
-          { id: 1, text: 'Добро пожаловать в чат!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
-        ];
+        if (!response || !Array.isArray(response)) {
+          return [
+            { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
+          ];
+        }
+        return response;
       }
     }),
     addMessage: builder.mutation({
