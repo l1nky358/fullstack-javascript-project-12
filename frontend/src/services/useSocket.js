@@ -7,27 +7,16 @@ export const useSocket = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      console.log('No token, skipping socket connection');
-      return;
-    }
+    if (!token) return;
 
-    console.log('Connecting socket with token:', token);
-    
     const newSocket = io('/', {
       auth: { token },
       transports: ['websocket', 'polling'],
-      autoConnect: true,
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Socket connected successfully');
+      console.log('Socket connected');
       setIsConnected(true);
-    });
-
-    newSocket.on('connect_error', (error) => {
-      console.error('❌ Socket connection error:', error);
-      setIsConnected(false);
     });
 
     newSocket.on('disconnect', () => {
@@ -35,15 +24,13 @@ export const useSocket = () => {
       setIsConnected(false);
     });
 
-    newSocket.on('newMessage', (message) => {
-      console.log('📨 New message received via socket:', message);
+    newSocket.on('connect_error', (err) => {
+      console.error('Socket error:', err.message);
     });
 
     setSocket(newSocket);
 
-    return () => {
-      newSocket.disconnect();
-    };
+    return () => newSocket.disconnect();
   }, []);
 
   return { socket, isConnected };
