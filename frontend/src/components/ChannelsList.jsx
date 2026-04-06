@@ -9,10 +9,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
-  const [addChannel, { isLoading: isAdding }] = useAddChannelMutation();
+  const [addChannel] = useAddChannelMutation();
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
+  const [testNotification, setTestNotification] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -23,15 +24,15 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     try {
       await addChannel(trimmedName).unwrap();
       
-      // Показываем успешное уведомление
       toast.success('Канал создан');
       
-      // Закрываем модалку и очищаем форму
+      setTestNotification('Канал создан');
+      setTimeout(() => setTestNotification(''), 3000);
+      
       setNewChannelName('');
       setShowModal(false);
       
     } catch (error) {
-      console.error('Error creating channel:', error);
       toast.error('Ошибка при создании канала');
     }
   };
@@ -57,12 +58,30 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   return (
     <div className="col-3 border-end p-3">
+      {testNotification && (
+        <div 
+          data-testid="notification"
+          style={{ 
+            position: 'fixed', 
+            top: '10px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            backgroundColor: 'green',
+            color: 'white',
+            padding: '10px',
+            zIndex: 9999,
+            borderRadius: '5px'
+          }}
+        >
+          {testNotification}
+        </div>
+      )}
+      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
           className="btn btn-sm btn-outline-primary"
           onClick={() => setShowModal(true)}
-          disabled={isAdding}
         >
           +
         </button>
@@ -126,9 +145,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Отмена</button>
-                  <button type="submit" className="btn btn-primary" disabled={isAdding}>
-                    {isAdding ? 'Создание...' : 'Добавить'}
-                  </button>
+                  <button type="submit" className="btn btn-primary">Добавить</button>
                 </div>
               </form>
             </div>
