@@ -9,21 +9,27 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
-  const [addChannel] = useAddChannelMutation();
+  const [addChannel, { isLoading: isAdding }] = useAddChannelMutation();
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
-    if (!newChannelName.trim()) return;
+    const trimmedName = newChannelName.trim();
+    
+    if (!trimmedName) return;
     
     try {
-      await addChannel(newChannelName.trim()).unwrap();
+      await addChannel(trimmedName).unwrap();
       
+      // Показываем успешное уведомление
       toast.success('Канал создан');
+      
+      // Закрываем модалку и очищаем форму
       setNewChannelName('');
       setShowModal(false);
+      
     } catch (error) {
       console.error('Error creating channel:', error);
       toast.error('Ошибка при создании канала');
@@ -56,6 +62,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         <button 
           className="btn btn-sm btn-outline-primary"
           onClick={() => setShowModal(true)}
+          disabled={isAdding}
         >
           +
         </button>
@@ -119,7 +126,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Отмена</button>
-                  <button type="submit" className="btn btn-primary">Добавить</button>
+                  <button type="submit" className="btn btn-primary" disabled={isAdding}>
+                    {isAdding ? 'Создание...' : 'Добавить'}
+                  </button>
                 </div>
               </form>
             </div>
