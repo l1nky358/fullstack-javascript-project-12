@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
 
-const ChannelsList = ({ channels, currentChannelId }) => {
+const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
@@ -13,86 +13,110 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
 
+  const showNotification = (message, isError = false) => {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: ${isError ? '#dc3545' : '#28a745'};
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      z-index: 10000;
+      font-size: 16px;
+      font-weight: 500;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      animation: slideDown 0.3s ease-out;
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideUp 0.3s ease-out';
+      setTimeout(() => notification.remove(), 300);
+    }, 2700);
+  };
+
   const handleAddChannel = async (e) => {
     e.preventDefault();
-    console.log('=== handleAddChannel called ===');
-    console.log('Channel name:', newChannelName);
+    const trimmedName = newChannelName.trim();
     
-    if (!newChannelName.trim()) {
-      console.log('Channel name is empty, returning');
+    if (!trimmedName) {
+      showNotification('Введите имя канала', true);
       return;
     }
     
-    console.log('Calling addChannel mutation...');
+    if (trimmedName.length < 3 || trimmedName.length > 20) {
+      showNotification('Имя канала должно быть от 3 до 20 символов', true);
+      return;
+    }
+    
     try {
-      const result = await addChannel(newChannelName.trim()).unwrap();
-      console.log('SUCCESS! Channel created:', result);
+      await addChannel(trimmedName).unwrap();
       
-      // Создаем уведомление прямо здесь
-      const notificationDiv = document.createElement('div');
-      notificationDiv.textContent = 'Канал создан';
-      notificationDiv.style.position = 'fixed';
-      notificationDiv.style.top = '10px';
-      notificationDiv.style.left = '50%';
-      notificationDiv.style.transform = 'translateX(-50%)';
-      notificationDiv.style.backgroundColor = 'green';
-      notificationDiv.style.color = 'white';
-      notificationDiv.style.padding = '10px';
-      notificationDiv.style.zIndex = '99999';
-      notificationDiv.style.fontSize = '20px';
-      notificationDiv.style.fontWeight = 'bold';
-      document.body.appendChild(notificationDiv);
+      if (onChannelChange) {
+        onChannelChange();
+      }
       
-      console.log('Notification added to DOM');
-      
-      setTimeout(() => {
-        notificationDiv.remove();
-        console.log('Notification removed');
-      }, 5000);
+      showNotification('Канал создан');
       
       setNewChannelName('');
       setShowModal(false);
       
     } catch (error) {
-      console.error('ERROR creating channel:', error);
-      console.error('Error details:', JSON.stringify(error));
-      
-      // Показываем ошибку на странице
-      const errorDiv = document.createElement('div');
-      errorDiv.textContent = `Ошибка: ${error.message || 'Unknown error'}`;
-      errorDiv.style.position = 'fixed';
-      errorDiv.style.top = '10px';
-      errorDiv.style.left = '50%';
-      errorDiv.style.transform = 'translateX(-50%)';
-      errorDiv.style.backgroundColor = 'red';
-      errorDiv.style.color = 'white';
-      errorDiv.style.padding = '10px';
-      errorDiv.style.zIndex = '99999';
-      document.body.appendChild(errorDiv);
-      
-      setTimeout(() => errorDiv.remove(), 5000);
+      console.error('Error creating channel:', error);
+      showNotification('Ошибка при создании канала', true);
     }
   };
 
   const handleRename = async (channelId, newName) => {
     try {
       await renameChannel({ id: channelId, name: newName }).unwrap();
+      if (onChannelChange) onChannelChange();
+      showNotification('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
-      console.error('Rename error:', error);
+      showNotification('Ошибка при переименовании', true);
     }
   };
 
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
+      if (onChannelChange) onChannelChange();
+      showNotification('Канал удалён');
     } catch (error) {
-      console.error('Remove error:', error);
+      showNotification('Ошибка при удалении', true);
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
+      <style>{`
+        @keyframes slideDown {
+          from {
+            transform: translateX(-50%) translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slideUp {
+          from {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(-50%) translateY(-100%);
+            opacity: 0;
+          }
+        }
+      `}</style>
+      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
