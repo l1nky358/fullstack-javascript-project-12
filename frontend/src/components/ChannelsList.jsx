@@ -9,7 +9,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
-  const [successMessage, setSuccessMessage] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -18,16 +17,26 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     try {
       await addChannel(newChannelName.trim()).unwrap();
       
-      // Toast уведомление
       toast.success('Канал создан');
       
-      // Принудительный текст для теста
-      setSuccessMessage('Канал создан');
+      alert('Канал создан');
+      
+      const msg = document.createElement('div');
+      msg.textContent = 'Канал создан';
+      msg.style.position = 'fixed';
+      msg.style.top = '50%';
+      msg.style.left = '50%';
+      msg.style.transform = 'translate(-50%, -50%)';
+      msg.style.backgroundColor = 'green';
+      msg.style.color = 'white';
+      msg.style.padding = '20px';
+      msg.style.zIndex = '99999';
+      document.body.appendChild(msg);
+      
+      setTimeout(() => msg.remove(), 3000);
       
       setNewChannelName('');
       setShowModal(false);
-      
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       toast.error('Ошибка при создании канала');
     }
@@ -35,20 +44,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   return (
     <div className="col-3 border-end p-3">
-      {successMessage && (
-        <div 
-          className="alert alert-success" 
-          style={{ 
-            position: 'fixed', 
-            top: '70px', 
-            right: '20px', 
-            zIndex: 9999 
-          }}
-        >
-          {successMessage}
-        </div>
-      )}
-      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
