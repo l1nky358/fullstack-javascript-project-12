@@ -14,6 +14,7 @@ const Chat = () => {
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
+    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
@@ -72,6 +73,10 @@ const Chat = () => {
     }, 500);
   };
 
+  const handleChannelChange = () => {
+    refetchChannels();
+  };
+
   if (channelsLoading || messagesLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center vh-100">
@@ -91,6 +96,7 @@ const Chat = () => {
         <ChannelsList 
           channels={displayChannels}
           currentChannelId={currentChannelId}
+          onChannelChange={handleChannelChange}
         />
         
         <div className="col-9 col-md-10 d-flex flex-column h-100">
