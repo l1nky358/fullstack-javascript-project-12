@@ -32,13 +32,19 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
+        console.log('Raw channels response:', response);
+        
         if (!response || !Array.isArray(response) || response.length === 0) {
           return [
             { id: 1, name: 'general', removable: false },
             { id: 2, name: 'random', removable: true },
           ];
         }
-        return response;
+        
+        return response.map(channel => ({
+          ...channel,
+          removable: channel.name !== 'general'
+        }));
       }
     }),
     addChannel: builder.mutation({
