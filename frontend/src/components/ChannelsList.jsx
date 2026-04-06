@@ -21,7 +21,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await addChannel(newChannelName.trim()).unwrap();
-    
+      
       setSuccessMessage('Канал создан');
       showSuccess('Канал создан');
       
