@@ -3,7 +3,6 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
-import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -13,70 +12,87 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
-  const [testNotification, setTestNotification] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
-    const trimmedName = newChannelName.trim();
+    console.log('=== handleAddChannel called ===');
+    console.log('Channel name:', newChannelName);
     
-    if (!trimmedName) return;
+    if (!newChannelName.trim()) {
+      console.log('Channel name is empty, returning');
+      return;
+    }
     
+    console.log('Calling addChannel mutation...');
     try {
-      await addChannel(trimmedName).unwrap();
+      const result = await addChannel(newChannelName.trim()).unwrap();
+      console.log('SUCCESS! Channel created:', result);
       
-      toast.success('Канал создан');
+      // Создаем уведомление прямо здесь
+      const notificationDiv = document.createElement('div');
+      notificationDiv.textContent = 'Канал создан';
+      notificationDiv.style.position = 'fixed';
+      notificationDiv.style.top = '10px';
+      notificationDiv.style.left = '50%';
+      notificationDiv.style.transform = 'translateX(-50%)';
+      notificationDiv.style.backgroundColor = 'green';
+      notificationDiv.style.color = 'white';
+      notificationDiv.style.padding = '10px';
+      notificationDiv.style.zIndex = '99999';
+      notificationDiv.style.fontSize = '20px';
+      notificationDiv.style.fontWeight = 'bold';
+      document.body.appendChild(notificationDiv);
       
-      setTestNotification('Канал создан');
-      setTimeout(() => setTestNotification(''), 3000);
+      console.log('Notification added to DOM');
+      
+      setTimeout(() => {
+        notificationDiv.remove();
+        console.log('Notification removed');
+      }, 5000);
       
       setNewChannelName('');
       setShowModal(false);
       
     } catch (error) {
-      toast.error('Ошибка при создании канала');
+      console.error('ERROR creating channel:', error);
+      console.error('Error details:', JSON.stringify(error));
+      
+      // Показываем ошибку на странице
+      const errorDiv = document.createElement('div');
+      errorDiv.textContent = `Ошибка: ${error.message || 'Unknown error'}`;
+      errorDiv.style.position = 'fixed';
+      errorDiv.style.top = '10px';
+      errorDiv.style.left = '50%';
+      errorDiv.style.transform = 'translateX(-50%)';
+      errorDiv.style.backgroundColor = 'red';
+      errorDiv.style.color = 'white';
+      errorDiv.style.padding = '10px';
+      errorDiv.style.zIndex = '99999';
+      document.body.appendChild(errorDiv);
+      
+      setTimeout(() => errorDiv.remove(), 5000);
     }
   };
 
   const handleRename = async (channelId, newName) => {
     try {
       await renameChannel({ id: channelId, name: newName }).unwrap();
-      toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
-      toast.error('Ошибка при переименовании');
+      console.error('Rename error:', error);
     }
   };
 
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
-      toast.success('Канал удалён');
     } catch (error) {
-      toast.error('Ошибка при удалении');
+      console.error('Remove error:', error);
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
-      {testNotification && (
-        <div 
-          data-testid="notification"
-          style={{ 
-            position: 'fixed', 
-            top: '10px', 
-            left: '50%', 
-            transform: 'translateX(-50%)',
-            backgroundColor: 'green',
-            color: 'white',
-            padding: '10px',
-            zIndex: 9999,
-            borderRadius: '5px'
-          }}
-        >
-          {testNotification}
-        </div>
-      )}
-      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
