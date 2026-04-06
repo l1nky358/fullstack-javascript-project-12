@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useState } from 'react';
-import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation, useGetChannelsQuery } from '../services/api';
+import { useState, useEffect } from 'react';
+import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
 import { toast } from 'react-toastify';
 
@@ -13,37 +13,50 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
-  const { refetch: refetchChannels } = useGetChannelsQuery();
+
+  useEffect(() => {
+    console.log('ChannelsList received channels:', channels.map(c => c.name));
+  }, [channels]);
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
     const trimmedName = newChannelName.trim();
     
+    console.log('=== HANDLE ADD CHANNEL ===');
+    console.log('Channel name:', trimmedName);
+    console.log('Current channels before create:', channels.map(c => c.name));
+    
     if (!trimmedName) return;
     
     if (trimmedName.length < 3 || trimmedName.length > 20) {
+      console.log('Validation failed: length');
       toast.error('Имя канала должно быть от 3 до 20 символов');
       return;
     }
     
     if (channels.some(ch => ch.name === trimmedName)) {
+      console.log('Validation failed: duplicate');
       toast.error('Канал с таким именем уже существует');
       return;
     }
     
     try {
+      console.log('Calling addChannel mutation...');
       const result = await addChannel(trimmedName).unwrap();
-      
-      await refetchChannels();
+      console.log('Mutation result:', result);
+      console.log('New channel ID:', result.id);
       
       toast.success('Канал создан');
       
+      console.log('Dispatching setCurrentChannel with ID:', result.id);
       dispatch(setCurrentChannel(result.id));
       
       setNewChannelName('');
       setShowModal(false);
+      
+      console.log('Modal closed, state cleared');
     } catch (error) {
-      console.error('Error creating channel:', error);
+      console.error('ERROR in handleAddChannel:', error);
       toast.error('Ошибка при создании канала');
     }
   };
@@ -65,7 +78,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await renameChannel({ id: channelId, name: trimmedName }).unwrap();
-      await refetchChannels();
       toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
@@ -76,9 +88,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
-      await refetchChannels();
       toast.success('Канал удалён');
-
+      
       if (currentChannelId === channelId) {
         const generalChannel = channels.find(ch => ch.name === 'general');
         if (generalChannel) {
