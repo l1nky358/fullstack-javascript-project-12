@@ -3,6 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
+import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -20,25 +21,23 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!trimmedName) return;
     
     if (trimmedName.length < 3 || trimmedName.length > 20) {
-      alert('Имя канала должно быть от 3 до 20 символов');
+      toast.error('Имя канала должно быть от 3 до 20 символов');
       return;
     }
     
     if (channels.some(ch => ch.name === trimmedName)) {
-      alert('Канал с таким именем уже существует');
+      toast.error('Канал с таким именем уже существует');
       return;
     }
     
     try {
       const result = await addChannel(trimmedName).unwrap();
-      
-      alert('Канал создан');
-      
+      toast.success('Канал создан');
       dispatch(setCurrentChannel(result.id));
       setNewChannelName('');
       setShowModal(false);
     } catch (error) {
-      alert('Ошибка при создании канала');
+      toast.error('Ошибка при создании канала');
     }
   };
 
@@ -48,28 +47,28 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!trimmedName) return;
     
     if (trimmedName.length < 3 || trimmedName.length > 20) {
-      alert('Имя канала должно быть от 3 до 20 символов');
+      toast.error('Имя канала должно быть от 3 до 20 символов');
       return;
     }
     
     if (channels.some(ch => ch.id !== channelId && ch.name === trimmedName)) {
-      alert('Канал с таким именем уже существует');
+      toast.error('Канал с таким именем уже существует');
       return;
     }
     
     try {
       await renameChannel({ id: channelId, name: trimmedName }).unwrap();
-      alert('Канал переименован');
+      toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
-      alert('Ошибка при переименовании');
+      toast.error('Ошибка при переименовании');
     }
   };
 
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
-      alert('Канал удалён');
+      toast.success('Канал удалён');
       
       if (currentChannelId === channelId) {
         const generalChannel = channels.find(ch => ch.name === 'general');
@@ -78,7 +77,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         }
       }
     } catch (error) {
-      alert('Ошибка при удалении');
+      toast.error('Ошибка при удалении');
     }
   };
 
