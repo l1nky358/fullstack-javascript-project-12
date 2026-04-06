@@ -25,13 +25,6 @@ const Chat = () => {
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
 
-  const defaultChannels = [
-    { id: 1, name: 'general', removable: false },
-    { id: 2, name: 'random', removable: true },
-  ];
-  
-  const displayChannels = channels.length > 0 ? channels : defaultChannels;
-
   useEffect(() => {
     if (messages && messages.length) {
       setLocalMessages(messages);
@@ -46,11 +39,11 @@ const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!channelsLoading && displayChannels.length > 0 && !currentChannelId) {
-      const generalChannel = displayChannels.find(ch => ch.name === 'general');
-      dispatch(setCurrentChannel(generalChannel?.id || displayChannels[0].id));
+    if (!channelsLoading && channels.length > 0 && !currentChannelId) {
+      const generalChannel = channels.find(ch => ch.name === 'general');
+      dispatch(setCurrentChannel(generalChannel?.id || channels[0].id));
     }
-  }, [channelsLoading, displayChannels, currentChannelId, dispatch]);
+  }, [channelsLoading, channels, currentChannelId, dispatch]);
 
   useEffect(() => {
     if (currentChannelId) {
@@ -73,10 +66,6 @@ const Chat = () => {
     }, 500);
   };
 
-  const handleChannelChange = () => {
-    refetchChannels();
-  };
-
   if (channelsLoading || messagesLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center vh-100">
@@ -87,16 +76,15 @@ const Chat = () => {
     );
   }
 
-  const currentChannel = displayChannels.find(c => c.id === currentChannelId);
+  const currentChannel = channels.find(c => c.id === currentChannelId);
   const channelMessages = localMessages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
       <div className="row h-100 g-0">
         <ChannelsList 
-          channels={displayChannels}
+          channels={channels}
           currentChannelId={currentChannelId}
-          onChannelChange={handleChannelChange}
         />
         
         <div className="col-9 col-md-10 d-flex flex-column h-100">
