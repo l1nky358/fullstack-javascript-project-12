@@ -16,7 +16,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
   const [editingChannel, setEditingChannel] = useState(null);
-  const [renameValue, setRenameValue] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
 
   useState(() => {
@@ -63,28 +62,23 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleRename = async (channelId, newName) => {
-    if (!newName.trim()) return;
-    
-    if (newName.length < 3 || newName.length > 20) {
+    if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
       return;
     }
     
+    const trimmedName = newName.trim();
+    
     try {
-      await renameChannel({ id: channelId, name: newName }).unwrap();
+      await renameChannel({ id: channelId, name: trimmedName }).unwrap();
       setLocalChannels(prev => prev.map(ch => 
-        ch.id === channelId ? { ...ch, name: newName } : ch
+        ch.id === channelId ? { ...ch, name: trimmedName } : ch
       ));
       setSuccessMessage('Канал переименован');
       setTimeout(() => setSuccessMessage(''), 3000);
-      setEditingChannel(null);
     } catch (error) {
       console.error('Rename error:', error);
     }
-  };
-
-  const startRename = (channel) => {
-    setEditingChannel(channel.id);
-    setRenameValue(channel.name);
+    setEditingChannel(null);
   };
 
   const handleRemove = async (channelId) => {
@@ -162,19 +156,21 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 {channel.name === 'general' ? 'general' : `# ${channel.name}`}
               </button>
             )}
-            {channel.removable && (
+            {/* Кнопка меню для каналов, которые можно удалить */}
+            {channel.removable && editingChannel !== channel.id && (
               <div className="dropdown">
                 <button
                   className="btn btn-sm btn-link"
                   type="button"
                   data-bs-toggle="dropdown"
+                  aria-expanded="false"
                   aria-label="Управление каналом"
                 >
                   ⋮
                 </button>
                 <ul className="dropdown-menu">
                   <li>
-                    <button className="dropdown-item" onClick={() => startRename(channel)}>
+                    <button className="dropdown-item" onClick={() => setEditingChannel(channel.id)}>
                       Переименовать
                     </button>
                   </li>
