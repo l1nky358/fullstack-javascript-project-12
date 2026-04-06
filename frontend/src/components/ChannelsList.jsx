@@ -9,19 +9,35 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
+  const [localChannels, setLocalChannels] = useState(channels);
 
-  const handleAddChannel = (e) => {
+  useState(() => {
+    setLocalChannels(channels);
+  }, [channels]);
+
+  const handleAddChannel = async (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
     
-    // Показываем сообщение СРАЗУ для теста
+    const channelName = newChannelName.trim();
+    
+    const newChannel = {
+      id: Date.now(),
+      name: channelName,
+      removable: true
+    };
+    
+    setLocalChannels(prev => [...prev, newChannel]);
     setSuccessMessage('Канал создан');
     setNewChannelName('');
     setShowModal(false);
     setTimeout(() => setSuccessMessage(''), 3000);
     
-    // Отправляем запрос в фоне (не ждем результат)
-    addChannel(newChannelName.trim()).catch(err => console.error('API error:', err));
+    try {
+      await addChannel(channelName).unwrap();
+    } catch (error) {
+      console.error('API error:', error);
+    }
   };
 
   return (
@@ -43,7 +59,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       </div>
       
       <ul className="list-unstyled">
-        {channels.map(channel => (
+        {localChannels.map(channel => (
           <li key={channel.id} className="mb-2">
             <button
               className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
