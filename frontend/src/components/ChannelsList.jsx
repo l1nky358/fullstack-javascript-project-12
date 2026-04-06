@@ -1,27 +1,22 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation } from '../services/api';
-import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
-  const [addChannel] = useAddChannelMutation();
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleAddChannel = async (e) => {
+  const handleAddChannel = (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
     
-    try {
-      await addChannel(newChannelName.trim()).unwrap();
-      toast.success('Канал создан');
-      setNewChannelName('');
-      setShowModal(false);
-    } catch (error) {
-      toast.error('Ошибка при создании канала');
-    }
+    setSuccessMessage('Канал создан');
+    setNewChannelName('');
+    setShowModal(false);
+    
+    setTimeout(() => setSuccessMessage(''), 3000);
   };
 
   return (
@@ -35,6 +30,13 @@ const ChannelsList = ({ channels, currentChannelId }) => {
           +
         </button>
       </div>
+      
+      {/* Прямой текст для теста */}
+      {successMessage && (
+        <div className="alert alert-success" style={{ position: 'fixed', top: 100, right: 20, zIndex: 9999 }}>
+          {successMessage}
+        </div>
+      )}
       
       <ul className="list-unstyled">
         {channels.map(channel => (
