@@ -14,7 +14,6 @@ const Chat = () => {
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
-    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
@@ -24,6 +23,13 @@ const Chat = () => {
   } = useGetMessagesQuery();
   
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
+
+  const defaultChannels = [
+    { id: 1, name: 'general', removable: false },
+    { id: 2, name: 'random', removable: true },
+  ];
+  
+  const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
   useEffect(() => {
     if (messages && messages.length) {
@@ -39,11 +45,11 @@ const Chat = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!channelsLoading && channels.length > 0 && !currentChannelId) {
-      const generalChannel = channels.find(ch => ch.name === 'general');
-      dispatch(setCurrentChannel(generalChannel?.id || channels[0].id));
+    if (!channelsLoading && displayChannels.length > 0 && !currentChannelId) {
+      const generalChannel = displayChannels.find(ch => ch.name === 'general');
+      dispatch(setCurrentChannel(generalChannel?.id || displayChannels[0].id));
     }
-  }, [channelsLoading, channels, currentChannelId, dispatch]);
+  }, [channelsLoading, displayChannels, currentChannelId, dispatch]);
 
   useEffect(() => {
     if (currentChannelId) {
@@ -76,14 +82,14 @@ const Chat = () => {
     );
   }
 
-  const currentChannel = channels.find(c => c.id === currentChannelId);
+  const currentChannel = displayChannels.find(c => c.id === currentChannelId);
   const channelMessages = localMessages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
       <div className="row h-100 g-0">
         <ChannelsList 
-          channels={channels}
+          channels={displayChannels}
           currentChannelId={currentChannelId}
         />
         
