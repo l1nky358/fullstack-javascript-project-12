@@ -54,16 +54,11 @@ export const api = createApi({
         body: { name },
       }),
       transformResponse: (response) => {
-        console.log('=== ADD CHANNEL RESPONSE ===');
-        console.log('Full response:', response);
-        console.log('Response id:', response?.id);
-        console.log('Response name:', response?.name);
+        console.log('=== ADD CHANNEL RESPONSE ===', response);
         return response;
       },
       transformErrorResponse: (response) => {
-        console.log('=== ADD CHANNEL ERROR ===');
-        console.log('Error status:', response.status);
-        console.log('Error data:', response.data);
+        console.log('=== ADD CHANNEL ERROR ===', response);
         return response;
       },
       invalidatesTags: ['Channels'],
