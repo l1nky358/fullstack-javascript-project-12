@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
+import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation, useGetChannelsQuery } from '../services/api';
 import ChannelMenu from './ChannelMenu';
 import { toast } from 'react-toastify';
 
@@ -13,6 +13,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
+
+  const { refetch: refetchChannels } = useGetChannelsQuery();
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -32,11 +34,16 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       const result = await addChannel(trimmedName).unwrap();
+      console.log('Создан канал:', result);
+      
+      await refetchChannels();
+      
       toast.success('Канал создан');
       dispatch(setCurrentChannel(result.id));
       setNewChannelName('');
       setShowModal(false);
     } catch (error) {
+      console.error('Ошибка при создании:', error);
       toast.error('Ошибка при создании канала');
     }
   };
@@ -58,6 +65,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await renameChannel({ id: channelId, name: trimmedName }).unwrap();
+      await refetchChannels();
       toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
@@ -68,6 +76,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
+      await refetchChannels();
       toast.success('Канал удалён');
       
       if (currentChannelId === channelId) {
