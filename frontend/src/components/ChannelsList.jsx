@@ -17,11 +17,25 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const handleAddChannel = async (e) => {
     e.preventDefault();
     const trimmedName = newChannelName.trim();
+    
     if (!trimmedName) return;
     
+    if (trimmedName.length < 3 || trimmedName.length > 20) {
+      toast.error('Имя канала должно быть от 3 до 20 символов');
+      return;
+    }
+    
+    if (channels.some(ch => ch.name === trimmedName)) {
+      toast.error('Канал с таким именем уже существует');
+      return;
+    }
+    
     try {
-      await addChannel(trimmedName).unwrap();
+      const result = await addChannel(trimmedName).unwrap();
       toast.success('Канал создан');
+
+      dispatch(setCurrentChannel(result.id));
+      
       setNewChannelName('');
       setShowModal(false);
     } catch (error) {
@@ -30,8 +44,23 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleRename = async (channelId, newName) => {
+    const trimmedName = newName.trim();
+    
+    if (!trimmedName) return;
+    
+    if (trimmedName.length < 3 || trimmedName.length > 20) {
+      toast.error('Имя канала должно быть от 3 до 20 символов');
+      return;
+    }
+    
+    // Проверка уникальности имени
+    if (channels.some(ch => ch.id !== channelId && ch.name === trimmedName)) {
+      toast.error('Канал с таким именем уже существует');
+      return;
+    }
+    
     try {
-      await renameChannel({ id: channelId, name: newName }).unwrap();
+      await renameChannel({ id: channelId, name: trimmedName }).unwrap();
       toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
