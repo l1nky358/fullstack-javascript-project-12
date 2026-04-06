@@ -4,10 +4,8 @@ import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
 import { showSuccess, showError } from './Toast';
-import { useTranslation } from 'react-i18next';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
-  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
@@ -33,7 +31,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      showError(t('toast.error.failedToCreate'));
+      showError('Ошибка при создании канала');
     }
   };
 
@@ -41,19 +39,19 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!newName.trim()) return;
     try {
       await renameChannel({ id: channelId, name: newName.trim() }).unwrap();
-      showSuccess(t('toast.channelRenamed'));
+      showSuccess('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
-      showError(t('toast.error.failedToRename'));
+      showError('Ошибка при переименовании');
     }
   };
 
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
-      showSuccess(t('toast.channelRemoved'));
+      showSuccess('Канал удалён');
     } catch (error) {
-      showError(t('toast.error.failedToRemove'));
+      showError('Ошибка при удалении');
     }
   };
 
@@ -81,12 +79,12 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       )}
       
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="h5 mb-0">{t('chat.channels')}</h2>
+        <h2 className="h5 mb-0">Каналы</h2>
         <button 
           className="btn btn-sm btn-outline-primary"
           onClick={() => setShowModal(true)}
         >
-          {t('chat.addChannel')}
+          +
         </button>
       </div>
       
@@ -131,29 +129,25 @@ const ChannelsList = ({ channels, currentChannelId }) => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{t('channels.modals.add.title')}</h5>
+                <h5 className="modal-title">Добавить канал</h5>
                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <form onSubmit={handleAddChannel}>
                 <div className="modal-body">
-                  <label htmlFor="channelName" className="form-label">{t('channels.modals.add.name')}</label>
+                  <label htmlFor="channelName" className="form-label">Имя канала</label>
                   <input
                     type="text"
                     id="channelName"
                     className="form-control"
-                    placeholder={t('channels.modals.add.placeholder')}
+                    placeholder="Введите имя канала"
                     value={newChannelName}
                     onChange={(e) => setNewChannelName(e.target.value)}
                     autoFocus
                   />
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                    {t('channels.modals.add.cancel')}
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {t('channels.modals.add.submit')}
-                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Отмена</button>
+                  <button type="submit" className="btn btn-primary">Добавить</button>
                 </div>
               </form>
             </div>
