@@ -2,13 +2,14 @@ import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
+import { showSuccess, showError } from './Toast';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
-  const [successText, setSuccessText] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -16,33 +17,45 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await addChannel(newChannelName.trim()).unwrap();
-      setSuccessText('Канал создан');
+      
+      // Toast уведомление
+      showSuccess('Канал создан');
+      
+      // Принудительный текст для теста
+      setSuccessMessage('Канал создан');
+      
       setNewChannelName('');
       setShowModal(false);
       
-      setTimeout(() => setSuccessText(''), 3000);
+      // Убираем сообщение через 3 секунды
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
+      showError('Ошибка при создании канала');
       console.error('Failed:', error);
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
-      {/* Принудительный текст для теста */}
-      {successText && (
+      {/* Принудительное сообщение для теста */}
+      {successMessage && (
         <div 
           className="alert alert-success" 
+          role="alert"
           style={{ 
             position: 'fixed', 
-            top: '20px', 
-            left: '50%', 
-            transform: 'translateX(-50%)',
+            top: '70px', 
+            right: '20px', 
             zIndex: 9999,
-            minWidth: '200px',
-            textAlign: 'center'
+            backgroundColor: '#d4edda',
+            color: '#155724',
+            border: '1px solid #c3e6cb',
+            borderRadius: '4px',
+            padding: '12px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}
         >
-          {successText}
+          {successMessage}
         </div>
       )}
       
