@@ -5,14 +5,14 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
   const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
 
-  if (channel.removable === false) {
+  if (!channel.removable) {
     return null;
   }
 
   return (
-    <div className="dropdown d-inline">
+    <>
       <button
-        className="btn btn-sm btn-link dropdown-toggle"
+        className="btn btn-sm btn-link text-secondary"
         type="button"
         onClick={() => setShowMenu(!showMenu)}
         aria-label={t('channelMenu')}
@@ -21,36 +21,37 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
       </button>
       
       {showMenu && (
-        <div className="dropdown-menu show">
-          <button
-            className="dropdown-item"
-            onClick={() => {
-              setShowMenu(false);
-              onRename();
-            }}
+        <>
+          <div
+            className="dropdown-menu show"
+            style={{ position: 'absolute', right: 0, zIndex: 1050 }}
           >
-            {t('channels.menu.rename')}
-          </button>
-          <button
-            className="dropdown-item text-danger"
-            onClick={() => {
-              setShowMenu(false);
-              onRemove();
-            }}
-          >
-            {t('channels.menu.remove')}
-          </button>
-        </div>
+            <button
+              className="dropdown-item"
+              onClick={() => {
+                setShowMenu(false);
+                onRename();
+              }}
+            >
+              {t('channels.menu.rename')}
+            </button>
+            <button
+              className="dropdown-item text-danger"
+              onClick={() => {
+                setShowMenu(false);
+                onRemove();
+              }}
+            >
+              {t('channels.menu.remove')}
+            </button>
+          </div>
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 1040 }}
+            onClick={() => setShowMenu(false)}
+          />
+        </>
       )}
-      
-      {showMenu && (
-        <div
-          className="dropdown-backdrop"
-          style={{ position: 'fixed', inset: 0, zIndex: 1040 }}
-          onClick={() => setShowMenu(false)}
-        />
-      )}
-    </div>
+    </>
   );
 };
 
