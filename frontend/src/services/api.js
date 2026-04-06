@@ -32,8 +32,7 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
-        console.log('Channels API response:', response);
-        if (!response || response.length === 0) {
+        if (!response || !Array.isArray(response) || response.length === 0) {
           return [
             { id: 1, name: 'general', removable: false },
             { id: 2, name: 'random', removable: true },
@@ -48,6 +47,14 @@ export const api = createApi({
         method: 'POST',
         body: { name },
       }),
+      async onQueryStarted(name, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(api.util.invalidateTags(['Channels']));
+        } catch (err) {
+          console.error('Failed:', err);
+        }
+      },
       invalidatesTags: ['Channels'],
     }),
     renameChannel: builder.mutation({
