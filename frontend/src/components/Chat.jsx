@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
@@ -9,7 +9,6 @@ import ChannelsList from './ChannelsList';
 const Chat = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [localMessages, setLocalMessages] = useState([]);
 
   const { 
     data: channels = [], 
@@ -32,12 +31,6 @@ const Chat = () => {
   const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
   useEffect(() => {
-    if (messages && messages.length) {
-      setLocalMessages(messages);
-    }
-  }, [messages]);
-
-  useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
@@ -57,21 +50,6 @@ const Chat = () => {
     }
   }, [currentChannelId, refetchMessages]);
 
-  const addOptimisticMessage = (text, username) => {
-    const tempId = Date.now();
-    const newMessage = {
-      id: tempId,
-      text: text,
-      channelId: currentChannelId,
-      username: username,
-      createdAt: new Date().toISOString(),
-    };
-    setLocalMessages(prev => [...prev, newMessage]);
-    setTimeout(() => {
-      refetchMessages();
-    }, 500);
-  };
-
   if (channelsLoading || messagesLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center vh-100">
@@ -83,7 +61,7 @@ const Chat = () => {
   }
 
   const currentChannel = displayChannels.find(c => c.id === currentChannelId);
-  const channelMessages = localMessages.filter(m => m.channelId === currentChannelId);
+  const channelMessages = messages.filter(m => m.channelId === currentChannelId);
 
   return (
     <div className="container-fluid h-100 overflow-hidden p-0">
@@ -118,10 +96,8 @@ const Chat = () => {
               </div>
               
               <MessageForm 
-                currentChannelId={currentChannelId}
-                onMessageSent={(text, username) => {
-                  addOptimisticMessage(text, username);
-                }}
+                currentChannelId={currentChannelId} 
+                onMessageSent={refetchMessages}
               />
             </>
           ) : (
