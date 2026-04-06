@@ -3,7 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
-import { showSuccess, showError } from './Toast';
+import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -13,83 +13,44 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
-    console.log('Form submitted, channel name:', newChannelName);
-    
-    if (!newChannelName.trim()) {
-      console.log('Channel name is empty');
-      return;
-    }
+    if (!newChannelName.trim()) return;
     
     try {
-      console.log('Calling addChannel mutation...');
-      const result = await addChannel({ name: newChannelName.trim() }).unwrap();
-      console.log('Channel created successfully:', result);
+      await addChannel(newChannelName.trim()).unwrap();
       
-      // Показываем сообщение
-      setSuccessMessage('Канал создан');
-      console.log('Success message set to:', 'Канал создан');
-      
-      // Очищаем форму и закрываем модалку
+      toast.success('Канал создан');
       setNewChannelName('');
       setShowModal(false);
-      
-      // Не скрываем сообщение быстро, дадим тесту время
-      // setTimeout(() => setSuccessMessage(''), 5000);
-      
     } catch (error) {
       console.error('Error creating channel:', error);
-      showError('Ошибка при создании канала');
+      toast.error('Ошибка при создании канала');
     }
   };
 
   const handleRename = async (channelId, newName) => {
     try {
       await renameChannel({ id: channelId, name: newName }).unwrap();
-      showSuccess('Канал переименован');
+      toast.success('Канал переименован');
       setEditingChannel(null);
     } catch (error) {
-      showError('Ошибка при переименовании');
+      toast.error('Ошибка при переименовании');
     }
   };
 
   const handleRemove = async (channelId) => {
     try {
       await removeChannel(channelId).unwrap();
-      showSuccess('Канал удалён');
+      toast.success('Канал удалён');
     } catch (error) {
-      showError('Ошибка при удалении');
+      toast.error('Ошибка при удалении');
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
-      {/* Уведомление об успехе - всегда рендерим если есть сообщение */}
-      {successMessage && (
-        <div 
-          data-testid="success-message"
-          className="alert alert-success"
-          role="alert"
-          style={{ 
-            position: 'fixed', 
-            top: '20px', 
-            left: '50%', 
-            transform: 'translateX(-50%)',
-            zIndex: 10000,
-            backgroundColor: '#d4edda',
-            color: '#155724',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-          }}
-        >
-          {successMessage}
-        </div>
-      )}
-      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
