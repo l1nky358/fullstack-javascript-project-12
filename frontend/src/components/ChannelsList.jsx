@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation } from '../services/api';
+import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
@@ -9,10 +9,14 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
+  const [renameChannel] = useRenameChannelMutation();
+  const [removeChannel] = useRemoveChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
+  const [editingChannel, setEditingChannel] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
 
   useState(() => {
@@ -58,6 +62,42 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
   };
 
+  const handleRename = async (channelId, newName) => {
+    if (!newName.trim()) return;
+    
+    if (newName.length < 3 || newName.length > 20) {
+      return;
+    }
+    
+    try {
+      await renameChannel({ id: channelId, name: newName }).unwrap();
+      setLocalChannels(prev => prev.map(ch => 
+        ch.id === channelId ? { ...ch, name: newName } : ch
+      ));
+      setSuccessMessage('Канал переименован');
+      setTimeout(() => setSuccessMessage(''), 3000);
+      setEditingChannel(null);
+    } catch (error) {
+      console.error('Rename error:', error);
+    }
+  };
+
+  const startRename = (channel) => {
+    setEditingChannel(channel.id);
+    setRenameValue(channel.name);
+  };
+
+  const handleRemove = async (channelId) => {
+    try {
+      await removeChannel(channelId).unwrap();
+      setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
+      setSuccessMessage('Канал удалён');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Remove error:', error);
+    }
+  };
+
   const handleProfanityConfirm = () => {
     setShowProfanityWarning(false);
     const cleanedName = cleanProfanity(pendingChannelName);
@@ -100,13 +140,52 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {localChannels.map(channel => (
-          <li key={channel.id} className="mb-2">
-            <button
-              className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-              onClick={() => dispatch(setCurrentChannel(channel.id))}
-            >
-              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-            </button>
+          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
+            {editingChannel === channel.id ? (
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                defaultValue={channel.name}
+                autoFocus
+                onBlur={(e) => handleRename(channel.id, e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleRename(channel.id, e.target.value);
+                  }
+                }}
+              />
+            ) : (
+              <button
+                className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+                onClick={() => dispatch(setCurrentChannel(channel.id))}
+              >
+                {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+              </button>
+            )}
+            {channel.removable && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-sm btn-link"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-label="Управление каналом"
+                >
+                  ⋮
+                </button>
+                <ul className="dropdown-menu">
+                  <li>
+                    <button className="dropdown-item" onClick={() => startRename(channel)}>
+                      Переименовать
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item text-danger" onClick={() => handleRemove(channel.id)}>
+                      Удалить
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           </li>
         ))}
       </ul>
