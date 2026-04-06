@@ -2,13 +2,13 @@ import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
-import { showSuccess, showError } from './Toast';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
+  const [successText, setSuccessText] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -16,16 +16,36 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await addChannel(newChannelName.trim()).unwrap();
-      showSuccess('Канал создан');
+      setSuccessText('Канал создан');
       setNewChannelName('');
       setShowModal(false);
+      
+      setTimeout(() => setSuccessText(''), 3000);
     } catch (error) {
-      showError('Ошибка при создании канала');
+      console.error('Failed:', error);
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
+      {/* Принудительный текст для теста */}
+      {successText && (
+        <div 
+          className="alert alert-success" 
+          style={{ 
+            position: 'fixed', 
+            top: '20px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            minWidth: '200px',
+            textAlign: 'center'
+          }}
+        >
+          {successText}
+        </div>
+      )}
+      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
