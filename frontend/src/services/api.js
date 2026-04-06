@@ -1,84 +1,82 @@
-let channels = [
-  { id: 1, name: 'general', removable: false },
-  { id: 2, name: 'random', removable: true },
-];
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-let messages = [
-  { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
-];
-
-let nextId = 3;
-let nextMsgId = 2;
-
-export const api = {
+export const api = createApi({
   reducerPath: 'api',
-  reducer: (state) => state || {},
-  middleware: () => (next) => (action) => next(action),
-};
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: '/api/v1',
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['Channels', 'Messages'],
+  endpoints: (builder) => ({
+    login: builder.mutation({
+      query: (credentials) => ({
+        url: '/login',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+    signup: builder.mutation({
+      query: (userData) => ({
+        url: '/signup',
+        method: 'POST',
+        body: userData,
+      }),
+    }),
+    getChannels: builder.query({
+      query: () => '/channels',
+      providesTags: ['Channels'],
+    }),
+    addChannel: builder.mutation({
+      query: (name) => ({
+        url: '/channels',
+        method: 'POST',
+        body: { name },
+      }),
+      invalidatesTags: ['Channels'],
+    }),
+    renameChannel: builder.mutation({
+      query: ({ id, name }) => ({
+        url: `/channels/${id}`,
+        method: 'PATCH',
+        body: { name },
+      }),
+      invalidatesTags: ['Channels'],
+    }),
+    removeChannel: builder.mutation({
+      query: (id) => ({
+        url: `/channels/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Channels'],
+    }),
+    getMessages: builder.query({
+      query: () => '/messages',
+      providesTags: ['Messages'],
+    }),
+    addMessage: builder.mutation({
+      query: (message) => ({
+        url: '/messages',
+        method: 'POST',
+        body: message,
+      }),
+      invalidatesTags: ['Messages'],
+    }),
+  }),
+});
 
-export const useGetChannelsQuery = () => {
-  return { 
-    data: channels, 
-    isLoading: false, 
-    error: null, 
-    refetch: () => {} 
-  };
-};
-
-export const useAddChannelMutation = () => {
-  const addChannel = async (name) => {
-    const newChannel = { id: nextId++, name, removable: true };
-    channels.push(newChannel);
-    return { unwrap: () => Promise.resolve(newChannel) };
-  };
-  return [addChannel, { isLoading: false }];
-};
-
-export const useRenameChannelMutation = () => {
-  const renameChannel = async ({ id, name }) => {
-    const channel = channels.find(c => c.id === id);
-    if (channel) channel.name = name;
-    return { unwrap: () => Promise.resolve({ id, name }) };
-  };
-  return [renameChannel, { isLoading: false }];
-};
-
-export const useRemoveChannelMutation = () => {
-  const removeChannel = async (id) => {
-    channels = channels.filter(c => c.id !== id);
-    return { unwrap: () => Promise.resolve({ id }) };
-  };
-  return [removeChannel, { isLoading: false }];
-};
-
-export const useGetMessagesQuery = () => {
-  return { 
-    data: messages, 
-    isLoading: false, 
-    error: null, 
-    refetch: () => {} 
-  };
-};
-
-export const useAddMessageMutation = () => {
-  const addMessage = async (message) => {
-    const newMessage = { ...message, id: nextMsgId++, createdAt: new Date().toISOString() };
-    messages.push(newMessage);
-    return { unwrap: () => Promise.resolve(newMessage) };
-  };
-  return [addMessage, { isLoading: false }];
-};
-
-export const useLoginMutation = () => {
-  const login = async (credentials) => {
-    return { unwrap: () => Promise.resolve({ token: 'mock-token', username: credentials.username }) };
-  };
-  return [login, { isLoading: false }];
-};
-
-export const useSignupMutation = () => {
-  const signup = async (userData) => {
-    return { unwrap: () => Promise.resolve({ token: 'mock-token', username: userData.username }) };
-  };
-  return [signup, { isLoading: false }];
-};
+export const {
+  useLoginMutation,
+  useSignupMutation,
+  useGetChannelsQuery,
+  useAddChannelMutation,
+  useRenameChannelMutation,
+  useRemoveChannelMutation,
+  useGetMessagesQuery,
+  useAddMessageMutation,
+} = api;
