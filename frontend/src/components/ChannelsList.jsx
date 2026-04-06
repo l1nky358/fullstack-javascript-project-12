@@ -22,8 +22,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     try {
       await addChannel(newChannelName.trim()).unwrap();
       
-      setSuccessMessage('Канал создан');
       showSuccess('Канал создан');
+      
+      setSuccessMessage('Канал создан');
       
       setNewChannelName('');
       setShowModal(false);
@@ -55,9 +56,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   return (
     <div className="col-3 border-end p-3">
+      {/* Обычное уведомление для тестов */}
       {successMessage && (
         <div 
-          className="alert alert-success" 
+          className="alert alert-success"
+          role="alert"
           style={{ 
             position: 'fixed', 
             top: '20px', 
