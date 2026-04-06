@@ -2,26 +2,25 @@ import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
+import { toast } from 'react-toastify';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
-  const [notification, setNotification] = useState(null);
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
+    
     try {
       await addChannel(newChannelName.trim()).unwrap();
-      setNotification('Канал создан');
+      toast.success('Канал создан');
       setNewChannelName('');
       setShowModal(false);
-      setTimeout(() => setNotification(null), 3000);
     } catch (error) {
-      setNotification('Ошибка при создании канала');
-      setTimeout(() => setNotification(null), 3000);
+      toast.error('Ошибка при создании канала');
     }
   };
 
@@ -36,12 +35,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
           +
         </button>
       </div>
-      
-      {notification && (
-        <div className="alert alert-success alert-sm">
-          {notification}
-        </div>
-      )}
       
       <ul className="list-unstyled">
         {channels.map(channel => (
