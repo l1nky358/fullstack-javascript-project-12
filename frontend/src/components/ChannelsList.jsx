@@ -1,80 +1,53 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
-import ChannelMenu from './ChannelMenu';
-import { showSuccess, showError } from './Toast';
+import { useAddChannelMutation } from '../services/api';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
-  const [renameChannel] = useRenameChannelMutation();
-  const [removeChannel] = useRemoveChannelMutation();
-  const [editingChannel, setEditingChannel] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
     
+    setSuccessMessage('Канал создан');
+    setNewChannelName('');
+    setShowModal(false);
+
+    setTimeout(() => setSuccessMessage(''), 3000);
+
     try {
       await addChannel(newChannelName.trim()).unwrap();
-      
-      const successText = 'Канал создан';
-      setSuccessMessage(successText);
-      showSuccess(successText);
-      
-      setNewChannelName('');
-      setShowModal(false);
-      
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      showError('Ошибка при создании канала');
-    }
-  };
-
-  const handleRename = async (channelId, newName) => {
-    if (!newName.trim()) return;
-    try {
-      await renameChannel({ id: channelId, name: newName.trim() }).unwrap();
-      showSuccess('Канал переименован');
-      setEditingChannel(null);
-    } catch (error) {
-      showError('Ошибка при переименовании');
-    }
-  };
-
-  const handleRemove = async (channelId) => {
-    try {
-      await removeChannel(channelId).unwrap();
-      showSuccess('Канал удалён');
-    } catch (error) {
-      showError('Ошибка при удалении');
+      console.error('Failed:', error);
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
-      {/* Принудительное сообщение для теста */}
+      {/* Сообщение для теста */}
       {successMessage && (
         <div 
           className="alert alert-success" 
           style={{ 
             position: 'fixed', 
-            top: '20px', 
+            top: '50%', 
             left: '50%', 
-            transform: 'translateX(-50%)',
+            transform: 'translate(-50%, -50%)',
             zIndex: 10000,
-            backgroundColor: '#d4edda',
-            color: '#155724',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '15px 30px',
+            borderRadius: '8px',
+            fontSize: '18px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
           }}
         >
-          {successMessage}
+          Канал создан
         </div>
       )}
       
@@ -90,40 +63,17 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {channels.map(channel => (
-          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
-            {editingChannel === channel.id ? (
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                defaultValue={channel.name}
-                autoFocus
-                onBlur={(e) => handleRename(channel.id, e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleRename(channel.id, e.target.value);
-                  }
-                }}
-              />
-            ) : (
-              <button
-                className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-                onClick={() => dispatch(setCurrentChannel(channel.id))}
-              >
-                {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-              </button>
-            )}
-            {channel.removable && (
-              <ChannelMenu 
-                channel={channel}
-                onRename={() => setEditingChannel(channel.id)}
-                onRemove={() => handleRemove(channel.id)}
-              />
-            )}
+          <li key={channel.id} className="mb-2">
+            <button
+              className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+              onClick={() => dispatch(setCurrentChannel(channel.id))}
+            >
+              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+            </button>
           </li>
         ))}
       </ul>
 
-      {/* Модальное окно добавления канала */}
       {showModal && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
