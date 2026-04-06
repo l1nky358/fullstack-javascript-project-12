@@ -1,14 +1,19 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation } from '../services/api';
-import { toast } from 'react-toastify';
+import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
+import ChannelMenu from './ChannelMenu';
+import { showSuccess, showError } from './Toast';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
+  const [renameChannel] = useRenameChannelMutation();
+  const [removeChannel] = useRemoveChannelMutation();
+  const [editingChannel, setEditingChannel] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -16,34 +21,60 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     try {
       await addChannel(newChannelName.trim()).unwrap();
-      
-      toast.success('Канал создан');
-      
-      alert('Канал создан');
-      
-      const msg = document.createElement('div');
-      msg.textContent = 'Канал создан';
-      msg.style.position = 'fixed';
-      msg.style.top = '50%';
-      msg.style.left = '50%';
-      msg.style.transform = 'translate(-50%, -50%)';
-      msg.style.backgroundColor = 'green';
-      msg.style.color = 'white';
-      msg.style.padding = '20px';
-      msg.style.zIndex = '99999';
-      document.body.appendChild(msg);
-      
-      setTimeout(() => msg.remove(), 3000);
+    
+      setSuccessMessage('Канал создан');
+      showSuccess('Канал создан');
       
       setNewChannelName('');
       setShowModal(false);
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      toast.error('Ошибка при создании канала');
+      showError('Ошибка при создании канала');
+    }
+  };
+
+  const handleRename = async (channelId, newName) => {
+    try {
+      await renameChannel({ id: channelId, name: newName }).unwrap();
+      showSuccess('Канал переименован');
+      setEditingChannel(null);
+    } catch (error) {
+      showError('Ошибка при переименовании');
+    }
+  };
+
+  const handleRemove = async (channelId) => {
+    try {
+      await removeChannel(channelId).unwrap();
+      showSuccess('Канал удалён');
+    } catch (error) {
+      showError('Ошибка при удалении');
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
+      {successMessage && (
+        <div 
+          className="alert alert-success" 
+          style={{ 
+            position: 'fixed', 
+            top: '20px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            zIndex: 10000,
+            backgroundColor: '#d4edda',
+            color: '#155724',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
@@ -56,13 +87,35 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {channels.map(channel => (
-          <li key={channel.id} className="mb-2">
-            <button
-              className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-              onClick={() => dispatch(setCurrentChannel(channel.id))}
-            >
-              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-            </button>
+          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
+            {editingChannel === channel.id ? (
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                defaultValue={channel.name}
+                autoFocus
+                onBlur={(e) => handleRename(channel.id, e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleRename(channel.id, e.target.value);
+                  }
+                }}
+              />
+            ) : (
+              <button
+                className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+                onClick={() => dispatch(setCurrentChannel(channel.id))}
+              >
+                {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+              </button>
+            )}
+            {channel.removable && (
+              <ChannelMenu 
+                channel={channel}
+                onRename={() => setEditingChannel(channel.id)}
+                onRemove={() => handleRemove(channel.id)}
+              />
+            )}
           </li>
         ))}
       </ul>
