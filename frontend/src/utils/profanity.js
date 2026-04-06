@@ -1,7 +1,7 @@
 const profanityList = [
   'badword', 'swearword', 'curse', 'fuck', 'shit', 'damn', 'hell',
   'asshole', 'bitch', 'crap', 'piss', 'dick', 'pussy', 'cock', 'cunt',
-  'whore', 'slut', 'nigger', 'faggot', 'retard'
+  'whore', 'slut', 'nigger', 'faggot', 'retard', 'boobs'
 ];
 
 const normalizeText = (text) => {
