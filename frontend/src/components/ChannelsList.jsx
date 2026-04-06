@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
+import { containsProfanity, cleanProfanity } from '../utils/profanity';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -10,11 +11,26 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [addChannel] = useAddChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showProfanityWarning, setShowProfanityWarning] = useState(false);
+  const [pendingChannelName, setPendingChannelName] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
 
   useState(() => {
     setLocalChannels(channels);
   }, [channels]);
+
+  const addChannelToList = (channelName) => {
+    const newChannel = {
+      id: Date.now(),
+      name: channelName,
+      removable: true
+    };
+    setLocalChannels(prev => [...prev, newChannel]);
+    setSuccessMessage('Канал создан');
+    setNewChannelName('');
+    setShowModal(false);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -27,23 +43,37 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       return;
     }
     
-    const newChannel = {
-      id: Date.now(),
-      name: channelName,
-      removable: true
-    };
+    if (containsProfanity(channelName)) {
+      setPendingChannelName(channelName);
+      setShowProfanityWarning(true);
+      return;
+    }
     
-    setLocalChannels(prev => [...prev, newChannel]);
-    setSuccessMessage('Канал создан');
-    setNewChannelName('');
-    setShowModal(false);
-    setTimeout(() => setSuccessMessage(''), 3000);
+    addChannelToList(channelName);
     
     try {
       await addChannel(channelName).unwrap();
     } catch (error) {
       console.error('API error:', error);
     }
+  };
+
+  const handleProfanityConfirm = () => {
+    setShowProfanityWarning(false);
+    const cleanedName = cleanProfanity(pendingChannelName);
+    addChannelToList(cleanedName);
+    
+    try {
+      addChannel(cleanedName).unwrap();
+    } catch (error) {
+      console.error('API error:', error);
+    }
+  };
+
+  const handleProfanityCancel = () => {
+    setShowProfanityWarning(false);
+    setPendingChannelName('');
+    setNewChannelName('');
   };
 
   return (
@@ -81,7 +111,32 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         ))}
       </ul>
 
-      {showModal && (
+      {/* Модальное окно предупреждения о нецензурных словах */}
+      {showProfanityWarning && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Предупреждение</h5>
+                <button type="button" className="btn-close" onClick={handleProfanityCancel}></button>
+              </div>
+              <div className="modal-body">
+                <p>Название канала содержит недопустимые слова.</p>
+                <p>Отправить с заменой на *****?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleProfanityCancel}>Отмена</button>
+                <button type="button" className="btn btn-warning" onClick={handleProfanityConfirm}>
+                  *****
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно добавления канала */}
+      {showModal && !showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
             <div className="modal-content">
