@@ -53,6 +53,19 @@ export const api = createApi({
         method: 'POST',
         body: { name },
       }),
+      transformResponse: (response) => {
+        console.log('=== ADD CHANNEL RESPONSE ===');
+        console.log('Full response:', response);
+        console.log('Response id:', response?.id);
+        console.log('Response name:', response?.name);
+        return response;
+      },
+      transformErrorResponse: (response) => {
+        console.log('=== ADD CHANNEL ERROR ===');
+        console.log('Error status:', response.status);
+        console.log('Error data:', response.data);
+        return response;
+      },
       invalidatesTags: ['Channels'],
     }),
     renameChannel: builder.mutation({
