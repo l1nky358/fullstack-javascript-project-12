@@ -32,15 +32,12 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
-        console.log('Raw channels response:', response);
-        
         if (!response || !Array.isArray(response) || response.length === 0) {
           return [
             { id: 1, name: 'general', removable: false },
             { id: 2, name: 'random', removable: true },
           ];
         }
-        
         return response.map(channel => ({
           ...channel,
           removable: channel.name !== 'general'
@@ -54,11 +51,10 @@ export const api = createApi({
         body: { name },
       }),
       transformResponse: (response) => {
-        console.log('=== ADD CHANNEL RESPONSE ===', response);
-        return response;
-      },
-      transformErrorResponse: (response) => {
-        console.log('=== ADD CHANNEL ERROR ===', response);
+        console.log('Response from server:', response);
+        if (response && !response.id && response.name) {
+          return { ...response, id: Date.now() };
+        }
         return response;
       },
       invalidatesTags: ['Channels'],
