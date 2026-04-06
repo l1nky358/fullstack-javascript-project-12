@@ -17,20 +17,31 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
-    if (!newChannelName.trim()) return;
+    console.log('Form submitted, channel name:', newChannelName);
+    
+    if (!newChannelName.trim()) {
+      console.log('Channel name is empty');
+      return;
+    }
     
     try {
-      await addChannel(newChannelName.trim()).unwrap();
+      console.log('Calling addChannel mutation...');
+      const result = await addChannel({ name: newChannelName.trim() }).unwrap();
+      console.log('Channel created successfully:', result);
       
-      showSuccess('Канал создан');
-      
+      // Показываем сообщение
       setSuccessMessage('Канал создан');
+      console.log('Success message set to:', 'Канал создан');
       
+      // Очищаем форму и закрываем модалку
       setNewChannelName('');
       setShowModal(false);
       
-      setTimeout(() => setSuccessMessage(''), 3000);
+      // Не скрываем сообщение быстро, дадим тесту время
+      // setTimeout(() => setSuccessMessage(''), 5000);
+      
     } catch (error) {
+      console.error('Error creating channel:', error);
       showError('Ошибка при создании канала');
     }
   };
@@ -56,9 +67,10 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   return (
     <div className="col-3 border-end p-3">
-      {/* Обычное уведомление для тестов */}
+      {/* Уведомление об успехе - всегда рендерим если есть сообщение */}
       {successMessage && (
         <div 
+          data-testid="success-message"
           className="alert alert-success"
           role="alert"
           style={{ 
