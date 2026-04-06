@@ -33,7 +33,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     try {
       const result = await addChannel(trimmedName).unwrap();
       toast.success('Канал создан');
-
+      
+      // Переключаемся на новый канал
       dispatch(setCurrentChannel(result.id));
       
       setNewChannelName('');
@@ -53,7 +54,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       return;
     }
     
-    // Проверка уникальности имени
     if (channels.some(ch => ch.id !== channelId && ch.name === trimmedName)) {
       toast.error('Канал с таким именем уже существует');
       return;
