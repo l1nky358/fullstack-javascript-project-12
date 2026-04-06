@@ -156,7 +156,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 {channel.name === 'general' ? 'general' : `# ${channel.name}`}
               </button>
             )}
-            {/* Кнопка меню для каналов, которые можно удалить */}
             {channel.removable && editingChannel !== channel.id && (
               <div className="dropdown">
                 <button
