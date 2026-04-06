@@ -47,14 +47,6 @@ export const api = createApi({
         method: 'POST',
         body: { name },
       }),
-      async onQueryStarted(name, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          dispatch(api.util.invalidateTags(['Channels']));
-        } catch (err) {
-          console.error('Failed:', err);
-        }
-      },
       invalidatesTags: ['Channels'],
     }),
     renameChannel: builder.mutation({
