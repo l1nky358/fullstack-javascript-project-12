@@ -3,6 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
+import { showGlobalNotification } from './NotificationManager';
 
 const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const dispatch = useDispatch();
@@ -13,61 +14,39 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
 
-  const showNotification = (message, isError = false) => {
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: ${isError ? '#dc3545' : '#28a745'};
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      z-index: 10000;
-      font-size: 16px;
-      font-weight: 500;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      animation: slideDown 0.3s ease-out;
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.animation = 'slideUp 0.3s ease-out';
-      setTimeout(() => notification.remove(), 300);
-    }, 2700);
-  };
-
   const handleAddChannel = async (e) => {
     e.preventDefault();
     const trimmedName = newChannelName.trim();
     
     if (!trimmedName) {
-      showNotification('Введите имя канала', true);
+      showGlobalNotification('Введите имя канала', 'error');
       return;
     }
     
     if (trimmedName.length < 3 || trimmedName.length > 20) {
-      showNotification('Имя канала должно быть от 3 до 20 символов', true);
+      showGlobalNotification('Имя канала должно быть от 3 до 20 символов', 'error');
       return;
     }
     
     try {
-      await addChannel(trimmedName).unwrap();
+      const result = await addChannel(trimmedName).unwrap();
+      console.log('Channel created:', result);
       
+      // Обновляем список каналов
       if (onChannelChange) {
-        onChannelChange();
+        await onChannelChange();
       }
       
-      showNotification('Канал создан');
+      // Показываем уведомление
+      showGlobalNotification('Канал создан', 'success');
       
+      // Очищаем форму и закрываем модалку
       setNewChannelName('');
       setShowModal(false);
       
     } catch (error) {
       console.error('Error creating channel:', error);
-      showNotification('Ошибка при создании канала', true);
+      showGlobalNotification(error?.data?.message || 'Ошибка при создании канала', 'error');
     }
   };
 
@@ -75,10 +54,10 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     try {
       await renameChannel({ id: channelId, name: newName }).unwrap();
       if (onChannelChange) onChannelChange();
-      showNotification('Канал переименован');
+      showGlobalNotification('Канал переименован', 'success');
       setEditingChannel(null);
     } catch (error) {
-      showNotification('Ошибка при переименовании', true);
+      showGlobalNotification('Ошибка при переименовании', 'error');
     }
   };
 
@@ -86,37 +65,14 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     try {
       await removeChannel(channelId).unwrap();
       if (onChannelChange) onChannelChange();
-      showNotification('Канал удалён');
+      showGlobalNotification('Канал удалён', 'success');
     } catch (error) {
-      showNotification('Ошибка при удалении', true);
+      showGlobalNotification('Ошибка при удалении', 'error');
     }
   };
 
   return (
     <div className="col-3 border-end p-3">
-      <style>{`
-        @keyframes slideDown {
-          from {
-            transform: translateX(-50%) translateY(-100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-          }
-        }
-        @keyframes slideUp {
-          from {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-          }
-          to {
-            transform: translateX(-50%) translateY(-100%);
-            opacity: 0;
-          }
-        }
-      `}</style>
-      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
