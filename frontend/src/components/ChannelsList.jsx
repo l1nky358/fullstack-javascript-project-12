@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import ChannelMenu from './ChannelMenu';
 import { toast } from 'react-toastify';
@@ -13,6 +13,14 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
   const [editingChannel, setEditingChannel] = useState(null);
+  const [notification, setNotification] = useState('');
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const handleAddChannel = async (e) => {
     e.preventDefault();
@@ -21,25 +29,28 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!trimmedName) return;
     
     if (trimmedName.length < 3 || trimmedName.length > 20) {
-      toast.error('Имя канала должно быть от 3 до 20 символов');
+      setNotification('Ошибка: имя канала должно быть от 3 до 20 символов');
       return;
     }
     
     if (channels.some(ch => ch.name === trimmedName)) {
-      toast.error('Канал с таким именем уже существует');
+      setNotification('Ошибка: канал с таким именем уже существует');
       return;
     }
     
     try {
       const result = await addChannel(trimmedName).unwrap();
+      
+      setNotification('Канал создан');
+      
       toast.success('Канал создан');
       
-      // Переключаемся на новый канал
       dispatch(setCurrentChannel(result.id));
       
       setNewChannelName('');
       setShowModal(false);
     } catch (error) {
+      setNotification('Ошибка при создании канала');
       toast.error('Ошибка при создании канала');
     }
   };
@@ -72,6 +83,13 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     try {
       await removeChannel(channelId).unwrap();
       toast.success('Канал удалён');
+      
+      if (currentChannelId === channelId) {
+        const generalChannel = channels.find(ch => ch.name === 'general');
+        if (generalChannel) {
+          dispatch(setCurrentChannel(generalChannel.id));
+        }
+      }
     } catch (error) {
       toast.error('Ошибка при удалении');
     }
@@ -79,6 +97,29 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   return (
     <div className="col-3 border-end p-3">
+      {/* Уведомление для теста - в самом простом виде */}
+      {notification && (
+        <div 
+          id="test-notification"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: notification.includes('Ошибка') ? '#dc3545' : '#28a745',
+            color: 'white',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            zIndex: 10000,
+            fontSize: '16px',
+            fontWeight: 'bold',
+            textAlign: 'center'
+          }}
+        >
+          {notification}
+        </div>
+      )}
+      
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="h5 mb-0">Каналы</h2>
         <button 
