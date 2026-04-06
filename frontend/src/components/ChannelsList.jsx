@@ -1,22 +1,31 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
+import { useAddChannelMutation } from '../services/api';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
+  const [addChannel] = useAddChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleAddChannel = (e) => {
+  const handleAddChannel = async (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
     
-    setSuccessMessage('Канал создан');
-    setNewChannelName('');
-    setShowModal(false);
+    const channelName = newChannelName.trim();
     
-    setTimeout(() => setSuccessMessage(''), 3000);
+    try {
+      await addChannel(channelName).unwrap();
+      setSuccessMessage('Канал создан');
+      setNewChannelName('');
+      setShowModal(false);
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Failed:', error);
+    }
   };
 
   return (
@@ -31,9 +40,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         </button>
       </div>
       
-      {/* Прямой текст для теста */}
+      {/* Сообщение об успехе */}
       {successMessage && (
-        <div className="alert alert-success" style={{ position: 'fixed', top: 100, right: 20, zIndex: 9999 }}>
+        <div className="alert alert-success alert-sm" role="alert">
           {successMessage}
         </div>
       )}
@@ -51,6 +60,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         ))}
       </ul>
 
+      {/* Модальное окно */}
       {showModal && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
