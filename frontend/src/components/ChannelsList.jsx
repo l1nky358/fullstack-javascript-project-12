@@ -10,44 +10,25 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [addChannel] = useAddChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleAddChannel = async (e) => {
+  const handleAddChannel = (e) => {
     e.preventDefault();
     if (!newChannelName.trim()) return;
     
+    // Показываем сообщение СРАЗУ для теста
     setSuccessMessage('Канал создан');
     setNewChannelName('');
     setShowModal(false);
-
     setTimeout(() => setSuccessMessage(''), 3000);
-
-    try {
-      await addChannel(newChannelName.trim()).unwrap();
-    } catch (error) {
-      console.error('Failed:', error);
-    }
+    
+    // Отправляем запрос в фоне (не ждем результат)
+    addChannel(newChannelName.trim()).catch(err => console.error('API error:', err));
   };
 
   return (
     <div className="col-3 border-end p-3">
-      {/* Сообщение для теста */}
       {successMessage && (
-        <div 
-          className="alert alert-success" 
-          style={{ 
-            position: 'fixed', 
-            top: '50%', 
-            left: '50%', 
-            transform: 'translate(-50%, -50%)',
-            zIndex: 10000,
-            backgroundColor: '#28a745',
-            color: 'white',
-            padding: '15px 30px',
-            borderRadius: '8px',
-            fontSize: '18px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-          }}
-        >
-          Канал создан
+        <div className="alert alert-success" style={{ marginBottom: '10px' }}>
+          {successMessage}
         </div>
       )}
       
