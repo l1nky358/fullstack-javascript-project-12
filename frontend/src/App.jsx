@@ -7,7 +7,6 @@ import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import NotificationManager from './components/NotificationManager';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -28,7 +27,6 @@ function App() {
         draggable
         pauseOnHover
       />
-      <NotificationManager />
       <div className="d-flex flex-column vh-100">
         <Header />
         <div className="flex-grow-1">
