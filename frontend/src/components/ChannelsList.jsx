@@ -147,7 +147,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {localChannels.map(channel => {
-          // Запрещаем управление для general и random
           const isSystemChannel = channel.name === 'general' || channel.name === 'random';
           const showMenu = !isSystemChannel && channel.removable;
           
@@ -163,9 +162,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 <div style={{ position: 'relative' }}>
                   <button
                     className="btn btn-sm btn-link"
+                    title="Управление каналом"
                     aria-label="Управление каналом"
                     onClick={() => toggleMenu(channel.id)}
                   >
+                    <span style={{ display: 'none' }}>Управление каналом</span>
                     ⋮
                   </button>
                   {openMenuChannelId === channel.id && (
