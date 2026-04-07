@@ -3,6 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
+import ChannelMenu from './ChannelMenu';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   const handleRename = async (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
+      setEditingChannel(null);
       return;
     }
     
@@ -157,29 +159,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               </button>
             )}
             {channel.removable && editingChannel !== channel.id && (
-              <div className="dropdown">
-                <button
-                  className="btn btn-sm btn-link"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  aria-label="Управление каналом"
-                >
-                  ⋮
-                </button>
-                <ul className="dropdown-menu">
-                  <li>
-                    <button className="dropdown-item" onClick={() => setEditingChannel(channel.id)}>
-                      Переименовать
-                    </button>
-                  </li>
-                  <li>
-                    <button className="dropdown-item text-danger" onClick={() => handleRemove(channel.id)}>
-                      Удалить
-                    </button>
-                  </li>
-                </ul>
-              </div>
+              <ChannelMenu 
+                channel={channel}
+                onRename={() => setEditingChannel(channel.id)}
+                onRemove={() => handleRemove(channel.id)}
+              />
             )}
           </li>
         ))}
