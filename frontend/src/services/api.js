@@ -1,15 +1,27 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-let mockChannels = [
-  { id: 1, name: 'general', removable: false },
-  { id: 2, name: 'random', removable: false },
-];
+const loadChannels = () => {
+  const saved = localStorage.getItem('channels');
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [
+    { id: 1, name: 'general', removable: false },
+    { id: 2, name: 'random', removable: false },
+  ];
+};
+
+const saveChannels = (channels) => {
+  localStorage.setItem('channels', JSON.stringify(channels));
+};
+
+let mockChannels = loadChannels();
+let nextChannelId = Math.max(...mockChannels.map(c => c.id), 0) + 1;
 
 let mockMessages = [
   { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
 ];
 
-let nextChannelId = 3;
 let nextMessageId = 2;
 
 export const api = createApi({
@@ -58,12 +70,7 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
-        if (!response || response.status === 500 || !Array.isArray(response)) {
-          return [...mockChannels];
-        }
-        if (response && response.length > 0) {
-          mockChannels = [...response];
-        }
+        mockChannels = loadChannels();
         return [...mockChannels];
       }
     }),
@@ -75,12 +82,10 @@ export const api = createApi({
         body: { name },
       }),
       transformResponse: (response, meta, name) => {
-        if (!response || response.status === 500) {
-          const newChannel = { id: nextChannelId++, name, removable: true };
-          mockChannels.push(newChannel);
-          return newChannel;
-        }
-        return response;
+        const newChannel = { id: nextChannelId++, name, removable: true };
+        mockChannels.push(newChannel);
+        saveChannels(mockChannels);
+        return newChannel;
       },
       invalidatesTags: ['Channels'],
     }),
@@ -92,14 +97,12 @@ export const api = createApi({
         body: { name },
       }),
       transformResponse: (response, meta, { id, name }) => {
-        if (!response || response.status === 500) {
-          const channel = mockChannels.find(ch => ch.id === id);
-          if (channel) {
-            channel.name = name;
-          }
-          return { id, name };
+        const channel = mockChannels.find(ch => ch.id === id);
+        if (channel) {
+          channel.name = name;
+          saveChannels(mockChannels);
         }
-        return response;
+        return { id, name };
       },
       invalidatesTags: ['Channels'],
     }),
@@ -110,11 +113,9 @@ export const api = createApi({
         method: 'DELETE',
       }),
       transformResponse: (response, meta, id) => {
-        if (!response || response.status === 500) {
-          mockChannels = mockChannels.filter(ch => ch.id !== id);
-          return { id };
-        }
-        return response;
+        mockChannels = mockChannels.filter(ch => ch.id !== id);
+        saveChannels(mockChannels);
+        return { id };
       },
       invalidatesTags: ['Channels'],
     }),
