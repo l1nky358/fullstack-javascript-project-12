@@ -14,6 +14,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [renameChannelId, setRenameChannelId] = useState(null);
+  const [renameChannelName, setRenameChannelName] = useState('');
 
   useState(() => {
     setLocalChannels(channels);
@@ -59,14 +62,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleRename = (channelId, newName) => {
-    if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
-      return;
-    }
-    
-    const trimmedName = newName.trim();
-    
     const updatedChannels = localChannels.map(ch => 
-      ch.id === channelId ? { ...ch, name: trimmedName } : ch
+      ch.id === channelId ? { ...ch, name: newName } : ch
     );
     setLocalChannels(updatedChannels);
     setSuccessMessage('Канал переименован');
@@ -75,8 +72,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
   const handleRemove = (channelId) => {
     const channel = localChannels.find(ch => ch.id === channelId);
-    if (channel?.name === 'general') {
-      setErrorMessage('Нельзя удалить канал general');
+    if (!channel?.removable) {
+      setErrorMessage('Нельзя удалить этот канал');
       setTimeout(() => setErrorMessage(''), 3000);
       return;
     }
@@ -105,11 +102,24 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setNewChannelName('');
   };
 
-  const startRename = (channel) => {
-    const newName = prompt('Введите новое имя канала:', channel.name);
-    if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
-      handleRename(channel.id, newName.trim());
+  const openRenameModal = (channel) => {
+    if (!channel.removable) {
+      setErrorMessage('Нельзя переименовать этот канал');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
     }
+    setRenameChannelId(channel.id);
+    setRenameChannelName(channel.name);
+    setRenameModalOpen(true);
+  };
+
+  const handleRenameSubmit = () => {
+    if (renameChannelName.trim().length >= 3 && renameChannelName.trim().length <= 20) {
+      handleRename(renameChannelId, renameChannelName.trim());
+    }
+    setRenameModalOpen(false);
+    setRenameChannelId(null);
+    setRenameChannelName('');
   };
 
   return (
@@ -147,7 +157,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               <button
                 className="btn btn-sm btn-link"
                 aria-label="Управление каналом"
-                onClick={() => startRename(channel)}
+                onClick={() => openRenameModal(channel)}
               >
                 ⋮
               </button>
@@ -156,6 +166,36 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         ))}
       </ul>
 
+      {/* Модальное окно переименования */}
+      {renameModalOpen && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Переименовать канал</h5>
+                <button type="button" className="btn-close" onClick={() => setRenameModalOpen(false)}></button>
+              </div>
+              <div className="modal-body">
+                <label htmlFor="renameChannelName" className="form-label">Имя канала</label>
+                <input
+                  type="text"
+                  id="renameChannelName"
+                  className="form-control"
+                  value={renameChannelName}
+                  onChange={(e) => setRenameChannelName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setRenameModalOpen(false)}>Отмена</button>
+                <button type="button" className="btn btn-primary" onClick={handleRenameSubmit}>Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -179,6 +219,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         </div>
       )}
 
+      {/* Модальное окно добавления канала */}
       {showModal && !showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
