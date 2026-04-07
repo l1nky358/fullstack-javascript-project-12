@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const ChannelMenu = ({ channel, onRename, onRemove }) => {
-  const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
 
-  if (!channel.removable) {
-    return null;
-  }
+  // Для general показываем меню, но без удаления
+  const isGeneral = channel.name === 'general';
 
   return (
     <>
@@ -15,7 +12,7 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
         className="btn btn-sm btn-link text-secondary"
         type="button"
         onClick={() => setShowMenu(!showMenu)}
-        aria-label={t('channelMenu')}
+        aria-label="Управление каналом"
       >
         ⋮
       </button>
@@ -33,17 +30,19 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
                 onRename();
               }}
             >
-              {t('channels.menu.rename')}
+              Переименовать
             </button>
-            <button
-              className="dropdown-item text-danger"
-              onClick={() => {
-                setShowMenu(false);
-                onRemove();
-              }}
-            >
-              {t('channels.menu.remove')}
-            </button>
+            {!isGeneral && (
+              <button
+                className="dropdown-item text-danger"
+                onClick={() => {
+                  setShowMenu(false);
+                  onRemove();
+                }}
+              >
+                Удалить
+              </button>
+            )}
           </div>
           <div
             style={{ position: 'fixed', inset: 0, zIndex: 1040 }}
