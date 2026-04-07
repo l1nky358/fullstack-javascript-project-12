@@ -1,7 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
 
@@ -9,7 +8,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
-  const [addChannel] = useAddChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
@@ -23,20 +21,26 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setLocalChannels(channels);
   }, [channels]);
 
+  const saveChannels = (updatedChannels) => {
+    localStorage.setItem('channels', JSON.stringify(updatedChannels));
+    setLocalChannels(updatedChannels);
+  };
+
   const addChannelToList = (channelName) => {
     const newChannel = {
       id: Date.now(),
       name: channelName,
       removable: true
     };
-    setLocalChannels(prev => [...prev, newChannel]);
+    const updatedChannels = [...localChannels, newChannel];
+    saveChannels(updatedChannels);
     setSuccessMessage('Канал создан');
     setNewChannelName('');
     setShowModal(false);
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
-  const handleAddChannel = async (e) => {
+  const handleAddChannel = (e) => {
     e.preventDefault();
     setErrorMessage('');
     
@@ -54,19 +58,21 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
     
     addChannelToList(channelName);
-    
-    try {
-      await addChannel(channelName).unwrap();
-    } catch (error) {
-      console.error('API error:', error);
-    }
   };
 
   const handleRename = (channelId, newName) => {
+    if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
+      setErrorMessage('От 3 до 20 символов');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+    
+    const trimmedName = newName.trim();
+    
     const updatedChannels = localChannels.map(ch => 
-      ch.id === channelId ? { ...ch, name: newName } : ch
+      ch.id === channelId ? { ...ch, name: trimmedName } : ch
     );
-    setLocalChannels(updatedChannels);
+    saveChannels(updatedChannels);
     setSuccessMessage('Канал переименован');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
@@ -80,7 +86,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
     
     const updatedChannels = localChannels.filter(ch => ch.id !== channelId);
-    setLocalChannels(updatedChannels);
+    saveChannels(updatedChannels);
     setSuccessMessage('Канал удалён');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
@@ -89,12 +95,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setShowProfanityWarning(false);
     const cleanedName = cleanProfanity(pendingChannelName);
     addChannelToList(cleanedName);
-    
-    try {
-      addChannel(cleanedName).unwrap();
-    } catch (error) {
-      console.error('API error:', error);
-    }
   };
 
   const handleProfanityCancel = () => {
@@ -112,6 +112,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const handleRenameSubmit = () => {
     if (renameChannelName.trim().length >= 3 && renameChannelName.trim().length <= 20) {
       handleRename(renameChannelId, renameChannelName.trim());
+    } else {
+      setErrorMessage('От 3 до 20 символов');
+      setTimeout(() => setErrorMessage(''), 3000);
     }
     setRenameModalOpen(false);
     setRenameChannelId(null);
@@ -123,6 +126,12 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       {successMessage && (
         <div className="alert alert-success" style={{ marginBottom: '10px' }}>
           {successMessage}
+        </div>
+      )}
+      
+      {errorMessage && (
+        <div className="alert alert-danger" style={{ marginBottom: '10px' }}>
+          {errorMessage}
         </div>
       )}
       
@@ -245,11 +254,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                     onChange={(e) => setNewChannelName(e.target.value)}
                     autoFocus
                   />
-                  {errorMessage && (
-                    <div className="text-danger mt-2" style={{ fontSize: '14px' }}>
-                      {errorMessage}
-                    </div>
-                  )}
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Отмена</button>
