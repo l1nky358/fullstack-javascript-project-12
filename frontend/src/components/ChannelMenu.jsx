@@ -11,10 +11,9 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
         className="btn btn-sm btn-link text-secondary"
         type="button"
         onClick={() => setShowMenu(!showMenu)}
-        aria-label="Управление каналом"
         style={{ textDecoration: 'none', padding: '0 4px' }}
       >
-        ⋮
+        Управление каналом
       </button>
       
       {showMenu && (
