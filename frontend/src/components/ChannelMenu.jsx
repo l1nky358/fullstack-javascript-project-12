@@ -2,8 +2,7 @@ import { useState } from 'react';
 
 const ChannelMenu = ({ channel, onRename, onRemove }) => {
   const [showMenu, setShowMenu] = useState(false);
-
-  // Для general показываем меню, но без удаления
+  
   const isGeneral = channel.name === 'general';
 
   return (
