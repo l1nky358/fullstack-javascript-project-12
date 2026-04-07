@@ -4,6 +4,23 @@ import { useState } from 'react';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
 
+const STORAGE_KEY = 'app_channels';
+
+const loadChannelsFromStorage = () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [
+    { id: 1, name: 'general', removable: false },
+    { id: 2, name: 'random', removable: false },
+  ];
+};
+
+const saveChannelsToStorage = (channels) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(channels));
+};
+
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
@@ -12,17 +29,20 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
-  const [localChannels, setLocalChannels] = useState(channels);
+  const [localChannels, setLocalChannels] = useState(loadChannelsFromStorage());
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
 
   useState(() => {
-    setLocalChannels(channels);
+    if (channels && channels.length > 0) {
+      setLocalChannels(channels);
+      saveChannelsToStorage(channels);
+    }
   }, [channels]);
 
   const saveChannels = (updatedChannels) => {
-    localStorage.setItem('channels', JSON.stringify(updatedChannels));
+    saveChannelsToStorage(updatedChannels);
     setLocalChannels(updatedChannels);
   };
 
