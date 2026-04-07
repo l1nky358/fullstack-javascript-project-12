@@ -3,6 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
+import ChannelMenu from './ChannelMenu';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -17,7 +18,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
-  const [openMenuChannelId, setOpenMenuChannelId] = useState(null);
 
   useState(() => {
     setLocalChannels(channels);
@@ -103,12 +103,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setNewChannelName('');
   };
 
-  const toggleMenu = (channelId) => {
-    setOpenMenuChannelId(openMenuChannelId === channelId ? null : channelId);
-  };
-
   const openRenameModal = (channel) => {
-    setOpenMenuChannelId(null);
     setRenameChannelId(channel.id);
     setRenameChannelName(channel.name);
     setRenameModalOpen(true);
@@ -159,82 +154,16 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 {channel.name === 'general' ? 'general' : `# ${channel.name}`}
               </button>
               {showMenu && (
-                <div style={{ position: 'relative' }}>
-                  <button
-                    className="btn btn-sm btn-link"
-                    onClick={() => toggleMenu(channel.id)}
-                  >
-                    Управление каналом
-                  </button>
-                  {openMenuChannelId === channel.id && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        right: 0,
-                        backgroundColor: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                        zIndex: 1000,
-                        minWidth: '150px'
-                      }}
-                    >
-                      <button
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          padding: '8px 16px',
-                          textAlign: 'left',
-                          border: 'none',
-                          background: 'none',
-                          cursor: 'pointer'
-                        }}
-                        onClick={() => openRenameModal(channel)}
-                      >
-                        Переименовать
-                      </button>
-                      <button
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          padding: '8px 16px',
-                          textAlign: 'left',
-                          border: 'none',
-                          background: 'none',
-                          cursor: 'pointer',
-                          color: 'red'
-                        }}
-                        onClick={() => {
-                          setOpenMenuChannelId(null);
-                          handleRemove(channel.id);
-                        }}
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <ChannelMenu 
+                  channel={channel}
+                  onRename={() => openRenameModal(channel)}
+                  onRemove={() => handleRemove(channel.id)}
+                />
               )}
             </li>
           );
         })}
       </ul>
-
-      {/* Закрытие меню при клике вне */}
-      {openMenuChannelId !== null && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999
-          }}
-          onClick={() => setOpenMenuChannelId(null)}
-        />
-      )}
 
       {/* Модальное окно переименования */}
       {renameModalOpen && (
@@ -253,6 +182,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                   className="form-control"
                   value={renameChannelName}
                   onChange={(e) => setRenameChannelName(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleRenameSubmit();
+                    }
+                  }}
                   autoFocus
                 />
               </div>
