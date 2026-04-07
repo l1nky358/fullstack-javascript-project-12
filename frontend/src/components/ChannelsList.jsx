@@ -164,7 +164,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                     className="btn btn-sm btn-link"
                     onClick={() => toggleMenu(channel.id)}
                   >
-                    Управление каналом ⋮
+                    Управление каналом
                   </button>
                   {openMenuChannelId === channel.id && (
                     <div
@@ -221,6 +221,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         })}
       </ul>
 
+      {/* Закрытие меню при клике вне */}
       {openMenuChannelId !== null && (
         <div
           style={{
@@ -235,6 +236,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         />
       )}
 
+      {/* Модальное окно переименования */}
       {renameModalOpen && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -263,6 +265,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         </div>
       )}
 
+      {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -286,6 +289,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         </div>
       )}
 
+      {/* Модальное окно добавления канала */}
       {showModal && !showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
