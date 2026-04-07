@@ -191,6 +191,24 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                     >
                       Переименовать
                     </button>
+                    <button
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        padding: '8px 16px',
+                        textAlign: 'left',
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        color: 'red'
+                      }}
+                      onClick={() => {
+                        setOpenMenuChannelId(null);
+                        handleRemove(channel.id);
+                      }}
+                    >
+                      Удалить
+                    </button>
                   </div>
                 )}
               </div>
