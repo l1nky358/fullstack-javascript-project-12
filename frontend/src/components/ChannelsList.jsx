@@ -146,75 +146,81 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       </div>
       
       <ul className="list-unstyled">
-        {localChannels.map(channel => (
-          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
-            <button
-              className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-              onClick={() => dispatch(setCurrentChannel(channel.id))}
-            >
-              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-            </button>
-            {channel.removable && (
-              <div style={{ position: 'relative' }}>
-                <button
-                  className="btn btn-sm btn-link"
-                  aria-label="Управление каналом"
-                  onClick={() => toggleMenu(channel.id)}
-                >
-                  ⋮
-                </button>
-                {openMenuChannelId === channel.id && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
-                      backgroundColor: 'white',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                      zIndex: 1000,
-                      minWidth: '150px'
-                    }}
+        {localChannels.map(channel => {
+          // Запрещаем управление для general и random
+          const isSystemChannel = channel.name === 'general' || channel.name === 'random';
+          const showMenu = !isSystemChannel && channel.removable;
+          
+          return (
+            <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
+              <button
+                className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+                onClick={() => dispatch(setCurrentChannel(channel.id))}
+              >
+                {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+              </button>
+              {showMenu && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    className="btn btn-sm btn-link"
+                    aria-label="Управление каналом"
+                    onClick={() => toggleMenu(channel.id)}
                   >
-                    <button
+                    ⋮
+                  </button>
+                  {openMenuChannelId === channel.id && (
+                    <div
                       style={{
-                        display: 'block',
-                        width: '100%',
-                        padding: '8px 16px',
-                        textAlign: 'left',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => openRenameModal(channel)}
-                    >
-                      Переименовать
-                    </button>
-                    <button
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        padding: '8px 16px',
-                        textAlign: 'left',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                        color: 'red'
-                      }}
-                      onClick={() => {
-                        setOpenMenuChannelId(null);
-                        handleRemove(channel.id);
+                        position: 'absolute',
+                        top: '100%',
+                        right: 0,
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                        zIndex: 1000,
+                        minWidth: '150px'
                       }}
                     >
-                      Удалить
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </li>
-        ))}
+                      <button
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => openRenameModal(channel)}
+                      >
+                        Переименовать
+                      </button>
+                      <button
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer',
+                          color: 'red'
+                        }}
+                        onClick={() => {
+                          setOpenMenuChannelId(null);
+                          handleRemove(channel.id);
+                        }}
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       {/* Закрытие меню при клике вне */}
