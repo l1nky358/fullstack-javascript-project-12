@@ -17,6 +17,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
   const [editingChannel, setEditingChannel] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
 
   useState(() => {
@@ -65,6 +66,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const handleRename = async (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
       setEditingChannel(null);
+      setRenameValue('');
       return;
     }
     
@@ -81,6 +83,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       console.error('Rename error:', error);
     }
     setEditingChannel(null);
+    setRenameValue('');
   };
 
   const handleRemove = async (channelId) => {
@@ -112,6 +115,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setNewChannelName('');
   };
 
+  const startRename = (channel) => {
+    setEditingChannel(channel.id);
+    setRenameValue(channel.name);
+  };
+
   return (
     <div className="col-3 border-end p-3">
       {successMessage && (
@@ -141,12 +149,13 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               <input
                 type="text"
                 className="form-control form-control-sm"
-                defaultValue={channel.name}
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
                 autoFocus
-                onBlur={(e) => handleRename(channel.id, e.target.value)}
+                onBlur={() => handleRename(channel.id, renameValue)}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
-                    handleRename(channel.id, e.target.value);
+                    handleRename(channel.id, renameValue);
                   }
                 }}
               />
@@ -161,7 +170,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
             {channel.removable && editingChannel !== channel.id && (
               <ChannelMenu 
                 channel={channel}
-                onRename={() => setEditingChannel(channel.id)}
+                onRename={() => startRename(channel)}
                 onRemove={() => handleRemove(channel.id)}
               />
             )}
