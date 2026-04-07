@@ -17,6 +17,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
+  const [openMenuChannelId, setOpenMenuChannelId] = useState(null);
 
   useState(() => {
     setLocalChannels(channels);
@@ -102,12 +103,12 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setNewChannelName('');
   };
 
+  const toggleMenu = (channelId) => {
+    setOpenMenuChannelId(openMenuChannelId === channelId ? null : channelId);
+  };
+
   const openRenameModal = (channel) => {
-    if (!channel.removable) {
-      setErrorMessage('Нельзя переименовать этот канал');
-      setTimeout(() => setErrorMessage(''), 3000);
-      return;
-    }
+    setOpenMenuChannelId(null);
     setRenameChannelId(channel.id);
     setRenameChannelName(channel.name);
     setRenameModalOpen(true);
@@ -154,17 +155,64 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               {channel.name === 'general' ? 'general' : `# ${channel.name}`}
             </button>
             {channel.removable && (
-              <button
-                className="btn btn-sm btn-link"
-                aria-label="Управление каналом"
-                onClick={() => openRenameModal(channel)}
-              >
-                ⋮
-              </button>
+              <div style={{ position: 'relative' }}>
+                <button
+                  className="btn btn-sm btn-link"
+                  aria-label="Управление каналом"
+                  onClick={() => toggleMenu(channel.id)}
+                >
+                  ⋮
+                </button>
+                {openMenuChannelId === channel.id && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      backgroundColor: 'white',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                      zIndex: 1000,
+                      minWidth: '150px'
+                    }}
+                  >
+                    <button
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        padding: '8px 16px',
+                        textAlign: 'left',
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => openRenameModal(channel)}
+                    >
+                      Переименовать
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </li>
         ))}
       </ul>
+
+      {/* Закрытие меню при клике вне */}
+      {openMenuChannelId !== null && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999
+          }}
+          onClick={() => setOpenMenuChannelId(null)}
+        />
+      )}
 
       {/* Модальное окно переименования */}
       {renameModalOpen && (
