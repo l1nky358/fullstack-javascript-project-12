@@ -3,7 +3,6 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
 import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
-import ChannelMenu from './ChannelMenu';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
   const dispatch = useDispatch();
@@ -87,6 +86,13 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleRemove = async (channelId) => {
+    const channel = localChannels.find(ch => ch.id === channelId);
+    if (channel?.name === 'general') {
+      setErrorMessage('Нельзя удалить канал general');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+    
     try {
       await removeChannel(channelId).unwrap();
       setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
@@ -144,7 +150,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {localChannels.map(channel => (
-          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
+          <li key={channel.id} className="mb-2">
             {editingChannel === channel.id ? (
               <input
                 type="text"
@@ -160,19 +166,32 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 }}
               />
             ) : (
-              <button
-                className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-                onClick={() => dispatch(setCurrentChannel(channel.id))}
-              >
-                {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-              </button>
-            )}
-            {channel.removable && editingChannel !== channel.id && (
-              <ChannelMenu 
-                channel={channel}
-                onRename={() => startRename(channel)}
-                onRemove={() => handleRemove(channel.id)}
-              />
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <button
+                  className={`btn ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+                  onClick={() => dispatch(setCurrentChannel(channel.id))}
+                >
+                  {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+                </button>
+                <div>
+                  <button
+                    className="btn btn-sm btn-link"
+                    onClick={() => startRename(channel)}
+                    aria-label="Переименовать"
+                  >
+                    ✏️
+                  </button>
+                  {channel.removable && (
+                    <button
+                      className="btn btn-sm btn-link text-danger"
+                      onClick={() => handleRemove(channel.id)}
+                      aria-label="Удалить"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
           </li>
         ))}
