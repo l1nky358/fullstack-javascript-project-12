@@ -18,6 +18,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [editingChannel, setEditingChannel] = useState(null);
   const [renameValue, setRenameValue] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
+  const [openMenuChannelId, setOpenMenuChannelId] = useState(null);
 
   useState(() => {
     setLocalChannels(channels);
@@ -66,6 +67,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
       setEditingChannel(null);
       setRenameValue('');
+      setOpenMenuChannelId(null);
       return;
     }
     
@@ -83,9 +85,18 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
     setEditingChannel(null);
     setRenameValue('');
+    setOpenMenuChannelId(null);
   };
 
   const handleRemove = async (channelId) => {
+    const channel = localChannels.find(ch => ch.id === channelId);
+    if (channel?.name === 'general') {
+      setErrorMessage('Нельзя удалить канал general');
+      setTimeout(() => setErrorMessage(''), 3000);
+      setOpenMenuChannelId(null);
+      return;
+    }
+    
     try {
       await removeChannel(channelId).unwrap();
       setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
@@ -94,6 +105,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     } catch (error) {
       console.error('Remove error:', error);
     }
+    setOpenMenuChannelId(null);
   };
 
   const handleProfanityConfirm = () => {
@@ -117,6 +129,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const startRename = (channel) => {
     setEditingChannel(channel.id);
     setRenameValue(channel.name);
+    setOpenMenuChannelId(null);
+  };
+
+  const toggleMenu = (channelId) => {
+    setOpenMenuChannelId(openMenuChannelId === channelId ? null : channelId);
   };
 
   return (
@@ -167,22 +184,66 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 >
                   {channel.name === 'general' ? 'general' : `# ${channel.name}`}
                 </button>
-                <div>
+                
+                {/* Кнопка с тремя точками */}
+                <div style={{ position: 'relative' }}>
                   <button
                     className="btn btn-sm btn-link"
-                    onClick={() => startRename(channel)}
-                    title="Переименовать"
+                    onClick={() => toggleMenu(channel.id)}
+                    aria-label="Управление каналом"
                   >
-                    ✏️
+                    ⋮
                   </button>
-                  {channel.removable && (
-                    <button
-                      className="btn btn-sm btn-link text-danger"
-                      onClick={() => handleRemove(channel.id)}
-                      title="Удалить"
+                  
+                  {/* Выпадающее меню */}
+                  {openMenuChannelId === channel.id && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        right: 0,
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                        zIndex: 1000,
+                        minWidth: '150px'
+                      }}
                     >
-                      🗑️
-                    </button>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => startRename(channel)}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Переименовать
+                      </button>
+                      {channel.removable && (
+                        <button
+                          className="dropdown-item text-danger"
+                          onClick={() => handleRemove(channel.id)}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '8px 16px',
+                            textAlign: 'left',
+                            border: 'none',
+                            background: 'none',
+                            cursor: 'pointer',
+                            color: 'red'
+                          }}
+                        >
+                          Удалить
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -190,6 +251,21 @@ const ChannelsList = ({ channels, currentChannelId }) => {
           </li>
         ))}
       </ul>
+
+      {/* Закрытие меню при клике вне */}
+      {openMenuChannelId !== null && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999
+          }}
+          onClick={() => setOpenMenuChannelId(null)}
+        />
+      )}
 
       {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
