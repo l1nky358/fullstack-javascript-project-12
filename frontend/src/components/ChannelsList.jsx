@@ -143,7 +143,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
             >
               {channel.name === 'general' ? 'general' : `# ${channel.name}`}
             </button>
-            {channel.name !== 'general' && (
+            {channel.removable && (
               <button
                 className="btn btn-sm btn-link"
                 aria-label="Управление каналом"
