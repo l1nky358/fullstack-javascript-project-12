@@ -13,7 +13,7 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
         onClick={() => setShowMenu(!showMenu)}
         aria-label="Управление каналом"
       >
-        ⋮
+        Управление каналом
       </button>
       
       {showMenu && (
