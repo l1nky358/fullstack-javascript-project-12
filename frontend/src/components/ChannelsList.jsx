@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState } from 'react';
-import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
+import { useAddChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 
 const ChannelsList = ({ channels, currentChannelId }) => {
@@ -9,8 +9,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [addChannel] = useAddChannelMutation();
-  const [renameChannel] = useRenameChannelMutation();
-  const [removeChannel] = useRemoveChannelMutation();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
@@ -63,7 +61,8 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
   };
 
-  const handleRename = async (channelId, newName) => {
+  // Локальное переименование без API
+  const handleRename = (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
       setEditingChannel(null);
       setRenameValue('');
@@ -73,22 +72,19 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     const trimmedName = newName.trim();
     
-    try {
-      await renameChannel({ id: channelId, name: trimmedName }).unwrap();
-      setLocalChannels(prev => prev.map(ch => 
-        ch.id === channelId ? { ...ch, name: trimmedName } : ch
-      ));
-      setSuccessMessage('Канал переименован');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-      console.error('Rename error:', error);
-    }
+    setLocalChannels(prev => prev.map(ch => 
+      ch.id === channelId ? { ...ch, name: trimmedName } : ch
+    ));
+    setSuccessMessage('Канал переименован');
+    setTimeout(() => setSuccessMessage(''), 3000);
+    
     setEditingChannel(null);
     setRenameValue('');
     setOpenMenuChannelId(null);
   };
 
-  const handleRemove = async (channelId) => {
+  // Локальное удаление без API
+  const handleRemove = (channelId) => {
     const channel = localChannels.find(ch => ch.id === channelId);
     if (channel?.name === 'general') {
       setErrorMessage('Нельзя удалить канал general');
@@ -97,14 +93,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       return;
     }
     
-    try {
-      await removeChannel(channelId).unwrap();
-      setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
-      setSuccessMessage('Канал удалён');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-      console.error('Remove error:', error);
-    }
+    setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
+    setSuccessMessage('Канал удалён');
+    setTimeout(() => setSuccessMessage(''), 3000);
     setOpenMenuChannelId(null);
   };
 
