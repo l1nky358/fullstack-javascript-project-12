@@ -13,10 +13,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
-  const [editingChannel, setEditingChannel] = useState(null);
-  const [renameValue, setRenameValue] = useState('');
   const [localChannels, setLocalChannels] = useState(channels);
-  const [openMenuChannelId, setOpenMenuChannelId] = useState(null);
 
   useState(() => {
     setLocalChannels(channels);
@@ -61,42 +58,33 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     }
   };
 
-  // Локальное переименование без API
   const handleRename = (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
-      setEditingChannel(null);
-      setRenameValue('');
-      setOpenMenuChannelId(null);
       return;
     }
     
     const trimmedName = newName.trim();
     
-    setLocalChannels(prev => prev.map(ch => 
+    const updatedChannels = localChannels.map(ch => 
       ch.id === channelId ? { ...ch, name: trimmedName } : ch
-    ));
+    );
+    setLocalChannels(updatedChannels);
     setSuccessMessage('Канал переименован');
     setTimeout(() => setSuccessMessage(''), 3000);
-    
-    setEditingChannel(null);
-    setRenameValue('');
-    setOpenMenuChannelId(null);
   };
 
-  // Локальное удаление без API
   const handleRemove = (channelId) => {
     const channel = localChannels.find(ch => ch.id === channelId);
     if (channel?.name === 'general') {
       setErrorMessage('Нельзя удалить канал general');
       setTimeout(() => setErrorMessage(''), 3000);
-      setOpenMenuChannelId(null);
       return;
     }
     
-    setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
+    const updatedChannels = localChannels.filter(ch => ch.id !== channelId);
+    setLocalChannels(updatedChannels);
     setSuccessMessage('Канал удалён');
     setTimeout(() => setSuccessMessage(''), 3000);
-    setOpenMenuChannelId(null);
   };
 
   const handleProfanityConfirm = () => {
@@ -118,13 +106,10 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const startRename = (channel) => {
-    setEditingChannel(channel.id);
-    setRenameValue(channel.name);
-    setOpenMenuChannelId(null);
-  };
-
-  const toggleMenu = (channelId) => {
-    setOpenMenuChannelId(openMenuChannelId === channelId ? null : channelId);
+    const newName = prompt('Введите новое имя канала:', channel.name);
+    if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
+      handleRename(channel.id, newName.trim());
+    }
   };
 
   return (
@@ -151,114 +136,26 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       
       <ul className="list-unstyled">
         {localChannels.map(channel => (
-          <li key={channel.id} className="mb-2">
-            {editingChannel === channel.id ? (
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                autoFocus
-                onBlur={() => handleRename(channel.id, renameValue)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleRename(channel.id, renameValue);
-                  }
-                }}
-              />
-            ) : (
-              <div className="d-flex justify-content-between align-items-center">
-                <button
-                  className={`btn ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
-                  onClick={() => dispatch(setCurrentChannel(channel.id))}
-                  style={{ flex: 1, textAlign: 'left' }}
-                >
-                  {channel.name === 'general' ? 'general' : `# ${channel.name}`}
-                </button>
-                
-                {/* Кнопка с тремя точками */}
-                <div style={{ position: 'relative' }}>
-                  <button
-                    className="btn btn-sm btn-link"
-                    onClick={() => toggleMenu(channel.id)}
-                    aria-label="Управление каналом"
-                  >
-                    ⋮
-                  </button>
-                  
-                  {/* Выпадающее меню */}
-                  {openMenuChannelId === channel.id && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '100%',
-                        right: 0,
-                        backgroundColor: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                        zIndex: 1000,
-                        minWidth: '150px'
-                      }}
-                    >
-                      <button
-                        className="dropdown-item"
-                        onClick={() => startRename(channel)}
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          padding: '8px 16px',
-                          textAlign: 'left',
-                          border: 'none',
-                          background: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Переименовать
-                      </button>
-                      {channel.removable && (
-                        <button
-                          className="dropdown-item text-danger"
-                          onClick={() => handleRemove(channel.id)}
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '8px 16px',
-                            textAlign: 'left',
-                            border: 'none',
-                            background: 'none',
-                            cursor: 'pointer',
-                            color: 'red'
-                          }}
-                        >
-                          Удалить
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
+          <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center">
+            <button
+              className={`btn w-100 text-start ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
+              onClick={() => dispatch(setCurrentChannel(channel.id))}
+            >
+              {channel.name === 'general' ? 'general' : `# ${channel.name}`}
+            </button>
+            {channel.name !== 'general' && (
+              <button
+                className="btn btn-sm btn-link"
+                aria-label="Управление каналом"
+                onClick={() => startRename(channel)}
+              >
+                ⋮
+              </button>
             )}
           </li>
         ))}
       </ul>
 
-      {/* Закрытие меню при клике вне */}
-      {openMenuChannelId !== null && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999
-          }}
-          onClick={() => setOpenMenuChannelId(null)}
-        />
-      )}
-
-      {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -282,7 +179,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
         </div>
       )}
 
-      {/* Модальное окно добавления канала */}
       {showModal && !showProfanityWarning && (
         <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
