@@ -86,13 +86,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleRemove = async (channelId) => {
-    const channel = localChannels.find(ch => ch.id === channelId);
-    if (channel?.name === 'general') {
-      setErrorMessage('Нельзя удалить канал general');
-      setTimeout(() => setErrorMessage(''), 3000);
-      return;
-    }
-    
     try {
       await removeChannel(channelId).unwrap();
       setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
@@ -166,10 +159,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 }}
               />
             ) : (
-              <div className="d-flex justify-content-between align-items-center w-100">
+              <div className="d-flex justify-content-between align-items-center">
                 <button
                   className={`btn ${currentChannelId === channel.id ? 'btn-primary' : 'btn-link'}`}
                   onClick={() => dispatch(setCurrentChannel(channel.id))}
+                  style={{ flex: 1, textAlign: 'left' }}
                 >
                   {channel.name === 'general' ? 'general' : `# ${channel.name}`}
                 </button>
@@ -177,7 +171,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                   <button
                     className="btn btn-sm btn-link"
                     onClick={() => startRename(channel)}
-                    aria-label="Переименовать"
+                    title="Переименовать"
                   >
                     ✏️
                   </button>
@@ -185,7 +179,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                     <button
                       className="btn btn-sm btn-link text-danger"
                       onClick={() => handleRemove(channel.id)}
-                      aria-label="Удалить"
+                      title="Удалить"
                     >
                       🗑️
                     </button>
