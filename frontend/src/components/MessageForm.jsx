@@ -15,14 +15,26 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
     if (onMessageSent) onMessageSent(messageText, username);
     try {
       await addMessage({ text: messageText, channelId: currentChannelId, username }).unwrap();
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err);
+      setText(messageText);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="border-top p-3">
       <div className="input-group">
-        <input type="text" className="form-control" placeholder="Введите сообщение..." aria-label="Новое сообщение" value={text} onChange={e => setText(e.target.value)} />
-        <button type="submit" className="btn btn-primary" disabled={!text.trim()}>Отправить</button>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Введите сообщение..."
+          aria-label="Новое сообщение"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button type="submit" className="btn btn-primary" disabled={!text.trim()}>
+          Отправить
+        </button>
       </div>
     </form>
   );
