@@ -1,12 +1,12 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
 
-const STORAGE_KEY = 'app_channels';
+const STORAGE_KEY = 'chat_channels';
 
-const loadChannelsFromStorage = () => {
+const loadChannels = () => {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     return JSON.parse(saved);
@@ -17,7 +17,7 @@ const loadChannelsFromStorage = () => {
   ];
 };
 
-const saveChannelsToStorage = (channels) => {
+const saveChannels = (channels) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(channels));
 };
 
@@ -29,22 +29,20 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
   const [pendingChannelName, setPendingChannelName] = useState('');
-  const [localChannels, setLocalChannels] = useState(loadChannelsFromStorage());
+  const [localChannels, setLocalChannels] = useState(loadChannels());
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
 
-  useState(() => {
+  useEffect(() => {
+    saveChannels(localChannels);
+  }, [localChannels]);
+
+  useEffect(() => {
     if (channels && channels.length > 0) {
       setLocalChannels(channels);
-      saveChannelsToStorage(channels);
     }
   }, [channels]);
-
-  const saveChannels = (updatedChannels) => {
-    saveChannelsToStorage(updatedChannels);
-    setLocalChannels(updatedChannels);
-  };
 
   const addChannelToList = (channelName) => {
     const newChannel = {
@@ -52,8 +50,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       name: channelName,
       removable: true
     };
-    const updatedChannels = [...localChannels, newChannel];
-    saveChannels(updatedChannels);
+    setLocalChannels(prev => [...prev, newChannel]);
     setSuccessMessage('Канал создан');
     setNewChannelName('');
     setShowModal(false);
@@ -89,10 +86,9 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     
     const trimmedName = newName.trim();
     
-    const updatedChannels = localChannels.map(ch => 
+    setLocalChannels(prev => prev.map(ch => 
       ch.id === channelId ? { ...ch, name: trimmedName } : ch
-    );
-    saveChannels(updatedChannels);
+    ));
     setSuccessMessage('Канал переименован');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
@@ -105,8 +101,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       return;
     }
     
-    const updatedChannels = localChannels.filter(ch => ch.id !== channelId);
-    saveChannels(updatedChannels);
+    setLocalChannels(prev => prev.filter(ch => ch.id !== channelId));
     setSuccessMessage('Канал удалён');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
