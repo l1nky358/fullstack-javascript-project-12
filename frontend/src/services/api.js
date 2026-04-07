@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const CHANNELS_STORAGE_KEY = 'chat_channels';
+const MESSAGES_STORAGE_KEY = 'chat_messages';
 
 const loadChannelsFromStorage = () => {
   const saved = localStorage.getItem(CHANNELS_STORAGE_KEY);
@@ -17,13 +18,25 @@ const saveChannelsToStorage = (channels) => {
   localStorage.setItem(CHANNELS_STORAGE_KEY, JSON.stringify(channels));
 };
 
+const loadMessagesFromStorage = () => {
+  const saved = localStorage.getItem(MESSAGES_STORAGE_KEY);
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [
+    { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
+  ];
+};
+
+const saveMessagesToStorage = (messages) => {
+  localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+};
+
 let mockChannels = loadChannelsFromStorage();
 let nextChannelId = Math.max(...mockChannels.map(c => c.id), 0) + 1;
 
-let mockMessages = [
-  { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
-];
-let nextMessageId = 2;
+let mockMessages = loadMessagesFromStorage();
+let nextMessageId = Math.max(...mockMessages.map(m => m.id), 0) + 1;
 
 export const api = createApi({
   reducerPath: 'api',
@@ -125,12 +138,7 @@ export const api = createApi({
       query: () => '/messages',
       providesTags: ['Messages'],
       transformResponse: (response) => {
-        if (!response || response.status === 500 || !Array.isArray(response)) {
-          return [...mockMessages];
-        }
-        if (response && response.length > 0) {
-          mockMessages = [...response];
-        }
+        mockMessages = loadMessagesFromStorage();
         return [...mockMessages];
       }
     }),
@@ -142,16 +150,14 @@ export const api = createApi({
         body: message,
       }),
       transformResponse: (response, meta, message) => {
-        if (!response || response.status === 500) {
-          const newMessage = { 
-            ...message, 
-            id: nextMessageId++, 
-            createdAt: new Date().toISOString() 
-          };
-          mockMessages.push(newMessage);
-          return newMessage;
-        }
-        return response;
+        const newMessage = { 
+          ...message, 
+          id: nextMessageId++, 
+          createdAt: new Date().toISOString() 
+        };
+        mockMessages.push(newMessage);
+        saveMessagesToStorage(mockMessages);
+        return newMessage;
       },
       invalidatesTags: ['Messages'],
     }),
