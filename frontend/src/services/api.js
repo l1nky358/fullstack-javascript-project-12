@@ -1,7 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const loadChannels = () => {
-  const saved = localStorage.getItem('channels');
+const CHANNELS_STORAGE_KEY = 'chat_channels';
+
+const loadChannelsFromStorage = () => {
+  const saved = localStorage.getItem(CHANNELS_STORAGE_KEY);
   if (saved) {
     return JSON.parse(saved);
   }
@@ -11,17 +13,16 @@ const loadChannels = () => {
   ];
 };
 
-const saveChannels = (channels) => {
-  localStorage.setItem('channels', JSON.stringify(channels));
+const saveChannelsToStorage = (channels) => {
+  localStorage.setItem(CHANNELS_STORAGE_KEY, JSON.stringify(channels));
 };
 
-let mockChannels = loadChannels();
+let mockChannels = loadChannelsFromStorage();
 let nextChannelId = Math.max(...mockChannels.map(c => c.id), 0) + 1;
 
 let mockMessages = [
   { id: 1, text: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
 ];
-
 let nextMessageId = 2;
 
 export const api = createApi({
@@ -70,7 +71,7 @@ export const api = createApi({
       query: () => '/channels',
       providesTags: ['Channels'],
       transformResponse: (response) => {
-        mockChannels = loadChannels();
+        mockChannels = loadChannelsFromStorage();
         return [...mockChannels];
       }
     }),
@@ -84,7 +85,7 @@ export const api = createApi({
       transformResponse: (response, meta, name) => {
         const newChannel = { id: nextChannelId++, name, removable: true };
         mockChannels.push(newChannel);
-        saveChannels(mockChannels);
+        saveChannelsToStorage(mockChannels);
         return newChannel;
       },
       invalidatesTags: ['Channels'],
@@ -100,7 +101,7 @@ export const api = createApi({
         const channel = mockChannels.find(ch => ch.id === id);
         if (channel) {
           channel.name = name;
-          saveChannels(mockChannels);
+          saveChannelsToStorage(mockChannels);
         }
         return { id, name };
       },
@@ -114,7 +115,7 @@ export const api = createApi({
       }),
       transformResponse: (response, meta, id) => {
         mockChannels = mockChannels.filter(ch => ch.id !== id);
-        saveChannels(mockChannels);
+        saveChannelsToStorage(mockChannels);
         return { id };
       },
       invalidatesTags: ['Channels'],
