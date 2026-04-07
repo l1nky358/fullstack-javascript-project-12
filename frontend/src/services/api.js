@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 let mockChannels = [
   { id: 1, name: 'general', removable: false },
-  { id: 2, name: 'random', removable: true },
+  { id: 2, name: 'random', removable: false },
 ];
 
 let mockMessages = [
@@ -32,8 +32,7 @@ export const api = createApi({
         method: 'POST',
         body: credentials,
       }),
-      transformResponse: (response, meta, credentials) => {
-        // Если бэкенд не работает, имитируем ответ
+      transformResponse: (response) => {
         if (!response || response.status === 500) {
           return { token: 'mock-token-' + Date.now(), username: credentials.username };
         }
@@ -95,7 +94,9 @@ export const api = createApi({
       transformResponse: (response, meta, { id, name }) => {
         if (!response || response.status === 500) {
           const channel = mockChannels.find(ch => ch.id === id);
-          if (channel) channel.name = name;
+          if (channel) {
+            channel.name = name;
+          }
           return { id, name };
         }
         return response;
