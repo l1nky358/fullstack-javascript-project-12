@@ -1,14 +1,17 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useEffect } from 'react';
+import { io } from 'socket.io-client';
 import Header from './components/Header';
 import Chat from './components/Chat';
 import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import { initSocket, closeSocket } from './socket';
+import { useSocketEvents } from './hooks/useSocketEvents';
+
+let socket = null;
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -18,14 +21,24 @@ const PrivateRoute = ({ children }) => {
 function App() {
   const { token } = useAuth();
 
-  // Обновляем сокет при изменении токена (логин/логаут)
   useEffect(() => {
-    if (token) {
-      initSocket(token);
-    } else {
-      closeSocket();
+    if (token && !socket) {
+      socket = io('/', {
+        auth: { token },
+        transports: ['websocket'],
+      });
+      socket.on('connect', () => console.log('✅ WebSocket connected'));
+      socket.on('connect_error', (err) => console.error('❌ WebSocket error:', err));
     }
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+    };
   }, [token]);
+
+  useSocketEvents(socket);
 
   return (
     <BrowserRouter>
