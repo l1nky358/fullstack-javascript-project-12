@@ -9,6 +9,8 @@ import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
+import { useDispatch } from 'react-redux';
+import { api } from './services/api';
 
 let socket = null;
 
@@ -19,6 +21,7 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   const { token } = useAuth();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (token && !socket) {
@@ -26,19 +29,34 @@ function App() {
         auth: { token },
         transports: ['websocket'],
       });
-      socket.on('connect', () => console.log('WebSocket connected'));
-      socket.on('newMessage', (msg) => console.log('New message:', msg));
-      socket.on('newChannel', (ch) => console.log('New channel:', ch));
-      socket.on('renameChannel', (ch) => console.log('Channel renamed:', ch));
-      socket.on('removeChannel', (ch) => console.log('Channel removed:', ch));
+      
+      socket.on('connect', () => console.log('✅ WebSocket connected'));
+      
+      // Обновление каналов при событиях
+      socket.on('newChannel', () => {
+        dispatch(api.util.invalidateTags(['Channels']));
+      });
+      
+      socket.on('renameChannel', () => {
+        dispatch(api.util.invalidateTags(['Channels']));
+      });
+      
+      socket.on('removeChannel', () => {
+        dispatch(api.util.invalidateTags(['Channels']));
+      });
+      
+      socket.on('newMessage', () => {
+        dispatch(api.util.invalidateTags(['Messages']));
+      });
     }
+    
     return () => {
       if (socket) {
         socket.disconnect();
         socket = null;
       }
     };
-  }, [token]);
+  }, [token, dispatch]);
 
   return (
     <BrowserRouter>
