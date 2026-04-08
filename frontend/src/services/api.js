@@ -1,25 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// Только для сообщений
-const MESSAGES_KEY = 'chat_messages';
-
-const loadMessages = () => {
-  const saved = localStorage.getItem(MESSAGES_KEY);
-  if (saved) {
-    return JSON.parse(saved);
-  }
-  return [
-    { id: 1, body: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
-  ];
-};
-
-const saveMessages = (messages) => {
-  localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
-};
-
-let messages = loadMessages();
-let nextMsgId = Math.max(...messages.map(m => m.id), 0) + 1;
-
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
@@ -48,6 +28,7 @@ export const api = createApi({
         body: userData,
       }),
     }),
+    
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
@@ -75,16 +56,10 @@ export const api = createApi({
       }),
       invalidatesTags: ['Channels'],
     }),
+    
     getMessages: builder.query({
       query: () => '/messages',
       providesTags: ['Messages'],
-      transformResponse: (response) => {
-        if (response && Array.isArray(response) && response.length > 0) {
-          saveMessages(response);
-          return response;
-        }
-        return loadMessages();
-      }
     }),
     addMessage: builder.mutation({
       query: (message) => ({
@@ -92,12 +67,6 @@ export const api = createApi({
         method: 'POST',
         body: message,
       }),
-      transformResponse: (response, meta, message) => {
-        const newMessage = { ...message, id: nextMsgId++, createdAt: new Date().toISOString() };
-        messages.push(newMessage);
-        saveMessages(messages);
-        return newMessage;
-      },
       invalidatesTags: ['Messages'],
     }),
   }),
