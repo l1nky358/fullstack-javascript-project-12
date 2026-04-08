@@ -8,6 +8,10 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
+import { initSocket } from './socket';
+
+// Инициализация сокета без токена пока
+initSocket(null);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
