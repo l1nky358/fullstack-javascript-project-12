@@ -14,6 +14,15 @@ export const api = createApi({
   }),
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
+    getChannels: builder.query({
+      query: () => '/channels',
+      providesTags: ['Channels'],
+    }),
+    getMessages: builder.query({
+      query: () => '/messages',
+      providesTags: ['Messages'],
+    }),
+    
     login: builder.mutation({
       query: (credentials) => ({
         url: '/login',
@@ -27,10 +36,6 @@ export const api = createApi({
         method: 'POST',
         body: userData,
       }),
-    }),
-    getChannels: builder.query({
-      query: () => '/channels',
-      providesTags: ['Channels'],
     }),
     addChannel: builder.mutation({
       query: (name) => ({
@@ -54,10 +59,6 @@ export const api = createApi({
         method: 'DELETE',
       }),
       invalidatesTags: ['Channels'],
-    }),
-    getMessages: builder.query({
-      query: () => '/messages',
-      providesTags: ['Messages'],
     }),
     addMessage: builder.mutation({
       query: (message) => ({
