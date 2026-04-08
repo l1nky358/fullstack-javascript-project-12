@@ -12,7 +12,7 @@ const MessagesList = ({ messages }) => {
       {messages.map((message) => (
         <div key={message.id} className="mb-2">
           <strong className="text-primary me-2">{message.username}:</strong>
-          <span>{message.text}</span>
+          <span>{message.body || message.text}</span>
         </div>
       ))}
     </div>
