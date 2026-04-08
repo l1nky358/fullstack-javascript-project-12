@@ -14,6 +14,7 @@ export const api = createApi({
   }),
   tagTypes: ['Channels', 'Messages'],
   endpoints: (builder) => ({
+    // Auth
     login: builder.mutation({
       query: (credentials) => ({
         url: '/login',
@@ -29,6 +30,7 @@ export const api = createApi({
       }),
     }),
     
+    // Channels
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
@@ -57,6 +59,7 @@ export const api = createApi({
       invalidatesTags: ['Channels'],
     }),
     
+    // Messages
     getMessages: builder.query({
       query: () => '/messages',
       providesTags: ['Messages'],
