@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { setCurrentChannel } from '../store/channelsSlice';
 import { useState, useEffect } from 'react';
+import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutation } from '../services/api';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
-import { useRenameChannelMutation } from '../services/api';
 
 const STORAGE_KEY = 'chat_channels';
 
