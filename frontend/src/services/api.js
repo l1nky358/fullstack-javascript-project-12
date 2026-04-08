@@ -1,9 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// Ключ для localStorage
 const CHANNELS_KEY = 'app_channels';
 
-// Загрузка каналов
 const loadChannels = () => {
   const saved = localStorage.getItem(CHANNELS_KEY);
   if (saved) {
@@ -15,7 +13,6 @@ const loadChannels = () => {
   ];
 };
 
-// Сохранение каналов
 const saveChannels = (channels) => {
   localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
 };
