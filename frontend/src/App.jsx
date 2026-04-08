@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from 'react';
 import Header from './components/Header';
 import Chat from './components/Chat';
 import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
+import { initSocket, closeSocket } from './socket';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -14,19 +16,20 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
+  const { token } = useAuth();
+
+  // Обновляем сокет при изменении токена (логин/логаут)
+  useEffect(() => {
+    if (token) {
+      initSocket(token);
+    } else {
+      closeSocket();
+    }
+  }, [token]);
+
   return (
     <BrowserRouter>
-      <ToastContainer 
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="d-flex flex-column vh-100">
         <Header />
         <div className="flex-grow-1">
