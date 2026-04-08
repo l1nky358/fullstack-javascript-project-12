@@ -33,6 +33,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   useEffect(() => {
     saveChannels(localChannels);
@@ -91,6 +92,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     ));
     setSuccessMessage('Канал переименован');
     setTimeout(() => setSuccessMessage(''), 3000);
+    setRenameModalOpen(false);
   };
 
   const handleRemove = (channelId) => {
@@ -122,6 +124,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setRenameChannelId(channel.id);
     setRenameChannelName(channel.name);
     setRenameModalOpen(true);
+    setOpenMenuId(null);
   };
 
   const handleRenameSubmit = () => {
@@ -130,10 +133,12 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     } else {
       setErrorMessage('От 3 до 20 символов');
       setTimeout(() => setErrorMessage(''), 3000);
+      setRenameModalOpen(false);
     }
-    setRenameModalOpen(false);
-    setRenameChannelId(null);
-    setRenameChannelName('');
+  };
+
+  const toggleMenu = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id);
   };
 
   return (
@@ -179,20 +184,73 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 {channel.name === 'general' ? 'general' : `# ${channel.name}`}
               </button>
               {showMenu && (
-                <ChannelMenu 
-                  channel={channel}
-                  onRename={() => openRenameModal(channel)}
-                  onRemove={() => handleRemove(channel.id)}
-                />
+                <div style={{ position: 'relative' }}>
+                  <button
+                    className="btn btn-sm btn-link"
+                    onClick={() => toggleMenu(channel.id)}
+                  >
+                    Управление каналом
+                  </button>
+                  {openMenuId === channel.id && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        right: 0,
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                        zIndex: 1000,
+                        minWidth: '150px'
+                      }}
+                    >
+                      <button
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => openRenameModal(channel)}
+                      >
+                        Переименовать
+                      </button>
+                      <button
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer',
+                          color: 'red'
+                        }}
+                        onClick={() => handleRemove(channel.id)}
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </li>
           );
         })}
       </ul>
 
+      {/* Затемняющий фон при открытом меню */}
+      {openMenuId !== null && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 999 }} onClick={() => setOpenMenuId(null)} />
+      )}
+
       {/* Модальное окно переименования */}
       {renameModalOpen && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
@@ -226,7 +284,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
       {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
@@ -250,7 +308,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
 
       {/* Модальное окно добавления канала */}
       {showModal && !showProfanityWarning && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
