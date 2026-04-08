@@ -3,6 +3,7 @@ import { setCurrentChannel } from '../store/channelsSlice';
 import { useState, useEffect } from 'react';
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
+import useGetChannelsQuery from '../services/api';
 
 const STORAGE_KEY = 'chat_channels';
 
