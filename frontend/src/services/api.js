@@ -1,10 +1,24 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-let channels = [
-  { id: 1, name: 'general', removable: false },
-  { id: 2, name: 'random', removable: false },
-];
-let nextId = 3;
+// Только для сообщений
+const MESSAGES_KEY = 'chat_messages';
+
+const loadMessages = () => {
+  const saved = localStorage.getItem(MESSAGES_KEY);
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [
+    { id: 1, body: 'Добро пожаловать!', channelId: 1, username: 'System', createdAt: new Date().toISOString() }
+  ];
+};
+
+const saveMessages = (messages) => {
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+};
+
+let messages = loadMessages();
+let nextMsgId = Math.max(...messages.map(m => m.id), 0) + 1;
 
 export const api = createApi({
   reducerPath: 'api',
@@ -37,13 +51,6 @@ export const api = createApi({
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
-      transformResponse: (response) => {
-        if (response && Array.isArray(response) && response.length > 0) {
-          channels = response;
-          return response;
-        }
-        return channels;
-      }
     }),
     addChannel: builder.mutation({
       query: (name) => ({
@@ -51,11 +58,6 @@ export const api = createApi({
         method: 'POST',
         body: { name },
       }),
-      transformResponse: (response, meta, name) => {
-        const newChannel = { id: nextId++, name, removable: true };
-        channels.push(newChannel);
-        return newChannel;
-      },
       invalidatesTags: ['Channels'],
     }),
     renameChannel: builder.mutation({
@@ -64,11 +66,6 @@ export const api = createApi({
         method: 'PATCH',
         body: { name },
       }),
-      transformResponse: (response, meta, { id, name }) => {
-        const channel = channels.find(ch => ch.id === id);
-        if (channel) channel.name = name;
-        return { id, name };
-      },
       invalidatesTags: ['Channels'],
     }),
     removeChannel: builder.mutation({
@@ -76,15 +73,18 @@ export const api = createApi({
         url: `/channels/${id}`,
         method: 'DELETE',
       }),
-      transformResponse: (response, meta, id) => {
-        channels = channels.filter(ch => ch.id !== id);
-        return { id };
-      },
       invalidatesTags: ['Channels'],
     }),
     getMessages: builder.query({
       query: () => '/messages',
       providesTags: ['Messages'],
+      transformResponse: (response) => {
+        if (response && Array.isArray(response) && response.length > 0) {
+          saveMessages(response);
+          return response;
+        }
+        return loadMessages();
+      }
     }),
     addMessage: builder.mutation({
       query: (message) => ({
@@ -92,6 +92,12 @@ export const api = createApi({
         method: 'POST',
         body: message,
       }),
+      transformResponse: (response, meta, message) => {
+        const newMessage = { ...message, id: nextMsgId++, createdAt: new Date().toISOString() };
+        messages.push(newMessage);
+        saveMessages(messages);
+        return newMessage;
+      },
       invalidatesTags: ['Messages'],
     }),
   }),
