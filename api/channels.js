@@ -1,6 +1,6 @@
 let channels = [
   { id: 1, name: 'general', removable: false },
-  { id: 2, name: 'random', removable: true },
+  { id: 2, name: 'random', removable: false },
   { id: 3, name: 'tech', removable: true }
 ];
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     };
     
     channels.push(newChannel);
-    return res.json(newChannel);
+    return res.status(201).json(newChannel);
   }
   
   return res.status(405).json({ error: 'Method not allowed' });
