@@ -32,7 +32,6 @@ function App() {
       
       socket.on('connect', () => console.log('✅ WebSocket connected'));
       
-      // Обновление каналов при событиях
       socket.on('newChannel', () => {
         dispatch(api.util.invalidateTags(['Channels']));
       });
