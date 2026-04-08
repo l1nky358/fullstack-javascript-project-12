@@ -1,20 +1,22 @@
 import { io } from 'socket.io-client';
 
-const socket = io('/', {
-  autoConnect: false,
-  reconnection: true,
-});
+let socket = null;
 
 export const initSocket = (token) => {
-  socket.auth = { token };
-  socket.connect();
+  if (!socket) {
+    socket = io('/', {
+      auth: { token },
+      transports: ['websocket'],
+    });
+  }
   return socket;
 };
 
 export const getSocket = () => socket;
 
 export const closeSocket = () => {
-  if (socket.connected) {
+  if (socket) {
     socket.disconnect();
+    socket = null;
   }
 };
