@@ -9,7 +9,6 @@ import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import { useSocketEvents } from './hooks/useSocketEvents';
 
 let socket = null;
 
@@ -27,8 +26,11 @@ function App() {
         auth: { token },
         transports: ['websocket'],
       });
-      socket.on('connect', () => console.log('✅ WebSocket connected'));
-      socket.on('connect_error', (err) => console.error('❌ WebSocket error:', err));
+      socket.on('connect', () => console.log('WebSocket connected'));
+      socket.on('newMessage', (msg) => console.log('New message:', msg));
+      socket.on('newChannel', (ch) => console.log('New channel:', ch));
+      socket.on('renameChannel', (ch) => console.log('Channel renamed:', ch));
+      socket.on('removeChannel', (ch) => console.log('Channel removed:', ch));
     }
     return () => {
       if (socket) {
@@ -37,8 +39,6 @@ function App() {
       }
     };
   }, [token]);
-
-  useSocketEvents(socket);
 
   return (
     <BrowserRouter>
