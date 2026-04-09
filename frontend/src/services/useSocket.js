@@ -1,31 +1,38 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { api } from '../services/api';
+import { useEffect, useState } from 'react';
+import { initSocket, closeSocket, getSocket } from '../socket';
 
-export const useSocketEvents = (socket) => {
-  const dispatch = useDispatch();
+export const useSocket = () => {
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!socket) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-    const invalidateChannels = () => {
-      dispatch(api.util.invalidateTags(['Channels']));
+    const socket = initSocket(token);
+    
+    const onConnect = () => {
+      console.log('✅ WebSocket connected');
+      setIsConnected(true);
     };
-
-    const invalidateMessages = () => {
-      dispatch(api.util.invalidateTags(['Messages']));
+    
+    const onDisconnect = () => {
+      console.log('❌ WebSocket disconnected');
+      setIsConnected(false);
     };
-
-    socket.on('newChannel', invalidateChannels);
-    socket.on('renameChannel', invalidateChannels);
-    socket.on('removeChannel', invalidateChannels);
-    socket.on('newMessage', invalidateMessages);
-
+    
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    
+    if (socket.connected) {
+      setIsConnected(true);
+    }
+    
     return () => {
-      socket.off('newChannel', invalidateChannels);
-      socket.off('renameChannel', invalidateChannels);
-      socket.off('removeChannel', invalidateChannels);
-      socket.off('newMessage', invalidateMessages);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      closeSocket();
     };
-  }, [socket, dispatch]);
+  }, []);
+
+  return { socket: getSocket(), isConnected };
 };
