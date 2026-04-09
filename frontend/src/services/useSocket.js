@@ -1,45 +1,31 @@
-import { useEffect, useState } from 'react';
-import { initSocket, closeSocket, getSocket } from '../socket';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { api } from '../services/api';
 
-export const useSocket = () => {
-  const [isConnected, setIsConnected] = useState(false);
+export const useSocketEvents = (socket) => {
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!socket) return;
 
-    const socket = initSocket(token);
-    
-    const onConnect = () => {
-      console.log('✅ Socket connected');
-      setIsConnected(true);
+    const invalidateChannels = () => {
+      dispatch(api.util.invalidateTags(['Channels']));
     };
-    
-    const onDisconnect = () => {
-      console.log('❌ Socket disconnected');
-      setIsConnected(false);
+
+    const invalidateMessages = () => {
+      dispatch(api.util.invalidateTags(['Messages']));
     };
-    
-    const onConnectError = (error) => {
-      console.error('Socket error:', error);
-      setIsConnected(false);
-    };
-    
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('connect_error', onConnectError);
-    
-    if (socket.connected) {
-      setIsConnected(true);
-    }
-    
+
+    socket.on('newChannel', invalidateChannels);
+    socket.on('renameChannel', invalidateChannels);
+    socket.on('removeChannel', invalidateChannels);
+    socket.on('newMessage', invalidateMessages);
+
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('connect_error', onConnectError);
-      closeSocket();
+      socket.off('newChannel', invalidateChannels);
+      socket.off('renameChannel', invalidateChannels);
+      socket.off('removeChannel', invalidateChannels);
+      socket.off('newMessage', invalidateMessages);
     };
-  }, []);
-
-  return { socket: getSocket(), isConnected };
+  }, [socket, dispatch]);
 };
