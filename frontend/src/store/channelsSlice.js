@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  currentChannelId: 1,
+  currentChannelId: localStorage.getItem('currentChannelId') 
+    ? Number(localStorage.getItem('currentChannelId')) 
+    : null,
 };
 
 const channelsSlice = createSlice({
@@ -10,6 +12,7 @@ const channelsSlice = createSlice({
   reducers: {
     setCurrentChannel: (state, action) => {
       state.currentChannelId = action.payload;
+      localStorage.setItem('currentChannelId', action.payload);
     },
   },
 });
