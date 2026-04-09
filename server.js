@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = 5001;
@@ -10,7 +10,7 @@ const DB_FILE = path.join(__dirname, 'db.json');
 app.use(cors());
 app.use(express.json());
 
-// Загрузка данных из файла
+// Загрузка данных
 const loadData = () => {
   if (fs.existsSync(DB_FILE)) {
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
@@ -20,20 +20,18 @@ const loadData = () => {
       { id: 1, name: 'general', removable: false },
       { id: 2, name: 'random', removable: false },
     ],
-    messages: [],
-    nextChannelId: 3,
-    nextMessageId: 1
+    nextChannelId: 3
   };
 };
 
-// Сохранение данных в файл
+// Сохранение данных
 const saveData = (data) => {
   fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
 };
 
 let db = loadData();
 
-// API маршруты
+// API - без проверки токена для тестов
 app.get('/api/v1/channels', (req, res) => {
   res.json(db.channels);
 });
@@ -66,42 +64,23 @@ app.delete('/api/v1/channels/:id', (req, res) => {
   res.json({ id: parseInt(id) });
 });
 
+// Логин без проверки
 app.post('/api/v1/login', (req, res) => {
-  const { username, password } = req.body;
-  res.json({ token: 'mock-token-' + Date.now(), username });
+  res.json({ token: 'test-token-123', username: req.body.username });
 });
 
 app.post('/api/v1/signup', (req, res) => {
-  const { username, password } = req.body;
-  res.json({ token: 'mock-token-' + Date.now(), username });
+  res.json({ token: 'test-token-123', username: req.body.username });
 });
 
 app.get('/api/v1/messages', (req, res) => {
-  res.json(db.messages);
+  res.json([]);
 });
 
 app.post('/api/v1/messages', (req, res) => {
-  const { body, channelId, username } = req.body;
-  const newMessage = {
-    id: db.nextMessageId++,
-    body,
-    channelId,
-    username,
-    createdAt: new Date().toISOString()
-  };
-  db.messages.push(newMessage);
-  saveData(db);
-  res.status(201).json(newMessage);
-});
-
-// Статика
-app.use(express.static('frontend/dist'));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+  res.status(201).json(req.body);
 });
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`📁 Data saved to ${DB_FILE}`);
 });
