@@ -20,7 +20,9 @@ const loadData = () => {
       { id: 1, name: 'general', removable: false },
       { id: 2, name: 'random', removable: false },
     ],
-    nextId: 3
+    messages: [],
+    nextChannelId: 3,
+    nextMessageId: 1
   };
 };
 
@@ -38,7 +40,7 @@ app.get('/api/v1/channels', (req, res) => {
 
 app.post('/api/v1/channels', (req, res) => {
   const { name } = req.body;
-  const newChannel = { id: db.nextId++, name, removable: true };
+  const newChannel = { id: db.nextChannelId++, name, removable: true };
   db.channels.push(newChannel);
   saveData(db);
   res.status(201).json(newChannel);
@@ -75,14 +77,24 @@ app.post('/api/v1/signup', (req, res) => {
 });
 
 app.get('/api/v1/messages', (req, res) => {
-  res.json([]);
+  res.json(db.messages);
 });
 
 app.post('/api/v1/messages', (req, res) => {
-  res.status(201).json(req.body);
+  const { body, channelId, username } = req.body;
+  const newMessage = {
+    id: db.nextMessageId++,
+    body,
+    channelId,
+    username,
+    createdAt: new Date().toISOString()
+  };
+  db.messages.push(newMessage);
+  saveData(db);
+  res.status(201).json(newMessage);
 });
 
-// Статика для фронтенда
+// Статика
 app.use(express.static('frontend/dist'));
 
 app.get('*', (req, res) => {
