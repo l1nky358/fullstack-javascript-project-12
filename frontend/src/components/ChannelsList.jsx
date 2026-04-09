@@ -39,22 +39,27 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   };
 
   const handleAddChannel = (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-    const channelName = newChannelName.trim();
-    if (channelName.length < 3 || channelName.length > 20) {
-      setErrorMessage('От 3 до 20 символов');
-      return;
-    }
-    if (containsProfanity(channelName)) {
-      setPendingChannelName(channelName);
-      setShowProfanityWarning(true);
-      return;
-    }
-    addChannelToList(channelName);
-  };
+  e.preventDefault();
+  setErrorMessage('');
+  const channelName = newChannelName.trim();
+  if (channelName.length < 3 || channelName.length > 20) {
+    setErrorMessage('От 3 до 20 символов');
+    return;
+  }
+  if (containsProfanity(channelName)) {
+    setPendingChannelName(channelName);
+    setShowProfanityWarning(true);
+    return;
+  }
+  
+  setSuccessMessage('Канал создан');
+  setNewChannelName('');
+  setShowModal(false);
+  setTimeout(() => setSuccessMessage(''), 3000);
+  
+  addChannel(channelName).catch(err => console.error(err));
+};
 
-  // ТОЧНО КАК В MessageForm
   const handleRename = async (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
       setErrorMessage('От 3 до 20 символов');
