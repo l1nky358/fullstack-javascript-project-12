@@ -23,27 +23,30 @@ const PrivateRoute = ({ children }) => {
 function App() {
   const { token } = useAuth();
   const dispatch = useDispatch();
-  const { data: channels = [] } = useGetChannelsQuery();
+  const { data: channels = [], refetch } = useGetChannelsQuery();
 
-  // Выбираем первый канал при загрузке
   useEffect(() => {
-    if (channels.length > 0 && !currentChannelId) {
+    if (channels.length > 0) {
       const general = channels.find(ch => ch.name === 'general');
-      dispatch(setCurrentChannel(general?.id || channels[0].id));
+      if (general) {
+        dispatch(setCurrentChannel(general.id));
+      } else {
+        dispatch(setCurrentChannel(channels[0].id));
+      }
     }
   }, [channels, dispatch]);
 
-  // WebSocket
   useEffect(() => {
     if (token && !socket) {
       socket = io('/', {
         auth: { token },
         transports: ['websocket'],
       });
+      
       socket.on('connect', () => console.log('WebSocket connected'));
-      socket.on('newChannel', () => {
-        // Обновить каналы
-      });
+      socket.on('newChannel', () => refetch());
+      socket.on('renameChannel', () => refetch());
+      socket.on('removeChannel', () => refetch());
     }
     return () => {
       if (socket) {
@@ -51,7 +54,7 @@ function App() {
         socket = null;
       }
     };
-  }, [token]);
+  }, [token, refetch]);
 
   return (
     <BrowserRouter>
