@@ -1,45 +1,31 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetChannelsQuery, useGetMessagesQuery } from '../services/api';
-import { setCurrentChannel } from '../store/channelsSlice';
+import { api } from '../services/api';
 
 export const useSocketEvents = (socket) => {
   const dispatch = useDispatch();
-  const { refetch: refetchChannels } = useGetChannelsQuery();
-  const { refetch: refetchMessages } = useGetMessagesQuery();
 
   useEffect(() => {
     if (!socket) return;
 
-    // Новое сообщение
-    socket.on('newMessage', (payload) => {
-      console.log('📨 New message:', payload);
-      refetchMessages();
-    });
+    const invalidateChannels = () => {
+      dispatch(api.util.invalidateTags(['Channels']));
+    };
 
-    // Новый канал
-    socket.on('newChannel', (payload) => {
-      console.log('➕ New channel:', payload);
-      refetchChannels();
-    });
+    const invalidateMessages = () => {
+      dispatch(api.util.invalidateTags(['Messages']));
+    };
 
-    // Переименование канала
-    socket.on('renameChannel', (payload) => {
-      console.log('✏️ Channel renamed:', payload);
-      refetchChannels();
-    });
-
-    // Удаление канала
-    socket.on('removeChannel', (payload) => {
-      console.log('❌ Channel removed:', payload);
-      refetchChannels();
-    });
+    socket.on('newChannel', invalidateChannels);
+    socket.on('renameChannel', invalidateChannels);
+    socket.on('removeChannel', invalidateChannels);
+    socket.on('newMessage', invalidateMessages);
 
     return () => {
-      socket.off('newMessage');
-      socket.off('newChannel');
-      socket.off('renameChannel');
-      socket.off('removeChannel');
+      socket.off('newChannel', invalidateChannels);
+      socket.off('renameChannel', invalidateChannels);
+      socket.off('removeChannel', invalidateChannels);
+      socket.off('newMessage', invalidateMessages);
     };
-  }, [socket, refetchChannels, refetchMessages]);
+  }, [socket, dispatch]);
 };
