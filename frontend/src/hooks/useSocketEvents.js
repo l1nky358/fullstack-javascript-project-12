@@ -8,24 +8,38 @@ export const useSocketEvents = (socket) => {
   useEffect(() => {
     if (!socket) return;
 
-    const invalidateChannels = () => {
+    // Обработчики событий согласно документации
+    const handleNewChannel = (payload) => {
+      console.log('🆕 New channel:', payload);
       dispatch(api.util.invalidateTags(['Channels']));
     };
 
-    const invalidateMessages = () => {
+    const handleRenameChannel = (payload) => {
+      console.log('✏️ Channel renamed:', payload);
+      dispatch(api.util.invalidateTags(['Channels']));
+    };
+
+    const handleRemoveChannel = (payload) => {
+      console.log('❌ Channel removed:', payload);
+      dispatch(api.util.invalidateTags(['Channels']));
+    };
+
+    const handleNewMessage = (payload) => {
+      console.log('💬 New message:', payload);
       dispatch(api.util.invalidateTags(['Messages']));
     };
 
-    socket.on('newChannel', invalidateChannels);
-    socket.on('renameChannel', invalidateChannels);
-    socket.on('removeChannel', invalidateChannels);
-    socket.on('newMessage', invalidateMessages);
+    // Подписываемся
+    socket.on('newChannel', handleNewChannel);
+    socket.on('renameChannel', handleRenameChannel);
+    socket.on('removeChannel', handleRemoveChannel);
+    socket.on('newMessage', handleNewMessage);
 
     return () => {
-      socket.off('newChannel', invalidateChannels);
-      socket.off('renameChannel', invalidateChannels);
-      socket.off('removeChannel', invalidateChannels);
-      socket.off('newMessage', invalidateMessages);
+      socket.off('newChannel', handleNewChannel);
+      socket.off('renameChannel', handleRenameChannel);
+      socket.off('removeChannel', handleRemoveChannel);
+      socket.off('newMessage', handleNewMessage);
     };
   }, [socket, dispatch]);
 };
