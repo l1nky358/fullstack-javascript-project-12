@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { io } from 'socket.io-client';
 import { useDispatch } from 'react-redux';
 import Header from './components/Header';
 import Chat from './components/Chat';
@@ -10,10 +9,9 @@ import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import { useGetChannelsQuery } from './services/api';
-import { setCurrentChannel } from './store/channelsSlice';
-
-let socket = null;
+import { useSocket } from './services/useSocket';
+import { useSocketEvents } from './hooks/useSocketEvents';
+import { api } from './services/api';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -23,38 +21,16 @@ const PrivateRoute = ({ children }) => {
 function App() {
   const { token } = useAuth();
   const dispatch = useDispatch();
-  const { data: channels = [], refetch } = useGetChannelsQuery();
+  const { socket } = useSocket();
+
+  useSocketEvents(socket);
 
   useEffect(() => {
-    if (channels.length > 0) {
-      const general = channels.find(ch => ch.name === 'general');
-      if (general) {
-        dispatch(setCurrentChannel(general.id));
-      } else {
-        dispatch(setCurrentChannel(channels[0].id));
-      }
+    if (token) {
+      dispatch(api.util.invalidateTags(['Channels']));
+      dispatch(api.util.invalidateTags(['Messages']));
     }
-  }, [channels, dispatch]);
-
-  useEffect(() => {
-    if (token && !socket) {
-      socket = io('/', {
-        auth: { token },
-        transports: ['websocket'],
-      });
-      
-      socket.on('connect', () => console.log('WebSocket connected'));
-      socket.on('newChannel', () => refetch());
-      socket.on('renameChannel', () => refetch());
-      socket.on('removeChannel', () => refetch());
-    }
-    return () => {
-      if (socket) {
-        socket.disconnect();
-        socket = null;
-      }
-    };
-  }, [token, refetch]);
+  }, [token, dispatch]);
 
   return (
     <BrowserRouter>
