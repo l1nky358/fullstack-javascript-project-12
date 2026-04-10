@@ -33,8 +33,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       await addChannel(channelName).unwrap()
       if (onChannelChange) onChannelChange()
     }
-    catch (_err) {
-      console.error('Add error:', _err)
+    catch (err) {
+      console.error('Add error:', err)
     }
   }
 
@@ -66,7 +66,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
     }
-    catch (_err) {
+    catch (err) {
       setErrorMessage('Ошибка при переименовании')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -86,7 +86,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
     }
-    catch (_err) {
+    catch (err) {
       setErrorMessage('Ошибка при удалении')
       setTimeout(() => setErrorMessage(''), 3000)
     }
