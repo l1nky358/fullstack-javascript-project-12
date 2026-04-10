@@ -20,6 +20,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const [renameChannelId, setRenameChannelId] = useState(null);
   const [renameChannelName, setRenameChannelName] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [channelToRemove, setChannelToRemove] = useState(null);
 
   const addChannelToList = async (channelName) => {
     setSuccessMessage('Канал создан');
@@ -87,6 +89,19 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     }
   };
 
+  const openRemoveConfirm = (channelId) => {
+    setChannelToRemove(channelId);
+    setShowRemoveConfirm(true);
+  };
+
+  const confirmRemove = async () => {
+    if (channelToRemove) {
+      await handleRemove(channelToRemove);
+      setShowRemoveConfirm(false);
+      setChannelToRemove(null);
+    }
+  };
+
   const handleProfanityConfirm = () => {
     setShowProfanityWarning(false);
     addChannelToList(cleanProfanity(pendingChannelName));
@@ -145,7 +160,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
                 <ChannelMenu 
                   channel={channel}
                   onRename={() => openRenameModal(channel)}
-                  onRemove={() => handleRemove(channel.id)}
+                  onRemove={() => openRemoveConfirm(channel.id)}
                 />
               )}
             </li>
@@ -154,6 +169,27 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       </ul>
 
       {openMenuId !== null && <div style={{ position: 'fixed', inset: 0, zIndex: 999 }} onClick={() => setOpenMenuId(null)} />}
+
+      {/* Модальное окно подтверждения удаления */}
+      {showRemoveConfirm && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Удалить канал</h5>
+                <button className="btn-close" onClick={() => setShowRemoveConfirm(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p>Вы уверены, что хотите удалить этот канал?</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowRemoveConfirm(false)}>Отмена</button>
+                <button className="btn btn-danger" onClick={confirmRemove}>Удалить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Модальное окно переименования */}
       {renameModalOpen && (
