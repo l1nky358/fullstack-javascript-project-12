@@ -1,14 +1,12 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 const ChannelMenu = ({ channel, onRename, onRemove }) => {
-  const [showMenu, setShowMenu] = useState(false);
-  
-  const isGeneral = channel.name === 'general';
-  const isRandom = channel.name === 'random';
-  
+  const [showMenu, setShowMenu] = useState(false)
+  const isGeneral = channel.name === 'general'
+  const isRandom = channel.name === 'random'
   // Не показываем меню для system каналов
   if (isGeneral || isRandom) {
-    return null;
+    return null
   }
 
   return (
@@ -21,7 +19,6 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
       >
         Управление каналом
       </button>
-      
       {showMenu && (
         <>
           <div
@@ -34,7 +31,7 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
               borderRadius: '4px',
               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
               zIndex: 1000,
-              minWidth: '150px'
+              minWidth: '150px',
             }}
           >
             <button
@@ -45,11 +42,11 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
                 textAlign: 'left',
                 border: 'none',
                 background: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
               onClick={() => {
-                setShowMenu(false);
-                onRename();
+                setShowMenu(false)
+                onRename()
               }}
             >
               Переименовать
@@ -63,11 +60,11 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
                 border: 'none',
                 background: 'none',
                 cursor: 'pointer',
-                color: 'red'
+                color: 'red',
               }}
               onClick={() => {
-                setShowMenu(false);
-                onRemove();
+                setShowMenu(false)
+                onRemove()
               }}
             >
               Удалить
@@ -80,7 +77,7 @@ const ChannelMenu = ({ channel, onRename, onRemove }) => {
         </>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ChannelMenu;
+export default ChannelMenu
