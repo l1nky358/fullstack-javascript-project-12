@@ -9,8 +9,10 @@ import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import { useGetChannelsQuery } from './services/api';
-import { setCurrentChannel } from './store/channelsSlice';
+import { initSocket, closeSocket } from './socket';
+import { useSocketEvents } from './hooks/useSocketEvents';
+
+let socket = null;
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -20,19 +22,20 @@ const PrivateRoute = ({ children }) => {
 function App() {
   const { token } = useAuth();
   const dispatch = useDispatch();
-  const { data: channels = [] } = useGetChannelsQuery();
 
-  // Автоматически выбираем канал при загрузке
   useEffect(() => {
-    if (channels.length > 0) {
-      const general = channels.find(ch => ch.name === 'general');
-      if (general) {
-        dispatch(setCurrentChannel(general.id));
-      } else {
-        dispatch(setCurrentChannel(channels[0].id));
-      }
+    if (token && !socket) {
+      socket = initSocket(token);
     }
-  }, [channels, dispatch]);
+    return () => {
+      if (socket) {
+        closeSocket();
+        socket = null;
+      }
+    };
+  }, [token]);
+
+  useSocketEvents(socket);
 
   return (
     <BrowserRouter>
