@@ -126,7 +126,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const handleRenameSubmit = () => {
     if (renameChannelName.trim().length >= 3 && renameChannelName.trim().length <= 20) {
       handleRename(renameChannelId, renameChannelName.trim())
-    } else {
+    }
+    else {
       setErrorMessage('От 3 до 20 символов')
       setTimeout(() => setErrorMessage(''), 3000)
       setRenameModalOpen(false)
