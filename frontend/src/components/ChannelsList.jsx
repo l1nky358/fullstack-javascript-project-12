@@ -29,16 +29,14 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     setShowModal(false)
     setTimeout(() => setSuccessMessage(''), 3000)
 
-try {
-  await renameChannel({ id: channelId, name: newName.trim() }).unwrap()
-  setSuccessMessage('Канал переименован')
-  setTimeout(() => setSuccessMessage(''), 3000)
-  if (onChannelChange) onChannelChange()
-}
-catch {
-  setErrorMessage('Ошибка при переименовании')
-  setTimeout(() => setErrorMessage(''), 3000)
-}
+    try {
+      await addChannel(channelName).unwrap()
+      if (onChannelChange) onChannelChange()
+    }
+    catch {
+      console.error('Add error:')
+    }
+  }
 
   const handleAddChannel = (e) => {
     e.preventDefault()
@@ -68,7 +66,7 @@ catch {
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
     }
-    catch (err) {
+    catch {
       setErrorMessage('Ошибка при переименовании')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -88,7 +86,7 @@ catch {
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
     }
-    catch (err) {
+    catch {
       setErrorMessage('Ошибка при удалении')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -207,8 +205,8 @@ catch {
                   id="renameChannelName"
                   className="form-control"
                   value={renameChannelName}
-                  onChange={e => setRenameChannelName(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && handleRenameSubmit()}
+                  onChange={(e) => setRenameChannelName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleRenameSubmit()}
                   autoFocus
                 />
               </div>
@@ -238,7 +236,7 @@ catch {
                     className="form-control"
                     placeholder="Введите имя канала"
                     value={newChannelName}
-                    onChange={e => setNewChannelName(e.target.value)}
+                    onChange={(e) => setNewChannelName(e.target.value)}
                     autoFocus
                   />
                 </div>
