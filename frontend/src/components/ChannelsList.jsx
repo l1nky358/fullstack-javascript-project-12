@@ -32,9 +32,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     try {
       await addChannel(channelName).unwrap()
       if (onChannelChange) onChannelChange()
-    }
-    catch (err) {
-      console.error('Add error:', err)
+    } catch (_err) {
+      console.error('Add error:', _err)
     }
   }
 
@@ -65,8 +64,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setSuccessMessage('Канал переименован')
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
-    }
-    catch (err) {
+    } catch (_err) {
       setErrorMessage('Ошибка при переименовании')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -85,8 +83,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setSuccessMessage('Канал удалён')
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
-    }
-    catch (err) {
+    } catch (_err) {
       setErrorMessage('Ошибка при удалении')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -126,8 +123,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const handleRenameSubmit = () => {
     if (renameChannelName.trim().length >= 3 && renameChannelName.trim().length <= 20) {
       handleRename(renameChannelId, renameChannelName.trim())
-    }
-    else {
+    } else {
       setErrorMessage('От 3 до 20 символов')
       setTimeout(() => setErrorMessage(''), 3000)
       setRenameModalOpen(false)
@@ -145,7 +141,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       </div>
 
       <ul className="list-unstyled">
-        {channels.map(channel => {
+        {channels.map((channel) => {
           const showMenu = channel.name !== 'general' && channel.name !== 'random'
           return (
             <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center" style={{ gap: '8px' }}>
@@ -170,7 +166,6 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
 
       {openMenuId !== null && <div style={{ position: 'fixed', inset: 0, zIndex: 999 }} onClick={() => setOpenMenuId(null)} />}
 
-      {/* Модальное окно подтверждения удаления */}
       {showRemoveConfirm && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
@@ -191,7 +186,6 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
         </div>
       )}
 
-      {/* Модальное окно переименования */}
       {renameModalOpen && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
@@ -221,7 +215,6 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
         </div>
       )}
 
-      {/* Модальное окно добавления канала */}
       {showModal && !showProfanityWarning && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
@@ -253,7 +246,6 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
         </div>
       )}
 
-      {/* Модальное окно предупреждения о нецензурных словах */}
       {showProfanityWarning && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog">
