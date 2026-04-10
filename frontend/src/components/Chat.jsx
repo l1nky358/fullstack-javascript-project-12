@@ -32,7 +32,7 @@ const Chat = () => {
   
   const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
-  // Обновляем локальные сообщения при загрузке
+  // Обновляем локальные сообщения из API
   useEffect(() => {
     if (messages && messages.length) {
       setLocalMessages(messages);
@@ -69,7 +69,11 @@ const Chat = () => {
       createdAt: new Date().toISOString(),
     };
     setLocalMessages(prev => [...prev, tempMessage]);
-    setTimeout(() => refetchMessages(), 500);
+    
+    // Обновляем из API через секунду
+    setTimeout(() => {
+      refetchMessages();
+    }, 500);
   };
 
   if (channelsLoading || messagesLoading) {
