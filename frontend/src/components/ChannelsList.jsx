@@ -32,8 +32,9 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     try {
       await addChannel(channelName).unwrap()
       if (onChannelChange) onChannelChange()
-    } catch (error) {
-      console.error('Add error:', error)
+    }
+    catch (err) {
+      console.error('Add error:', err)
     }
   }
 
@@ -64,7 +65,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setSuccessMessage('Канал переименован')
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
-    } catch (error) {
+    }
+    catch (err) {
       setErrorMessage('Ошибка при переименовании')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -83,7 +85,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       setSuccessMessage('Канал удалён')
       setTimeout(() => setSuccessMessage(''), 3000)
       if (onChannelChange) onChannelChange()
-    } catch (error) {
+    }
+    catch (err) {
       setErrorMessage('Ошибка при удалении')
       setTimeout(() => setErrorMessage(''), 3000)
     }
@@ -123,15 +126,12 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const handleRenameSubmit = () => {
     if (renameChannelName.trim().length >= 3 && renameChannelName.trim().length <= 20) {
       handleRename(renameChannelId, renameChannelName.trim())
-    } else {
+    }
+    else {
       setErrorMessage('От 3 до 20 символов')
       setTimeout(() => setErrorMessage(''), 3000)
       setRenameModalOpen(false)
     }
-  }
-
-  const toggleMenu = (id) => {
-    setOpenMenuId(openMenuId === id ? null : id)
   }
 
   return (
@@ -145,7 +145,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
       </div>
 
       <ul className="list-unstyled">
-        {channels.map((channel) => {
+        {channels.map(channel => {
           const showMenu = channel.name !== 'general' && channel.name !== 'random'
           return (
             <li key={channel.id} className="mb-2 d-flex justify-content-between align-items-center" style={{ gap: '8px' }}>
