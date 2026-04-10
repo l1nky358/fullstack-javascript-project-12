@@ -1,35 +1,33 @@
-import { useState } from 'react';
-import { useAddMessageMutation } from '../services/api';
-import { useAuth } from '../hooks/useAuth';
+import { useState } from 'react'
+import { useAddMessageMutation } from '../services/api'
+import { useAuth } from '../hooks/useAuth'
 
 const MessageForm = ({ currentChannelId, onMessageSent }) => {
-  const [text, setText] = useState('');
-  const [addMessage] = useAddMessageMutation();
-  const { username } = useAuth();
+  const [text, setText] = useState('')
+  const [addMessage] = useAddMessageMutation()
+  const { username } = useAuth()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!text.trim() || !currentChannelId) return;
+    e.preventDefault()
+    if (!text.trim() || !currentChannelId) return
 
-    const messageText = text.trim();
-    
+    const messageText = text.trim()
     if (onMessageSent) {
       onMessageSent(messageText, username);
     }
-    
-    setText('');
-    
+    setText('')
     try {
       await addMessage({
         body: messageText,
         channelId: currentChannelId,
         username: username,
-      }).unwrap();
-    } catch (error) {
-      console.error('Failed to send message:', error);
-      setText(messageText);
+      }).unwrap()
     }
-  };
+    catch (error) {
+      console.error('Failed to send message:', error)
+      setText(messageText)
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit} className="border-top p-3">
@@ -47,7 +45,7 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default MessageForm;
+export default MessageForm
