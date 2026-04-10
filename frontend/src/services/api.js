@@ -1,42 +1,42 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: '/api/v1',
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+        headers.set('Authorization', `Bearer ${token}`)
       }
-      return headers;
+      return headers
     },
   }),
   tagTypes: ['Channels', 'Messages'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     // Auth
     login: builder.mutation({
-      query: (credentials) => ({
+      query: credentials => ({
         url: '/login',
         method: 'POST',
         body: credentials,
       }),
     }),
     signup: builder.mutation({
-      query: (userData) => ({
+      query: userData => ({
         url: '/signup',
         method: 'POST',
         body: userData,
       }),
     }),
-    
+
     // Channels
     getChannels: builder.query({
       query: () => '/channels',
       providesTags: ['Channels'],
     }),
     addChannel: builder.mutation({
-      query: (name) => ({
+      query: name => ({
         url: '/channels',
         method: 'POST',
         body: { name },
@@ -52,20 +52,20 @@ export const api = createApi({
       invalidatesTags: ['Channels'],
     }),
     removeChannel: builder.mutation({
-      query: (id) => ({
+      query: id => ({
         url: `/channels/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Channels'],
     }),
-    
+
     // Messages
     getMessages: builder.query({
       query: () => '/messages',
       providesTags: ['Messages'],
     }),
     addMessage: builder.mutation({
-      query: (message) => ({
+      query: message => ({
         url: '/messages',
         method: 'POST',
         body: message,
@@ -73,7 +73,7 @@ export const api = createApi({
       invalidatesTags: ['Messages'],
     }),
   }),
-});
+})
 
 export const {
   useLoginMutation,
@@ -84,4 +84,4 @@ export const {
   useRemoveChannelMutation,
   useGetMessagesQuery,
   useAddMessageMutation,
-} = api;
+} = api

@@ -9,7 +9,7 @@ const store = configureStore({
     channels: channelsReducer,
     auth: authReducer,
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(api.middleware),
 })
 
