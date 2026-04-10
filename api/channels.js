@@ -1,7 +1,7 @@
 let channels = [
   { id: 1, name: 'general', removable: false },
   { id: 2, name: 'random', removable: false },
-  { id: 3, name: 'tech', removable: true }
+  { id: 3, name: 'tech', removable: true },
 ]
 
 export default async function handler(req, res) {
