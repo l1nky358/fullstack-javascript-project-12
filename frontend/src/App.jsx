@@ -8,7 +8,7 @@ import Login from './components/pages/Login'
 import Signup from './components/pages/Signup'
 import NotFound from './components/pages/NotFound'
 import { useAuth } from './hooks/useAuth'
-import { initSocket, closeSocket, getSocket } from './socket'
+import { initSocket, closeSocket } from './socket'
 import { useSocketEvents } from './hooks/useSocketEvents'
 
 const PrivateRoute = ({ children }) => {
@@ -23,8 +23,7 @@ function App() {
   useEffect(() => {
     if (token) {
       socketRef.current = initSocket(token)
-    }
-    else {
+    } else {
       if (socketRef.current) {
         closeSocket()
         socketRef.current = null
