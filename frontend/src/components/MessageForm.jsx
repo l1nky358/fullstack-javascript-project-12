@@ -13,7 +13,7 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
 
     const messageText = text.trim()
     if (onMessageSent) {
-      onMessageSent(messageText, username);
+      onMessageSent(messageText, username)
     }
     setText('')
     try {
@@ -38,7 +38,7 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
           placeholder="Введите сообщение..."
           aria-label="Новое сообщение"
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={e => setText(e.target.value)}
         />
         <button type="submit" className="btn btn-primary" disabled={!text.trim()}>
           Отправить
