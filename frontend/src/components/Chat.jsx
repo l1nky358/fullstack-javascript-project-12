@@ -14,6 +14,7 @@ const Chat = () => {
   const { 
     data: channels = [], 
     isLoading: channelsLoading,
+    refetch: refetchChannels
   } = useGetChannelsQuery();
   
   const { 
@@ -31,6 +32,7 @@ const Chat = () => {
   
   const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
+  // Обновляем локальные сообщения при загрузке
   useEffect(() => {
     if (messages && messages.length) {
       setLocalMessages(messages);
@@ -57,19 +59,17 @@ const Chat = () => {
     }
   }, [currentChannelId, refetchMessages]);
 
+  // Оптимистичное добавление сообщения
   const addOptimisticMessage = (text, username) => {
-    const tempId = Date.now();
-    const newMessage = {
-      id: tempId,
-      text: text,
+    const tempMessage = {
+      id: Date.now(),
+      body: text,
       channelId: currentChannelId,
       username: username,
       createdAt: new Date().toISOString(),
     };
-    setLocalMessages(prev => [...prev, newMessage]);
-    setTimeout(() => {
-      refetchMessages();
-    }, 500);
+    setLocalMessages(prev => [...prev, tempMessage]);
+    setTimeout(() => refetchMessages(), 500);
   };
 
   if (channelsLoading || messagesLoading) {
@@ -91,6 +91,7 @@ const Chat = () => {
         <ChannelsList 
           channels={displayChannels}
           currentChannelId={currentChannelId}
+          onChannelChange={refetchChannels}
         />
         
         <div className="col-9 col-md-10 d-flex flex-column h-100">
@@ -111,7 +112,7 @@ const Chat = () => {
                   channelMessages.map((msg) => (
                     <div key={msg.id} className="mb-2">
                       <strong className="text-primary me-2">{msg.username}:</strong>
-                      <span>{msg.text}</span>
+                      <span>{msg.body}</span>
                     </div>
                   ))
                 )}
@@ -119,9 +120,7 @@ const Chat = () => {
               
               <MessageForm 
                 currentChannelId={currentChannelId}
-                onMessageSent={(text, username) => {
-                  addOptimisticMessage(text, username);
-                }}
+                onMessageSent={addOptimisticMessage}
               />
             </>
           ) : (
