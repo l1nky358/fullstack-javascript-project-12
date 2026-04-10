@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useSignupMutation } from '../../services/api';
-import { useAuth } from '../../hooks/useAuth';
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+import { useSignupMutation } from '../../services/api'
+import { useAuth } from '../../hooks/useAuth'
 
 const Signup = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const [signup, { isLoading }] = useSignupMutation();
-  const [authError, setAuthError] = useState('');
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [signup, { isLoading }] = useSignupMutation()
+  const [authError, setAuthError] = useState('')
 
   const validationSchema = yup.object({
     username: yup
@@ -25,7 +25,7 @@ const Signup = () => {
       .string()
       .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
       .required('Обязательное поле'),
-  });
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -35,28 +35,27 @@ const Signup = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
-      setAuthError('');
-      
+      setAuthError('')
       try {
         const response = await signup({
           username: values.username,
           password: values.password,
-        }).unwrap();
-        
-        login(response.token, values.username);
-        
+        }).unwrap()
+        login(response.token, values.username)
         setTimeout(() => {
-          navigate('/');
-        }, 100);
-      } catch (error) {
+          navigate('/')
+        }, 100)
+      }
+      catch (error) {
         if (error.status === 409) {
-          setAuthError('Такой пользователь уже существует');
-        } else {
-          setAuthError('Ошибка сервера. Попробуйте позже.');
+          setAuthError('Такой пользователь уже существует')
+        }
+        else {
+          setAuthError('Ошибка сервера. Попробуйте позже.')
         }
       }
     },
-  });
+  })
 
   return (
     <div className="auth-container">
@@ -65,13 +64,11 @@ const Signup = () => {
           <h2>Регистрация</h2>
           <p>Создайте новый аккаунт</p>
         </div>
-        
         {authError && (
           <div className="auth-error">
             {authError}
           </div>
         )}
-        
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Имя пользователя</label>
@@ -92,7 +89,6 @@ const Signup = () => {
               <div className="error-message">{formik.errors.username}</div>
             )}
           </div>
-          
           <div className="form-group">
             <label htmlFor="password">Пароль</label>
             <div className="input-wrapper">
@@ -112,7 +108,6 @@ const Signup = () => {
               <div className="error-message">{formik.errors.password}</div>
             )}
           </div>
-          
           <div className="form-group">
             <label htmlFor="confirmPassword">Подтвердите пароль</label>
             <div className="input-wrapper">
@@ -132,7 +127,6 @@ const Signup = () => {
               <div className="error-message">{formik.errors.confirmPassword}</div>
             )}
           </div>
-          
           <button
             type="submit"
             className="auth-button"
@@ -141,16 +135,16 @@ const Signup = () => {
             {isLoading ? <span className="button-loader"></span> : 'Зарегистрироваться'}
           </button>
         </form>
-        
         <div className="auth-footer">
-          Уже есть аккаунт?{' '}
+          Уже есть аккаунт?
+          {' '}
           <Link to="/login" className="auth-link">
             Войти
           </Link>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup
