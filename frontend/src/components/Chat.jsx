@@ -32,12 +32,24 @@ const Chat = () => {
   
   const displayChannels = channels.length > 0 ? channels : defaultChannels;
 
-  // Обновляем локальные сообщения из API
+  // Обновляем локальные сообщения
   useEffect(() => {
     if (messages && messages.length) {
       setLocalMessages(messages);
     }
   }, [messages]);
+
+  // АВТООБНОВЛЕНИЕ КАЖДЫЕ 2 СЕКУНДЫ
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentChannelId) {
+        console.log('🔄 Auto-refreshing messages...');
+        refetchMessages();
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [currentChannelId, refetchMessages]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -59,7 +71,6 @@ const Chat = () => {
     }
   }, [currentChannelId, refetchMessages]);
 
-  // Оптимистичное добавление сообщения
   const addOptimisticMessage = (text, username) => {
     const tempMessage = {
       id: Date.now(),
@@ -69,11 +80,7 @@ const Chat = () => {
       createdAt: new Date().toISOString(),
     };
     setLocalMessages(prev => [...prev, tempMessage]);
-    
-    // Обновляем из API через секунду
-    setTimeout(() => {
-      refetchMessages();
-    }, 500);
+    setTimeout(() => refetchMessages(), 500);
   };
 
   if (channelsLoading || messagesLoading) {
