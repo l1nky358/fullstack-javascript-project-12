@@ -23,7 +23,8 @@ function App() {
   useEffect(() => {
     if (token) {
       socketRef.current = initSocket(token)
-    } else {
+    }
+    else {
       if (socketRef.current) {
         closeSocket()
         socketRef.current = null
