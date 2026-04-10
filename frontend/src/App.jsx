@@ -1,18 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux';
 import Header from './components/Header';
 import Chat from './components/Chat';
 import Login from './components/pages/Login';
 import Signup from './components/pages/Signup';
 import NotFound from './components/pages/NotFound';
 import { useAuth } from './hooks/useAuth';
-import { initSocket, closeSocket } from './socket';
+import { initSocket, closeSocket, getSocket } from './socket';
 import { useSocketEvents } from './hooks/useSocketEvents';
-
-let socket = null;
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -21,21 +18,20 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   const { token } = useAuth();
-  const dispatch = useDispatch();
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    if (token && !socket) {
-      socket = initSocket(token);
-    }
-    return () => {
-      if (socket) {
+    if (token) {
+      socketRef.current = initSocket(token);
+    } else {
+      if (socketRef.current) {
         closeSocket();
-        socket = null;
+        socketRef.current = null;
       }
-    };
+    }
   }, [token]);
 
-  useSocketEvents(socket);
+  useSocketEvents(socketRef.current);
 
   return (
     <BrowserRouter>
