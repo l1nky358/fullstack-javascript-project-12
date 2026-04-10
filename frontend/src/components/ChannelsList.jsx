@@ -5,16 +5,13 @@ import { useAddChannelMutation, useRenameChannelMutation, useRemoveChannelMutati
 import { containsProfanity, cleanProfanity } from '../utils/profanity';
 import ChannelMenu from './ChannelMenu';
 
-const ChannelsList = ({ channels, currentChannelId }) => {
+const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
-  
-  // ТОЧНО КАК В MessageForm
   const [addChannel] = useAddChannelMutation();
   const [renameChannel] = useRenameChannelMutation();
   const [removeChannel] = useRemoveChannelMutation();
-  
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showProfanityWarning, setShowProfanityWarning] = useState(false);
@@ -24,41 +21,35 @@ const ChannelsList = ({ channels, currentChannelId }) => {
   const [renameChannelName, setRenameChannelName] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
 
-  // ТОЧНО КАК В MessageForm
   const addChannelToList = async (channelName) => {
+    setSuccessMessage('Канал создан');
+    setNewChannelName('');
+    setShowModal(false);
+    setTimeout(() => setSuccessMessage(''), 3000);
+    
     try {
       await addChannel(channelName).unwrap();
-      setSuccessMessage('Канал создан');
-      setNewChannelName('');
-      setShowModal(false);
-      setTimeout(() => setSuccessMessage(''), 3000);
+      if (onChannelChange) onChannelChange();
     } catch (error) {
-      setErrorMessage('Ошибка при создании канала');
-      setTimeout(() => setErrorMessage(''), 3000);
+      console.error('Add error:', error);
     }
   };
 
   const handleAddChannel = (e) => {
-  e.preventDefault();
-  setErrorMessage('');
-  const channelName = newChannelName.trim();
-  if (channelName.length < 3 || channelName.length > 20) {
-    setErrorMessage('От 3 до 20 символов');
-    return;
-  }
-  if (containsProfanity(channelName)) {
-    setPendingChannelName(channelName);
-    setShowProfanityWarning(true);
-    return;
-  }
-  
-  setSuccessMessage('Канал создан');
-  setNewChannelName('');
-  setShowModal(false);
-  setTimeout(() => setSuccessMessage(''), 3000);
-  
-  addChannel(channelName).catch(err => console.error(err));
-};
+    e.preventDefault();
+    setErrorMessage('');
+    const channelName = newChannelName.trim();
+    if (channelName.length < 3 || channelName.length > 20) {
+      setErrorMessage('От 3 до 20 символов');
+      return;
+    }
+    if (containsProfanity(channelName)) {
+      setPendingChannelName(channelName);
+      setShowProfanityWarning(true);
+      return;
+    }
+    addChannelToList(channelName);
+  };
 
   const handleRename = async (channelId, newName) => {
     if (!newName || newName.trim().length < 3 || newName.trim().length > 20) {
@@ -70,6 +61,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       await renameChannel({ id: channelId, name: newName.trim() }).unwrap();
       setSuccessMessage('Канал переименован');
       setTimeout(() => setSuccessMessage(''), 3000);
+      if (onChannelChange) onChannelChange();
     } catch (error) {
       setErrorMessage('Ошибка при переименовании');
       setTimeout(() => setErrorMessage(''), 3000);
@@ -77,7 +69,6 @@ const ChannelsList = ({ channels, currentChannelId }) => {
     setRenameModalOpen(false);
   };
 
-  // ТОЧНО КАК В MessageForm
   const handleRemove = async (channelId) => {
     const channel = channels.find(ch => ch.id === channelId);
     if (channel?.name === 'general' || channel?.name === 'random') {
@@ -89,6 +80,7 @@ const ChannelsList = ({ channels, currentChannelId }) => {
       await removeChannel(channelId).unwrap();
       setSuccessMessage('Канал удалён');
       setTimeout(() => setSuccessMessage(''), 3000);
+      if (onChannelChange) onChannelChange();
     } catch (error) {
       setErrorMessage('Ошибка при удалении');
       setTimeout(() => setErrorMessage(''), 3000);
@@ -150,28 +142,11 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 {channel.name === 'general' ? 'general' : `# ${channel.name}`}
               </button>
               {showMenu && (
-                <div style={{ position: 'relative' }}>
-                  <button className="btn btn-sm btn-link" onClick={() => toggleMenu(channel.id)}>
-                    Управление каналом
-                  </button>
-                  {openMenuId === channel.id && (
-                    <div style={{
-                      position: 'absolute', top: '100%', right: 0,
-                      backgroundColor: 'white', border: '1px solid #ccc',
-                      borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                      zIndex: 1000, minWidth: '150px'
-                    }}>
-                      <button style={{ display: 'block', width: '100%', padding: '8px 16px', textAlign: 'left' }}
-                        onClick={() => openRenameModal(channel)}>
-                        Переименовать
-                      </button>
-                      <button style={{ display: 'block', width: '100%', padding: '8px 16px', textAlign: 'left', color: 'red' }}
-                        onClick={() => handleRemove(channel.id)}>
-                        Удалить
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <ChannelMenu 
+                  channel={channel}
+                  onRename={() => openRenameModal(channel)}
+                  onRemove={() => handleRemove(channel.id)}
+                />
               )}
             </li>
           );
@@ -190,10 +165,16 @@ const ChannelsList = ({ channels, currentChannelId }) => {
                 <button className="btn-close" onClick={() => setRenameModalOpen(false)}></button>
               </div>
               <div className="modal-body">
-                <label className="form-label">Имя канала</label>
-                <input type="text" className="form-control" value={renameChannelName}
+                <label htmlFor="renameChannelName" className="form-label">Имя канала</label>
+                <input
+                  type="text"
+                  id="renameChannelName"
+                  className="form-control"
+                  value={renameChannelName}
                   onChange={(e) => setRenameChannelName(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleRenameSubmit()} autoFocus />
+                  onKeyPress={(e) => e.key === 'Enter' && handleRenameSubmit()}
+                  autoFocus
+                />
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setRenameModalOpen(false)}>Отмена</button>
@@ -215,9 +196,16 @@ const ChannelsList = ({ channels, currentChannelId }) => {
               </div>
               <form onSubmit={handleAddChannel}>
                 <div className="modal-body">
-                  <label className="form-label">Имя канала</label>
-                  <input type="text" className="form-control" value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)} autoFocus />
+                  <label htmlFor="channelName" className="form-label">Имя канала</label>
+                  <input
+                    type="text"
+                    id="channelName"
+                    className="form-control"
+                    placeholder="Введите имя канала"
+                    value={newChannelName}
+                    onChange={(e) => setNewChannelName(e.target.value)}
+                    autoFocus
+                  />
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Отмена</button>
