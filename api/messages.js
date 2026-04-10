@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     }
     messages.push(newMessage)
     console.log('New message created:', newMessage)
-    console.log('All messages now:', messages);
+    console.log('All messages now:', messages)
     return res.status(201).json(newMessage)
   }
   return res.status(405).json({ error: 'Method not allowed' })
