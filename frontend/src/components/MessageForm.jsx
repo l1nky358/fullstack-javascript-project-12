@@ -10,17 +10,23 @@ const MessageForm = ({ currentChannelId, onMessageSent }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim() || !currentChannelId) return;
+
     const messageText = text.trim();
+    
+    if (onMessageSent) {
+      onMessageSent(messageText, username);
+    }
+    
     setText('');
-    if (onMessageSent) onMessageSent(messageText, username);
+    
     try {
-      await addMessage({ 
+      await addMessage({
         body: messageText,
-        channelId: currentChannelId, 
-        username 
+        channelId: currentChannelId,
+        username: username,
       }).unwrap();
-    } catch (err) { 
-      console.error(err);
+    } catch (error) {
+      console.error('Failed to send message:', error);
       setText(messageText);
     }
   };
