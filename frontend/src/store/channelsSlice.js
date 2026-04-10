@@ -1,21 +1,21 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  currentChannelId: localStorage.getItem('currentChannelId') 
-    ? Number(localStorage.getItem('currentChannelId')) 
+  currentChannelId: localStorage.getItem('currentChannelId')
+    ? Number(localStorage.getItem('currentChannelId'))
     : null,
-};
+}
 
 const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
     setCurrentChannel: (state, action) => {
-      state.currentChannelId = action.payload;
-      localStorage.setItem('currentChannelId', action.payload);
+      state.currentChannelId = action.payload
+      localStorage.setItem('currentChannelId', action.payload)
     },
   },
-});
+})
 
-export const { setCurrentChannel } = channelsSlice.actions;
-export default channelsSlice.reducer;
+export const { setCurrentChannel } = channelsSlice.actions
+export default channelsSlice.reducer
