@@ -1,13 +1,13 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useLoginMutation } from '../../services/api';
-import { useAuth } from '../../hooks/useAuth';
+import { useNavigate, Link } from 'react-router-dom'
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+import { useLoginMutation } from '../../services/api'
+import { useAuth } from '../../hooks/useAuth'
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const [loginMutation, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [loginMutation, { isLoading }] = useLoginMutation()
 
   const formik = useFormik({
     initialValues: {
@@ -20,15 +20,16 @@ const Login = () => {
     }),
     onSubmit: async (values, { setFieldError }) => {
       try {
-        const response = await loginMutation(values).unwrap();
-        login(response.token, values.username);
-        navigate('/');
-      } catch (err) {
-        setFieldError('username', 'Неверные имя пользователя или пароль');
-        setFieldError('password', ' ');
+        const response = await loginMutation(values).unwrap()
+        login(response.token, values.username)
+        navigate('/')
+      }
+      catch (err) {
+        setFieldError('username', 'Неверные имя пользователя или пароль')
+        setFieldError('password', ' ')
       }
     },
-  });
+  })
 
   return (
     <div className="auth-container">
@@ -37,7 +38,6 @@ const Login = () => {
           <h2>Вход в чат</h2>
           <p>Войдите в свой аккаунт</p>
         </div>
-        
         <form onSubmit={formik.handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Ваш ник</label>
@@ -54,7 +54,6 @@ const Login = () => {
               <div className="error-message">{formik.errors.username}</div>
             )}
           </div>
-          
           <div className="form-group">
             <label htmlFor="password">Пароль</label>
             <div className="input-wrapper">
@@ -70,21 +69,20 @@ const Login = () => {
               <div className="error-message">{formik.errors.password}</div>
             )}
           </div>
-          
           <button type="submit" className="auth-button" disabled={isLoading}>
             {isLoading ? <span className="button-loader"></span> : 'Войти'}
           </button>
         </form>
-        
         <div className="auth-footer">
-          Нет аккаунта?{' '}
+          Нет аккаунта?
+          {' '}
           <Link to="/signup" className="auth-link">
             Регистрация
           </Link>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
