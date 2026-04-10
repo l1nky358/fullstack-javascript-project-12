@@ -4,7 +4,7 @@ const MessagesList = ({ messages }) => {
       <div className="text-center text-muted">
         Нет сообщений. Напишите первое!
       </div>
-    );
+    )
   }
 
   return (
@@ -13,7 +13,8 @@ const MessagesList = ({ messages }) => {
         <div key={message.id} className="mb-2">
           <strong className="text-primary me-2">
             {message.username}
-            :</strong>
+          </strong>
+          :
           <span>{message.body || message.text}</span>
         </div>
       ))}
