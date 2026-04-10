@@ -9,14 +9,16 @@ const MessagesList = ({ messages }) => {
 
   return (
     <div>
-      {messages.map((message) => (
+      {messages.map(message => (
         <div key={message.id} className="mb-2">
-          <strong className="text-primary me-2">{message.username}:</strong>
+          <strong className="text-primary me-2">
+            {message.username}
+            :</strong>
           <span>{message.body || message.text}</span>
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default MessagesList;
+export default MessagesList
