@@ -29,14 +29,16 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
     setShowModal(false)
     setTimeout(() => setSuccessMessage(''), 3000)
 
-    try {
-      await addChannel(channelName).unwrap()
-      if (onChannelChange) onChannelChange()
-    }
-    catch (err) {
-      console.error('Add error:', err)
-    }
-  }
+try {
+  await renameChannel({ id: channelId, name: newName.trim() }).unwrap()
+  setSuccessMessage('Канал переименован')
+  setTimeout(() => setSuccessMessage(''), 3000)
+  if (onChannelChange) onChannelChange()
+}
+catch {
+  setErrorMessage('Ошибка при переименовании')
+  setTimeout(() => setErrorMessage(''), 3000)
+}
 
   const handleAddChannel = (e) => {
     e.preventDefault()
