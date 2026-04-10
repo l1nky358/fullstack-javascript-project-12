@@ -1,8 +1,8 @@
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 const NotFound = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   return (
     <div className="container text-center mt-5">
@@ -14,7 +14,7 @@ const NotFound = () => {
         {t('notFound.backHome')}
       </Link>
     </div>
-  );
-};
+  )
+}
 
-export default NotFound;
+export default NotFound
