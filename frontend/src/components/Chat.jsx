@@ -97,7 +97,7 @@ const Chat = () => {
                     Нет сообщений. Напишите первое!
                   </div>
                 ) : (
-                  channelMessages.map((msg) => (
+                  channelMessages.map(msg => (
                     <div key={msg.id} className="mb-2">
                       <strong className="text-primary me-2">
                         {msg.username}
