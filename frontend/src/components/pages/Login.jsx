@@ -19,15 +19,15 @@ const Login = () => {
       password: yup.string().required('Обязательное поле'),
     }),
     onSubmit: async (values, { setFieldError }) => {
-      try {
-        const response = await loginMutation(values).unwrap()
-        login(response.token, values.username)
-        navigate('/')
-      }
-      catch (err) {
-        setFieldError('username', 'Неверные имя пользователя или пароль')
-        setFieldError('password', ' ')
-      }
+try {
+  const response = await loginMutation(values).unwrap()
+  login(response.token, values.username)
+  navigate('/')
+}
+catch {
+  setFieldError('username', 'Неверные имя пользователя или пароль')
+  setFieldError('password', ' ')
+}
     },
   })
 
