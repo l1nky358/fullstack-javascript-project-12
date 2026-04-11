@@ -205,8 +205,8 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
                   id="renameChannelName"
                   className="form-control"
                   value={renameChannelName}
-                  onChange={(e) => setRenameChannelName(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleRenameSubmit()}
+                  onChange={e => setRenameChannelName(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleRenameSubmit()}
                   autoFocus
                 />
               </div>
@@ -236,7 +236,7 @@ const ChannelsList = ({ channels, currentChannelId, onChannelChange }) => {
                     className="form-control"
                     placeholder="Введите имя канала"
                     value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)}
+                    onChange={e => setNewChannelName(e.target.value)}
                     autoFocus
                   />
                 </div>
