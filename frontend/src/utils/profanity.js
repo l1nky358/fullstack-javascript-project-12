@@ -19,7 +19,7 @@ export const containsProfanity = (text) => {
   if (!text || typeof text !== 'string') return false
   const normalizedText = normalizeText(text)
   const words = splitIntoWords(normalizedText)
-  return words.some(word =>
+  return words.some((word) =>
     profanityList.some(badWord => word.includes(badWord.toLowerCase())),
   )
 }
@@ -27,10 +27,10 @@ export const containsProfanity = (text) => {
 export const cleanProfanity = (text) => {
   if (!text || typeof text !== 'string') return text
   const words = text.split(/(\s+)/)
-  const processedWords = words.map(word => {
+  const processedWords = words.map((word) => {
     if (word.trim().length > 0) {
       const normalizedWord = normalizeText(word)
-      const isProfane = profanityList.some(badWord =>
+      const isProfane = profanityList.some((badWord) =>
         normalizedWord.includes(badWord.toLowerCase()),
       )
       if (isProfane) {
