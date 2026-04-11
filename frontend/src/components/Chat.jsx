@@ -84,49 +84,43 @@ const Chat = () => {
           onChannelChange={refetchChannels}
         />
         <div className="col-9 col-md-10 d-flex flex-column h-100">
-          {currentChannel
-            ? (
-              <>
-                <div className="bg-light p-3 border-bottom">
-                  <h5 className="mb-0">
-                    {currentChannel.name === 'general'
-                      ? 'general'
-                      : `# ${currentChannel.name}`}
-                  </h5>
-                </div>
-                <div className="flex-grow-1 overflow-auto p-3">
-                  {channelMessages.length === 0
-                    ? (
-                      <div className="text-center text-muted">
-                        Нет сообщений. Напишите первое!
-                      </div>
-                    )
-                    : (
-                      channelMessages.map(msg => (
-                        <div key={msg.id} className="mb-2">
-                          <strong className="text-primary me-2">
-                            {msg.username}
-                          </strong>
-                          :
-                          <span>{msg.body}</span>
-                        </div>
-                      ))
-                    )}
-                </div>
-                <MessageForm
-                  currentChannelId={currentChannelId}
-                  onMessageSent={addOptimisticMessage}
-                />
-              </>
-            )
-            : (
-              <div className="d-flex align-items-center justify-content-center h-100">
-                <div className="text-center text-muted">
-                  <h4>Добро пожаловать!</h4>
-                  <p>Выберите канал из списка слева</p>
-                </div>
+          {currentChannel ? (
+            <>
+              <div className="bg-light p-3 border-bottom">
+                <h5 className="mb-0">
+                  {currentChannel.name === 'general' ? 'general' : `# ${currentChannel.name}`}
+                </h5>
               </div>
-            )}
+              <div className="flex-grow-1 overflow-auto p-3">
+                {channelMessages.length === 0 ? (
+                  <div className="text-center text-muted">
+                    Нет сообщений. Напишите первое!
+                  </div>
+                ) : (
+                  channelMessages.map((msg) => (
+                    <div key={msg.id} className="mb-2">
+                      <strong className="text-primary me-2">
+                        {msg.username}
+                      </strong>
+                      :
+                      <span>{msg.body}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+              <MessageForm
+                currentChannelId={currentChannelId}
+                onMessageSent={addOptimisticMessage}
+              />
+            </>
+          ) : (
+            <div className="d-flex align-items-center justify-content-center h-100">
+              <div className="text-center text-muted">
+                <h4>Добро пожаловать!</h4>
+                <p>Выберите канал из списка слева</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
